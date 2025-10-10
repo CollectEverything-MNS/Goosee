@@ -3,11 +3,11 @@
     "private": true,
     "scripts": {
         "install:project": "./scripts/install-project.sh",
-        "start:dev": "docker compose --env-file env/.env.dev -f docker/docker-compose.yml -f docker/dev/docker-compose.api.dev.yml -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml up --build",
-        "stop:dev": "docker compose --env-file env/.env.dev -f docker/docker-compose.yml -f docker/dev/docker-compose.api.dev.yml -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml down",
+        "start:dev": "docker compose --env-file env/.env.dev -f docker/docker-compose.yml -f docker/dev/docker-compose.api.dev.yml -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.services.dev.yml up --build",
+        "stop:dev": "docker compose --env-file env/.env.dev -f docker/docker-compose.yml -f docker/dev/docker-compose.api.dev.yml -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.services.dev.yml down",
         "restart:dev": "yarn stop:dev && yarn start:dev",
-        "start:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml up --build -d",
-        "stop:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml down",
+        "start:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml -f docker/prod/docker-compose.services.prod.yml up --build -d",
+        "stop:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml -f docker/prod/docker-compose.services.prod.yml down",
         "restart:prod": "yarn stop:prod && yarn start:prod"
     },
     "workspaces": [
