@@ -1,0 +1,20 @@
+{
+    "name": "goosee",
+    "version": "1.0.0",
+    "description": "A project for Metz Numeric School",
+    "main": "index.js",
+    "scripts": {
+        "start:dev": "docker compose --env-file env/.env.dev -f docker/docker-compose.yml -f docker/dev/docker-compose.api.dev.yml -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml up --build",
+        "stop:dev": "docker compose --env-file env/.env.dev -f docker/docker-compose.yml -f docker/dev/docker-compose.api.dev.yml -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml down",
+        "restart:dev": "yarn stop:dev && yarn start:dev",
+        "start:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml up --build -d",
+        "stop:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml down",
+        "restart:prod": "yarn stop:prod && yarn start:prod"
+    },
+    "keywords": [],
+    "author": "Romain GILOT, Alexandre CERF, Florent BERNAR, Baptiste COLLINOT, Seynabou BA KANE",
+    "license": "ISC",
+    "dependencies": {},
+    "devDependencies": {},
+    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

@@ -1,0 +1,13 @@
+services:
+    goosee-vitrine-prod:
+        build:
+            context: ../apps/front/goosee-vitrine
+            dockerfile: Dockerfile
+        command: yarn start
+        ports:
+            - "3020:3000"
+        environment:
+            NEXT_PUBLIC_API_GATEWAY_URL: ${NEXT_PUBLIC_API_GATEWAY_URL}
+            NODE_ENV: ${NODE_ENV}
+        networks:
+            - goosee_net
