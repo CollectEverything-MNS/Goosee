@@ -1,0 +1,62 @@
+name: 🔔 Discord Commit Notifications
+
+on:
+    push:
+        branches:
+            - "**"
+    pull_request:
+        types: [closed]
+
+jobs:
+    notify-discord:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📦 Checkout
+              uses: actions/checkout@v4
+
+            - name: 📢 Send commit message to Discord
+              env:
+                  GENERAL_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_GENERAL }}
+                  WEBHOOK_ROMAIN: ${{ secrets.DISCORD_WEBHOOK_ROMAIN }}
+                  WEBHOOK_FLO: ${{ secrets.DISCORD_WEBHOOK_FLO }}
+                  WEBHOOK_ALEX: ${{ secrets.DISCORD_WEBHOOK_ALEX }}
+                  WEBHOOK_BAPTISTE: ${{ secrets.DISCORD_WEBHOOK_BAPTISTE }}
+                  WEBHOOK_SEYNA: ${{ secrets.DISCORD_WEBHOOK_SEYNA }}
+
+                  AUTHOR: ${{ github.actor }}
+                  MESSAGE: ${{ github.event.head_commit.message }}
+                  URL: ${{ github.event.head_commit.url }}
+                  BRANCH: ${{ github.ref_name }}
+
+              run: |
+                  echo "Auteur GitHub détecté : $AUTHOR"
+
+                  case "$AUTHOR" in
+                    "Rom1GL-dev") WEBHOOK=$WEBHOOK_ROMAIN; COLOR=3447003 ;;     
+                    "FloBer57") WEBHOOK=$WEBHOOK_FLO; COLOR=15158332 ;;          
+                    "AlexandreCerf") WEBHOOK=$WEBHOOK_ALEX; COLOR=5763719 ;;   
+                    "decazed") WEBHOOK=$WEBHOOK_BAPTISTE; COLOR=3066993 ;; 
+                    "SeynabouBK") WEBHOOK=$WEBHOOK_SEYNA; COLOR=15844367 ;;    
+                    *) WEBHOOK=$GENERAL_WEBHOOK; COLOR=10181046 ;;             
+                  esac
+
+                  PAYLOAD="{
+                    \"embeds\": [{
+                      \"title\": \"📦 Nouveau commit sur $BRANCH\",
+                      \"description\": \"**Auteur :** [$AUTHOR](https://github.com/$AUTHOR)\n**Message :** $MESSAGE\n[🔗 Voir le commit]($URL)\",
+                      \"color\": $COLOR
+                    }]
+                  }"
+
+                  echo "➡️ Envoi du message Discord..."
+
+                  curl -H "Content-Type: application/json" \
+                    -X POST \
+                    -d "$PAYLOAD" \
+                    $WEBHOOK
+
+                  curl -H "Content-Type: application/json" \
+                    -X POST \
+                    -d "$PAYLOAD" \
+                    $GENERAL_WEBHOOK
