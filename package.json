@@ -8,7 +8,8 @@
         "restart:dev": "yarn stop:dev && yarn start:dev",
         "start:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml -f docker/prod/docker-compose.services.prod.yml up --build -d",
         "stop:prod": "docker compose --env-file env/.env.prod -f docker/docker-compose.yml -f docker/prod/docker-compose.api.prod.yml -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml -f docker/prod/docker-compose.services.prod.yml down",
-        "restart:prod": "yarn stop:prod && yarn start:prod"
+        "restart:prod": "yarn stop:prod && yarn start:prod",
+        "prepare": "husky install"
     },
     "workspaces": [
         "apps/*",

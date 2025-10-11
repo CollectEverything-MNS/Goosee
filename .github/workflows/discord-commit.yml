@@ -1,4 +1,4 @@
-name: 🔔 Discord Commit Notifications
+name: Discord Commit Notifications
 
 on:
     push:
@@ -12,10 +12,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: 📦 Checkout
+            - name: Checkout
               uses: actions/checkout@v4
 
-            - name: 📢 Send commit message to Discord
+            - name: Send commit message to Discord
               env:
                   GENERAL_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_GENERAL }}
                   WEBHOOK_ROMAIN: ${{ secrets.DISCORD_WEBHOOK_ROMAIN }}
