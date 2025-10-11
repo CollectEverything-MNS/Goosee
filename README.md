@@ -61,4 +61,4 @@ yarn restart:prod
 
 ## Documentation
 
--   [Structure du projet](docs/README.md)
+-   [Structure du projet](docs/structure.md)
