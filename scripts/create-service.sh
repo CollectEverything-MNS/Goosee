@@ -31,26 +31,17 @@ if [ -d "$NEW_SERVICE_DIR" ]; then
   exit 1
 fi
 
-# Copie du template
-echo "📁 Copie du template vers ${NEW_SERVICE_DIR}..."
-cp -R "$TEMPLATE_DIR" "$NEW_SERVICE_DIR"
+# Copie du template sans node_modules ni dist
+echo "📁 Copie du template vers ${NEW_SERVICE_DIR} (sans node_modules ni dist)..."
+rsync -av --progress "$TEMPLATE_DIR/" "$NEW_SERVICE_DIR" \
+  --exclude "node_modules" \
+  --exclude "dist"
 
 # Mise à jour du package.json
 if [ -f "${NEW_SERVICE_DIR}/package.json" ]; then
   echo "🧩 Mise à jour du package.json..."
   sed -i.bak "s/\"name\": \".*\"/\"name\": \"${SERVICE_NAME}\"/" "${NEW_SERVICE_DIR}/package.json"
   rm "${NEW_SERVICE_DIR}/package.json.bak"
-fi
-
-# Suppression des node_modules et dist du template (si présents)
-if [ -d "${NEW_SERVICE_DIR}/node_modules" ]; then
-  echo "🧹 Suppression des node_modules du template..."
-  rm -rf "${NEW_SERVICE_DIR}/node_modules"
-fi
-
-if [ -d "${NEW_SERVICE_DIR}/dist" ]; then
-  echo "🧹 Suppression du dossier dist du template..."
-  rm -rf "${NEW_SERVICE_DIR}/dist"
 fi
 
 # Nettoyage
