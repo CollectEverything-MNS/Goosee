@@ -1,37 +1,11 @@
 services:
-    goosee-vitrine-dev:
+    front-dev:
         build:
-            context: ../apps/front/goosee-vitrine
+            context: ../templates/front
             dockerfile: Dockerfile.dev
         command: yarn dev
         ports:
             - "3000:3000"
-        environment:
-            NEXT_PUBLIC_API_GATEWAY_URL: ${NEXT_PUBLIC_API_GATEWAY_URL}
-            NODE_ENV: ${NODE_ENV}
-        networks:
-            - goosee_net
-
-    goosee-client-vitrine-dev:
-        build:
-            context: ../apps/front/goosee-client-vitrine
-            dockerfile: Dockerfile.dev
-        command: yarn dev
-        ports:
-            - "3001:3000"
-        environment:
-            NEXT_PUBLIC_API_GATEWAY_URL: ${NEXT_PUBLIC_API_GATEWAY_URL}
-            NODE_ENV: ${NODE_ENV}
-        networks:
-            - goosee_net
-
-    goosee-client-admin-dev:
-        build:
-            context: ../apps/front/goosee-client-vitrine
-            dockerfile: Dockerfile.dev
-        command: yarn dev
-        ports:
-            - "3002:3000"
         environment:
             NEXT_PUBLIC_API_GATEWAY_URL: ${NEXT_PUBLIC_API_GATEWAY_URL}
             NODE_ENV: ${NODE_ENV}
