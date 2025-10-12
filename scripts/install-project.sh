@@ -3,19 +3,15 @@ set -e
 
 # Install Front dependencies
 echo "-----------------------------------------------------------------"
-echo "📦 Installation des dépendances du projet : Front Goosee Vitrine"
+echo "📦 Installation des dépendances du projet de front"
 echo "-----------------------------------------------------------------"
-cd apps/front/goosee-vitrine && yarn install && cd ../../../
+cd apps/front/ && yarn install && cd ../../../
 
+# Install Service dependencies
 echo "-----------------------------------------------------------------"
-echo "📦 Installation des dépendances du projet : Goosee Client Admin"
+echo "📦 Installation du micro service : _template"
 echo "-----------------------------------------------------------------"
-cd apps/front/goosee-client-admin && yarn install && cd ../../../
-
-echo "-----------------------------------------------------------------"
-echo "📦 Installation des dépendances du projet : Goosee Admin Vitrine"
-echo "-----------------------------------------------------------------"
-cd apps/front/goosee-client-vitrine && yarn install && cd ../../../
+cd apps/back/_template && yarn install && cd ../../../
 
 
 echo "✅ Installation complete."

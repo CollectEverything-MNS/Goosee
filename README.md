@@ -61,4 +61,5 @@ yarn restart:prod
 
 ## Documentation
 
--   [Structure du projet](docs/structure.md)
+-   [Structure du projet](docs/structure-projet.md)
+-   [Structure d'un micro service](docs/structure-micro-service.md)
