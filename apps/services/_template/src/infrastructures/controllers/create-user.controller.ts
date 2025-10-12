@@ -1,8 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { CreateUserDto } from './../../applications/dtos/create-user.dto';
-import { CreateUserUseCase } from './../../applications/usecases/create-user.usecase';
+import { routesConfig } from 'src/config/routes.config';
+import { CreateUserDto } from '../../applications/dtos/create-user.dto';
+import { CreateUserUseCase } from '../../applications/usecases/create-user.usecase';
 
-@Controller('users')
+@Controller(routesConfig.user.root)
 export class CreateUserController {
   constructor(private readonly createUser: CreateUserUseCase) {}
 

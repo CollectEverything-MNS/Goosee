@@ -1,7 +1,7 @@
 import { User } from '../entities/user.entity';
 
-export interface IUserRepository {
-  save(user: User): Promise<User>;
-  findAll(): Promise<User[]>;
-  deleteById(id: string): Promise<void>;
+export abstract class IUserRepository {
+  abstract save(user: User): Promise<User>;
+  abstract findAll(): Promise<User[]>;
+  abstract deleteById(id: string): Promise<void>;
 }
