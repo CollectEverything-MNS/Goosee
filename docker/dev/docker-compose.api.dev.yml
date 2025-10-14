@@ -1,0 +1,12 @@
+services:
+    api-gateway-dev:
+        build:
+            context: ../templates/back/api-gateway
+            dockerfile: Dockerfile.dev
+        command: yarn dev
+        ports:
+            - "3001:3000"
+        environment:
+            NODE_ENV: ${NODE_ENV}
+        networks:
+            - goosee_net
