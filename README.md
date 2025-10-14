@@ -1,6 +1,4 @@
-# Goosee Project
-
-Projet fil rouge réalisé dans le cadre du Mastère Management en Ingénienerie Informatique
+# Goosee Generator
 
 ## Installer de le projet
 
@@ -38,28 +36,9 @@ yarn stop:dev
 yarn restart:dev
 ```
 
-### Environnement de production
-
--   Créer le fichier `.env.prod` dans
--   Démarrer le projet
-
-```
-yarn start:prod
-```
-
--   Éteindre le projet
-
-```
-yarn stop:prod
-```
-
--   Redémarrer le projet
-
-```
-yarn restart:prod
-```
-
 ## Documentation
 
+-   [Fonctionnement](docs/fonctionnement.md)
 -   [Structure du projet](docs/structure-projet.md)
 -   [Structure d'un micro service](docs/structure-micro-service.md)
+-   [Structure de l'api gateway](docs/structure-api-gateway.md)

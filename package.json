@@ -1,5 +1,5 @@
 {
-    "name": "goosee-monorepo",
+    "name": "goosee-generator",
     "private": true,
     "scripts": {
         "install:project": "./scripts/install-project.sh",

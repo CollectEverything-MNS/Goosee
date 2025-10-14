@@ -2,14 +2,11 @@
 
 ```
 GOOSEE/
-├── apps/
-│   ├── api-gateway/                # API Gateway NestJS — point d’entrée des microservices
-│   └── front/
-│       ├── goosee-client-admin/    # Front back-office client (Next.js)
-│       ├── goosee-client-vitrine/  # Front public client (Next.js)
-│       └── goosee-vitrine/         # Front principal Goosee (Next.js)
-│
-├── services/                       # Dossier des microservices NestJS (ex: user-service, auth-service…)
+├── templates/
+│   ├── front/                      # Front (Admin et web du site client)
+│   └── back/
+│       ├── api-gateway/            # Projet de l'API Gateway
+│       └── services/               # Dossier qui contient tous les micro services
 │
 ├── docker/
 │   ├── dev/                        # Configs Docker Compose pour l'environnement de développement
@@ -21,6 +18,7 @@ GOOSEE/
 │   └── .env.prod                   # Variables d'environnement de production
 │
 ├── scripts/
+│   ├── create-service.sh           # Script de génération d'un micro service configuré
 │   └── install-project.sh          # Script d’installation multi-projets
 │
 ├── docs/                           # Documentation technique et fonctionnelle
