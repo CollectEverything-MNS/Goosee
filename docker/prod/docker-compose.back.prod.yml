@@ -1,0 +1,40 @@
+services:
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ../../templates/back/api-gateway
+      dockerfile: Dockerfile
+    command: node dist/main
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+    depends_on:
+      - user-service
+    networks:
+      - goosee_net
+
+  user-service:
+    container_name: user-service
+    build:
+      context: ../../templates/back/services/_template
+      dockerfile: Dockerfile
+    command: node dist/main
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+    expose:
+      - "${USER_SERVICE_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${USER_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+networks:
+  goosee_net:
+    driver: bridge

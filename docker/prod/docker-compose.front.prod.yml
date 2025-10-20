@@ -1,7 +1,7 @@
 services:
     front-prod:
         build:
-            context: ../templates/front
+            context: ../../templates/front
             dockerfile: Dockerfile
         command: yarn start
         ports:
