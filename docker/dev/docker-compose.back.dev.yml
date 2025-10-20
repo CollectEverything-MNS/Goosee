@@ -1,6 +1,6 @@
 services:
-  api-gateway:
-    container_name: api-gateway
+  goosee-api-gateway-dev:
+    container_name: goosee-api-gateway-dev
     build:
       context: ../../templates/back/api-gateway
       dockerfile: Dockerfile.dev
@@ -10,13 +10,14 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
     depends_on:
-      - user-service
+      - goosee-user-service-dev
     networks:
       - goosee_net
 
-  user-service:
-    container_name: user-service
+  goosee-user-service-dev:
+    container_name: goosee-user-service-dev
     build:
       context: ../../templates/back/services/_template
       dockerfile: Dockerfile.dev

@@ -1,5 +1,5 @@
 services:
-    front-dev:
+    goosee-front-dev:
         container_name: goosee-front-dev
         build:
             context: ../../templates/front

@@ -1,5 +1,6 @@
 services:
-    front-prod:
+    groosee-front-prod:
+        container_name: goosee-front-prod
         build:
             context: ../../templates/front
             dockerfile: Dockerfile
