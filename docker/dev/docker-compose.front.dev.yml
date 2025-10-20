@@ -1,5 +1,6 @@
 services:
     front-dev:
+        container_name: goosee-front-dev
         build:
             context: ../templates/front
             dockerfile: Dockerfile.dev

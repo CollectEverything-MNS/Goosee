@@ -1,9 +1,10 @@
 {
-  "name": "micro-service-goosee",
+  "name": "_template",
   "version": "0.0.1",
   "description": "",
   "author": "",
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
@@ -23,6 +24,7 @@
     "@nestjs/common": "^11.1.6",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/microservices": "^11.1.6",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
     "crypto": "^1.0.1",

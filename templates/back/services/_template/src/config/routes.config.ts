@@ -1,6 +1,6 @@
 export const routesConfig = {
   user: {
-    root: '/users',
-    byId: '/users/:id',
+    root: '/user',
+    byId: '/user/:id',
   },
 };

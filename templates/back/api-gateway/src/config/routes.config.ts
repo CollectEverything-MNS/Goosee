@@ -1,6 +1,8 @@
+const userBasePath = '/user';
+
 export const routesConfig = {
   user: {
-    root: '/users',
-    byId: '/users/:id',
+    root: userBasePath,
+    byId: `${userBasePath}/:id`,
   },
 };

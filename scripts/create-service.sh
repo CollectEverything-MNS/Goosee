@@ -2,8 +2,8 @@
 set -e
 
 # --- CONFIG ---
-TEMPLATE_DIR="apps/back/services/_template"
-TARGET_DIR="apps/back/services"
+TEMPLATE_DIR="templates/back/services/_template"
+TARGET_DIR="templates/back/services"
 # ---------------
 
 # Vérification des arguments
