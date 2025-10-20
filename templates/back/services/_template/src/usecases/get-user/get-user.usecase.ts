@@ -7,12 +7,12 @@ import { GetUserDto } from './get-user.dto';
 export class GetUserUseCase {
   constructor(private readonly userRepo: IUserRepository) {}
 
-  async execute(dto: GetUserDto): Promise<User> {
-    const newUser = new User({
-      name: dto.name,
-      email: dto.email,
-    });
+  async execute(id: string) {
+    return {
+      id: id,
+      name: "Romain",
+      email: "Test",
+    };
 
-    return this.userRepo.save(newUser);
   }
 }

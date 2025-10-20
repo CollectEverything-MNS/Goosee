@@ -2,7 +2,7 @@ services:
     front-dev:
         container_name: goosee-front-dev
         build:
-            context: ../templates/front
+            context: ../../templates/front
             dockerfile: Dockerfile.dev
         command: yarn dev
         ports:

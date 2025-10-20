@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { InMemoryUserRepository } from './repositories/implements/user.impl.repository';
 import { IUserRepository } from './repositories/user.repository';
-import { CreateUserController } from './usecases/create-user/create-user.controller';
-import { CreateUserUseCase } from './usecases/create-user/create-user.usecase';
+import { GetUserController } from "./usecases/get-user/get-user.controller";
+import { GetUserUseCase } from "./usecases/get-user/get-user.usecase";
 
 @Module({
   imports: [
@@ -11,13 +11,13 @@ import { CreateUserUseCase } from './usecases/create-user/create-user.usecase';
       isGlobal: true,
     }),
   ],
-  controllers: [CreateUserController],
+  controllers: [GetUserController],
   providers: [
     {
       provide: IUserRepository,
       useClass: InMemoryUserRepository,
     },
-    CreateUserUseCase,
+      GetUserUseCase
   ],
 })
 export class AppModule {}

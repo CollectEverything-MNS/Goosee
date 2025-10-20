@@ -1,38 +1,21 @@
 import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import 'reflect-metadata';
 import { AppModule } from './app.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-
-  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
-  const httpPort = configService.get<number>('SERVICE_PORT', 3003);
-  const tcpPort = configService.get<number>('TCP_PORT', 3004);
-
-  // 🔹 Logger selon l'environnement
-  if (nodeEnv === 'development') {
-    app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
-  } else {
-    app.useLogger(['error', 'warn']);
-  }
-
-  // 🔹 Lancer le microservice TCP
-  app.connectMicroservice<MicroserviceOptions>({
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     transport: Transport.TCP,
-    options: { host: '0.0.0.0', port: tcpPort },
+    options: {
+      host: process.env.HOST || '0.0.0.0',
+      port: Number(process.env.USER_SERVICE_PORT) || 3003,
+    },
   });
 
-  await app.startAllMicroservices();
-  await app.listen(httpPort);
-
-  const logger = new Logger('Bootstrap');
-  logger.log('🚀 User Service démarré');
-  logger.log(`   → HTTP: http://localhost:${httpPort}`);
-  logger.log(`   → TCP: ${tcpPort}`);
+  const logger = new Logger('UserService');
+  await app.listen();
+  logger.log(`🚀 User Service is running`);
+  logger.log(`   TCP: 0.0.0.0:${process.env.USER_SERVICE_PORT || 3003}`);
 }
 
 bootstrap();

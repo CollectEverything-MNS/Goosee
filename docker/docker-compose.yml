@@ -1,5 +1,0 @@
-name: goosee
-
-networks:
-    goosee_net:
-        driver: bridge
