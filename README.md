@@ -42,5 +42,5 @@ _Cliquez Sur le lien pour voir en détail._
 
 -   [Fonctionnement](docs/fonctionnement.md)
 -   [Structure du projet](docs/structure-projet.md)
--   [Structure d'un micro service](docs/structure-micro-service.md)
--   [Structure de l'api gateway](docs/structure-api-gateway.md)
+-   [Structure d'un micro service](docs/back/1-structure-micro-service)
+-   [Structure de l'api gateway](docs/back/2-structure-api-gateway)
