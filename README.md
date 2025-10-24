@@ -45,6 +45,6 @@ _Cliquez Sur le lien pour voir en détail._
 ----
 -   [1. Structure d'un micro service](docs/back/1-structure-micro-service.md)
 -   [2. Structure de l'api gateway](docs/back/2-structure-api-gateway.md)
--   [3. Création d'un micro service](docs/back/3-creation-micro-service-script.md)
--   [4. Création d'un micro service](docs/back/4-creation-micro-service-main.md)
--   [5. Création d'une API Gateway](docs/back/5-creation-api-gateway-main.md)
+-   [3. Création d'un micro service avec le script](docs/back/3-creation-micro-service-script.md)
+-   [4. Création d'un micro service à la main](docs/back/4-creation-micro-service-main.md)
+-   [5. Création d'une API Gateway à la main](docs/back/5-creation-api-gateway-main.md)
