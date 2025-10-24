@@ -1,21 +1,22 @@
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-    transport: Transport.TCP,
-    options: {
-      host: process.env.HOST || '0.0.0.0',
-      port: Number(process.env.USER_SERVICE_PORT) || 3003,
-    },
-  });
+  const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+  const port = Number(process.env.USER_SERVICE_PORT);
+
+  if(!port) {
+    throw new Error('USER_SERVICE_PORT is not defined');
+  }
+  
+  await app.listen(port);
 
   const logger = new Logger('UserService');
-  await app.listen();
-  logger.log(`🚀 User Service is running`);
-  logger.log(`   TCP: 0.0.0.0:${process.env.USER_SERVICE_PORT || 3003}`);
+  logger.log(`🚀 User Service is running on http://localhost:${port}/api`);
 }
 
 bootstrap();

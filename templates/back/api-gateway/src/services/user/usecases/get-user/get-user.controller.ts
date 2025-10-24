@@ -1,18 +1,17 @@
-import { Controller, Get, Param, Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { GetUserService } from './get-user.service';
 import { routesConfig } from '../../../../config/routes.config';
 
-@ApiTags('User')
+@ApiTags('Users')
 @Controller()
 export class GetUserController {
-    constructor(@Inject('USER_SERVICE') private readonly userService: ClientProxy) {}
+    constructor(private readonly getUserService: GetUserService) {}
 
-    @Get(routesConfig.user.byId)
-    @ApiOperation({ summary: "Récupère les informations de l'utilisateur" })
-    @ApiParam({ name: 'id', description: "ID de l'utilisateur", example: '123' })
+    @Get(routesConfig.user.byId.path)
+    @ApiOperation({ summary: "Récupère les informations d'un utilisateur" })
+    @ApiParam({ name: 'id', example: '123' })
     async getUser(@Param('id') id: string) {
-       return firstValueFrom(this.userService.send({ cmd: 'getUser' }, { id }));
+        return this.getUserService.execute(id);
     }
 }
