@@ -48,3 +48,5 @@ _Cliquez Sur le lien pour voir en détail._
 -   [3. Création d&apos;un micro service avec le script](docs/back/3-creation-micro-service-script.md)
 -   [4. Création d&apos;un micro service à la main](docs/back/4-creation-micro-service-main.md)
 -   [5. Création d&apos;une API Gateway à la main](docs/back/5-creation-api-gateway-main.md)
+-   [6. Création des variables d&apos;environnement](docs/back/6-env-configuration.md)
+-   [7. Création du Docker compose](docs/back/7-docker-compose-back.md)
