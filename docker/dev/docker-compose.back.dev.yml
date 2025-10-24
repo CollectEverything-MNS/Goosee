@@ -11,8 +11,6 @@ services:
       NODE_ENV: ${NODE_ENV}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
-      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
-      ORDER_SERVICE_HOST: ${ORDER_SERVICE_HOST}
     depends_on:
       - goosee-user-service-dev
     networks:
@@ -31,27 +29,6 @@ services:
       - "${USER_SERVICE_PORT}"
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${USER_SERVICE_PORT}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-      start_period: 5s
-    networks:
-      - goosee_net
-
-
-  goosee-order-service-dev:
-    container_name: goosee-order-service-dev
-    build:
-      context: ../../templates/back/services/order-service
-      dockerfile: Dockerfile.dev
-    command: yarn dev
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
-    expose:
-      - "${ORDER_SERVICE_PORT}"
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost ${ORDER_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10

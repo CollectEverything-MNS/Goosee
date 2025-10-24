@@ -74,13 +74,36 @@ else
   echo "⚠️  Fichier $ENV_FILE introuvable, variables non ajoutées."
 fi
 
+# --- AJOUT AUTOMATIQUE DES ENV DANS L'API GATEWAY ---
+if [ -f "$DOCKER_COMPOSE_FILE" ]; then
+  echo "🔄 Ajout des variables du nouveau service dans goosee-api-gateway-dev..."
+
+  if grep -q "goosee-api-gateway-dev:" "$DOCKER_COMPOSE_FILE"; then
+    awk -v e="$SERVICE_ENV_NAME" '
+      BEGIN {in_gateway=0}
+      /^  goosee-api-gateway-dev:/ {in_gateway=1}
+      in_gateway && /^[[:space:]]+environment:/ {
+        print;
+        print "      " e "_HOST: ${" e "_HOST}";
+        print "      " e "_PORT: ${" e "_PORT}";
+        in_gateway=0;
+        next
+      }
+      {print}
+    ' "$DOCKER_COMPOSE_FILE" > "${DOCKER_COMPOSE_FILE}.tmp" && mv "${DOCKER_COMPOSE_FILE}.tmp" "$DOCKER_COMPOSE_FILE"
+
+    echo "✅ Variables ${SERVICE_ENV_NAME}_HOST et ${SERVICE_ENV_NAME}_PORT ajoutées à goosee-api-gateway-dev."
+  else
+    echo "⚠️  Service goosee-api-gateway-dev introuvable dans $DOCKER_COMPOSE_FILE, ajout manuel requis."
+  fi
+fi
+
 # --- AJOUT AUTOMATIQUE AU DOCKER-COMPOSE ---
 if [ -f "$DOCKER_COMPOSE_FILE" ]; then
   echo "🐳 Mise à jour du fichier docker-compose.back.dev.yml..."
 
   SERVICE_CONTAINER="goosee-${SERVICE_NAME}-dev"
 
-  # Vérifie si le service existe déjà dans le docker-compose
   if grep -q "${SERVICE_CONTAINER}:" "$DOCKER_COMPOSE_FILE"; then
     echo "⚠️  Le service '${SERVICE_CONTAINER}' existe déjà dans docker-compose. Aucun ajout effectué."
   else
@@ -88,7 +111,7 @@ if [ -f "$DOCKER_COMPOSE_FILE" ]; then
       echo "🔧 Insertion du nouveau service dans docker-compose..."
 
       awk -v f="$NEW_SERVICE_DIR" -v s="$SERVICE_NAME" -v e="$SERVICE_ENV_NAME" '
-        /^networks:/ {   # Match uniquement la ligne principale sans indentation
+        /^networks:/ {
           print "";
           print "  goosee-" s "-dev:";
           print "    container_name: goosee-" s "-dev";
