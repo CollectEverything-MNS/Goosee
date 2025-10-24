@@ -16,7 +16,7 @@ async function bootstrap() {
   await app.listen(port);
 
   const logger = new Logger('UserService');
-  logger.log(`🚀 User Service is running on http://localhost:${port}/api`);
+  logger.log(`🚀 User Service is running on http://localhost:${port}`);
 }
 
 bootstrap();
