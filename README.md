@@ -42,8 +42,9 @@ _Cliquez Sur le lien pour voir en détail._
 
 -   [Fonctionnement](docs/fonctionnement.md)
 -   [Structure du projet](docs/structure-projet.md)
--   [Structure d'un micro service](docs/back/1-structure-micro-service.md)
--   [Structure de l'api gateway](docs/back/2-structure-api-gateway.md)
--   [Création d'un micro service](docs/back/3-creation-micro-service-script.md)
--   [Création d'un micro service](docs/back/4-creation-micro-service-main.md)
--   [Création d'une API Gateway](docs/back/5-creation-api-gateway-main.md)
+----
+-   [1. Structure d'un micro service](docs/back/1-structure-micro-service.md)
+-   [2. Structure de l'api gateway](docs/back/2-structure-api-gateway.md)
+-   [3. Création d'un micro service](docs/back/3-creation-micro-service-script.md)
+-   [4. Création d'un micro service](docs/back/4-creation-micro-service-main.md)
+-   [5. Création d'une API Gateway](docs/back/5-creation-api-gateway-main.md)
