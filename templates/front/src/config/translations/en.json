@@ -1,0 +1,62 @@
+{
+  "admin": {
+    "search": "Search...",
+    "noResults": "No results found",
+    "previous": "Previous",
+    "next": "Next",
+    "columns": "Columns",
+    "actions": "Actions",
+    "display": "Show",
+    "lines": "lines",
+    "cancel": "Cancel",
+    "profileDropdown": {
+      "settings": "Settings",
+      "support": "Support",
+      "logout": "Logout"
+    },
+    "login": {
+      "title": "Goosee Administration",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot Password?",
+      "loginButton": "Log In"
+    },
+    "sidebar": {
+      "toggleSidebar": "Toggle sidebar",
+      "dashboard": "Dashboard",
+      "products": {
+        "label": "Products",
+        "categories": "Categories",
+        "productsStock": "Products / Stock"
+      },
+      "orders": {
+        "label": "Orders",
+        "history": "History"
+      },
+      "clients": {
+        "label": "Clients",
+        "returnClients": "Customer Returns"
+      },
+      "personnalisation": {
+        "label": "Customization",
+        "pages": "Pages",
+        "templates": "Templates"
+      },
+      "access": {
+        "label": "Access",
+        "users": "Users",
+        "roles": "Roles"
+      },
+      "logout": "Logout"
+    },
+    "pages": {
+      "addNewPage": "Add New Page",
+      "table": {
+        "title": "Title",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    }
+
+  }
+}

@@ -11,6 +11,7 @@ import { GetUserService } from './usecases/get-user/get-user.service';
     ],
     controllers: [
         GetUserController,
+
     ],
     providers: [
         GetUserService,

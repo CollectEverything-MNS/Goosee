@@ -1,9 +1,10 @@
-import type { NextConfig } from 'next';
+import { NextConfig } from 'next'
+import createNextIntlPlugin from 'next-intl/plugin'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   compiler: {
-    removeConsole: true
+    removeConsole: true,
   },
   devIndicators: false,
 
@@ -12,15 +13,15 @@ const nextConfig: NextConfig = {
       {
         protocol: 'http',
         hostname: 'localhost',
-        pathname: '**'
+        pathname: '**',
       },
       {
         protocol: 'http',
         hostname: '127.0.0.1',
-        pathname: '**'
+        pathname: '**',
       },
-    ]
-  }
-};
-
-export default nextConfig;
+    ],
+  },
+}
+const withNextIntl = createNextIntlPlugin()
+export default withNextIntl(nextConfig)

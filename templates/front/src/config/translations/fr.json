@@ -1,0 +1,61 @@
+{
+  "admin": {
+    "search": "Rechercher...",
+    "noResults": "Aucun résultat trouvé",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "columns": "Colonnes",
+    "display": "Afficher",
+    "lines": "lignes",
+    "cancel": "Annuler",
+    "profileDropdown": {
+      "settings": "Paramètres",
+      "support": "Support",
+      "logout": "Déconnexion"
+    },
+    "login": {
+        "title": "Goose Administration",
+        "email": "Email",
+        "password": "Mot de passe",
+        "forgotPassword": "Mot de passe oublié ?",
+        "loginButton": "Se connecter"
+    },
+    "sidebar": {
+      "toggleSidebar": "Basculer la barre latérale",
+
+      "dashboard": "Tableau de bord",
+      "products": {
+        "label": "Produits",
+        "categories": "Catégories",
+        "productsStock": "Produits / Stocks"
+      },
+      "orders": {
+        "label": "Commandes",
+        "history": "Historiques"
+      },
+      "clients": {
+        "label": "Clients",
+        "returnClients": "Retour clients"
+      },
+      "personnalisation": {
+        "label": "Personnalisation",
+        "pages": "Pages",
+        "templates": "Templates"
+      },
+      "access": {
+        "label": "Accès",
+        "users": "Utilisateurs",
+        "roles": "Rôles"
+      },
+      "logout": "Déconnexion"
+    },
+    "pages": {
+      "addNewPage": "Ajouter une page",
+      "table": {
+        "title": "Titre",
+        "status": "Statut",
+        "actions": "Actions"
+      }
+    }
+  }
+}
