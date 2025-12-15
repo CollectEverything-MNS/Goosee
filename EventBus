@@ -1,0 +1,75 @@
+Importer dans le constructeur de consumer:     private readonly eventBus: EventBusService,
+```
+@Injectable()
+export class LogConsumer implements OnModuleInit {
+  constructor(
+    private readonly eventBus: EventBusService,
+    private readonly logger: LogHelper,
+    @Inject('LogServiceInterface') private readonly logService: LogServiceInterface,
+    private readonly dataSource: DataSource,
+  ) {}
+```
+
+Dans la liste des imports 
+
+```
+import { EventBusService } from '@anatix/runtime';
+```
+
+Comment l'utiliser : 
+
+```
+async onModuleInit() {
+    await this.eventBus.on('log.create.requested', this.handleCreateRequested.bind(this)); // Il s'abonne à cet event
+
+    private async handleCreateRequested(payload: LogCreateRequestedEventPayload): Promise<void> {
+        // Traitement de l'event
+  }
+}
+```
+
+Rajouter dans le app module le eventbusmodule 
+
+
+```
+import { OrderEntity } from './repository/order.entity';
+import { OrderItemEntity } from './repository/order-item.entity';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventBusModule } from '@anatix/runtime/event-bus';
+import { OrderApiModule } from './api/order.api.module';
+import { OrderConsumerModule } from './consumer/order.consumer.module';
+// ✨ Naming strategy (PK/FK/UNIQUE/CHECK/INDEX)
+import { AnatixNamingStrategy } from '@anatix/runtime/naming';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV || 'prod'}`,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('ORDER_DB_HOST') ?? 'localhost',
+        port: parseInt(configService.get<string>('ORDER_DB_PORT') ?? '5432', 10),
+        username: configService.get<string>('ORDER_DB_USER') ?? 'postgres',
+        password: configService.get<string>('ORDER_DB_PASSWORD') ?? 'postgres',
+        database: configService.get<string>('ORDER_DB_NAME') ?? 'order_dev',
+        entities: [OrderEntity, OrderItemEntity],
+        synchronize: (configService.get<string>('NODE_ENV') ?? process.env.NODE_ENV) === 'dev',
+        // 👇 clé de voûte: noms stables et courts
+        namingStrategy: new AnatixNamingStrategy(),
+      }),
+      inject: [ConfigService],
+    }),
+    EventBusModule,
+    OrderApiModule,
+    OrderConsumerModule,
+  ],
+})
+export class AppModule {}
+
+```
