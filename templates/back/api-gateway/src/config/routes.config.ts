@@ -1,4 +1,5 @@
 const userBasePath = '/user';
+const authBasePath = '/auth';
 
 export const routesConfig = {
   user: {
@@ -6,6 +7,17 @@ export const routesConfig = {
     byId: {
       path: `${userBasePath}/:id`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${userBasePath}/${id}`,
+    },
+  },
+  auth: {
+    root: authBasePath,
+    login: {
+      path: `${authBasePath}/login`,
+      link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/login`,
+    },
+    register: {
+      path: `${authBasePath}/register`,
+      link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/register`,
     },
   },
 };

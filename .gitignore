@@ -18,7 +18,8 @@ Thumbs.db
 .env.local
 .env.*.local
 .env.prod
-
+.claude/
+CLAUDE.md
 # Build files
 dist/
 build/

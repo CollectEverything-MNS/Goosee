@@ -8,27 +8,37 @@ services:
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       NODE_ENV: ${NODE_ENV}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
     depends_on:
-      - goosee-user-service-dev
+      - goosee-auth-service-dev
     networks:
       - goosee_net
 
-  goosee-user-service-dev:
-    container_name: goosee-user-service-dev
+  goosee-auth-service-dev:
+    container_name: goosee-auth-service-dev
     build:
-      context: ../../templates/back/services/_template
+      context: ../../templates/back/services/auth-service
       dockerfile: Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
-      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      AUTH_DB_HOST: ${AUTH_DB_HOST}
+      AUTH_DB_PORT: ${AUTH_DB_PORT}
+      AUTH_DB_USER: ${AUTH_DB_USER}
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
+      AUTH_DB_NAME: ${AUTH_DB_NAME}
     expose:
-      - "${USER_SERVICE_PORT}"
+      - "${AUTH_SERVICE_PORT}"
+    depends_on:
+      goosee-auth-db-dev:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost ${USER_SERVICE_PORT}"]
+      test: ["CMD-SHELL", "nc -z localhost ${AUTH_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10
