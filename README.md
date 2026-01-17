@@ -11,7 +11,7 @@ git clone git@github.com:CollectEverything-MNS/Goosee.git
 -   Pour développer en local vous pouvez installer les dépendances du projet :
 
 ```
-yarn install:project
+yarn install:project taper ça à la place dans le git bash: ./scripts/install-project.sh
 ```
 
 ## Démarrer le projet sous docker
