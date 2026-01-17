@@ -12,6 +12,7 @@ export class GetUserUseCase {
       id: id,
       name: "Romain",
       email: "Test",
+      // pensons à l utiliser ex: return this.userRepo.findById(id)
     };
 
   }

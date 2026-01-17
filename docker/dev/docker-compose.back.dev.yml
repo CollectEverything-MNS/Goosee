@@ -36,6 +36,11 @@ services:
     networks:
       - goosee_net
 
+# networks:
+#   goosee_net:
+#     driver: bridge
+
 networks:
   goosee_net:
-    driver: bridge
+    external: true
+    name: goosee_net

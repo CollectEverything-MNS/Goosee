@@ -5,13 +5,13 @@ set -e
 echo "-----------------------------------------------------------------"
 echo "📦 Installation des dépendances du projet de front"
 echo "-----------------------------------------------------------------"
-cd apps/front/ && yarn install && cd ../../../
+cd templates/front/ && yarn install && cd ../../
 
 # Install Service dependencies
 echo "-----------------------------------------------------------------"
 echo "📦 Installation du micro service : _template"
 echo "-----------------------------------------------------------------"
-cd apps/back/_template && yarn install && cd ../../../
+cd templates/back/services/_template && yarn install && cd ../../../../
 
 
 echo "✅ Installation complete."
