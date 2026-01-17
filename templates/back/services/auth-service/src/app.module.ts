@@ -11,6 +11,10 @@ import { LoginUseCase } from './usecases/login/login.usecase';
 import { RegisterUseCase } from './usecases/register/register.usecase';
 import { RegisterController } from './usecases/register/register.controller';
 import { LoginController } from './usecases/login/login.controller';
+import { RevokeTokenUseCase } from './usecases/revoke-token/revoke-token.usecase';
+import { RevokeTokenController } from './usecases/revoke-token/revoke-token.controller';
+import { RefreshTokenUseCase } from './usecases/refresh-token/refresh-token.usecase';
+import { RefreshTokenController } from './usecases/refresh-token/refresh-token.controller';
 
 @Module({
   imports: [
@@ -33,7 +37,12 @@ import { LoginController } from './usecases/login/login.controller';
     }),
     TypeOrmModule.forFeature([Auth, AuthToken]),
   ],
-  controllers: [RegisterController, LoginController],
+  controllers: [
+    RegisterController,
+    LoginController,
+    RevokeTokenController,
+    RefreshTokenController,
+  ],
   providers: [
     {
       provide: IAuthRepository,
@@ -45,6 +54,8 @@ import { LoginController } from './usecases/login/login.controller';
     },
     RegisterUseCase,
     LoginUseCase,
+    RevokeTokenUseCase,
+    RefreshTokenUseCase,
   ],
 })
 export class AppModule {}

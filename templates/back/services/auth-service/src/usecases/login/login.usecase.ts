@@ -16,7 +16,7 @@ export class LoginUseCase {
     const auth = await this.authRepo.findByEmail(dto.email);
 
     if (!auth) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('User not found');
     }
 
     const hashedPassword = this.hashPassword(dto.password);

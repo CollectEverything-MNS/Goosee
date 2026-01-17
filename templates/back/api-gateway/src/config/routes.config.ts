@@ -19,5 +19,15 @@ export const routesConfig = {
       path: `${authBasePath}/register`,
       link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/register`,
     },
+    token: {
+      revoke: {
+        path: `${authBasePath}/token/revoke`,
+        link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/token/revoke`,
+      },
+      refresh: {
+        path: `${authBasePath}/token/refresh`,
+        link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/token/refresh`,
+      },
+    },
   },
 };
