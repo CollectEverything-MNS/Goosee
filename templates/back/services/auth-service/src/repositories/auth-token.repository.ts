@@ -6,5 +6,5 @@ export abstract class IAuthTokenRepository {
   abstract findByAuthId(authId: string): Promise<AuthToken[]>;
   abstract deleteByAuthId(authId: string): Promise<void>;
   abstract deleteByToken(token: string): Promise<void>;
-  abstract updateExpiredAt(token: string, expiredAt: Date): Promise<AuthToken>;
+  abstract updateExpiredAt(token: string, expiredAt: Date): Promise<AuthToken | null>;
 }

@@ -5,9 +5,10 @@ import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { serviceUrl } from '../../../../config/services.config';
 import { routesConfig } from '../../../../config/routes.config';
+import { ForgetPasswordConfirmDto } from './forget-password-confirm.dto';
 
 @Injectable()
-export class GetUserService {
+export class ForgetPasswordConfirmService {
   private readonly services;
 
   constructor(
@@ -17,21 +18,21 @@ export class GetUserService {
     this.services = serviceUrl(this.config);
   }
 
-  async execute(id: string) {
-    const url = routesConfig.user.byId.link(this.services.user, id);
+  async execute(dto: ForgetPasswordConfirmDto) {
+    const url = routesConfig.auth.forgetPasswordRequest.link(this.services.auth);
 
     try {
-      const { data } = await firstValueFrom(this.http.get(url));
+      const { data } = await firstValueFrom(this.http.post(url, dto));
       return data;
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         throw new HttpException(
-          error.response.data?.message || 'User not found',
+          error.response.data?.message || 'Forget Password Request failed',
           error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
       throw new HttpException(
-        'User service unavailable',
+        'Auth service unavailable',
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     }

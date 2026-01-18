@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 import { Auth } from '../../entities/auth.entity';
 import { IAuthRepository } from '../../repositories/auth.repository';
 import { RegisterDto, RegisterResponseDto } from './register.dto';
+import { hashPassword } from '../../shared/utils';
 
 @Injectable()
 export class RegisterUseCase {
@@ -15,7 +16,7 @@ export class RegisterUseCase {
       throw new ConflictException('Email already exists');
     }
 
-    const hashedPassword = this.hashPassword(dto.password);
+    const hashedPassword = hashPassword(dto.password);
 
     const auth = new Auth({
       email: dto.email,
@@ -29,9 +30,5 @@ export class RegisterUseCase {
       email: savedAuth.email,
       createdAt: savedAuth.createdAt,
     };
-  }
-
-  private hashPassword(password: string): string {
-    return crypto.createHash('sha256').update(password).digest('hex');
   }
 }

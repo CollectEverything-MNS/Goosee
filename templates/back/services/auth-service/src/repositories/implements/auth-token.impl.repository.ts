@@ -31,7 +31,7 @@ export class TypeOrmAuthTokenRepository implements IAuthTokenRepository {
     await this.repository.delete({ token });
   }
 
-  async updateExpiredAt(token: string, expiredAt: Date): Promise<AuthToken> {
+  async updateExpiredAt(token: string, expiredAt: Date): Promise<AuthToken | null> {
     await this.repository.update({ token }, { expiredAt });
     return this.repository.findOne({ where: { token } });
   }

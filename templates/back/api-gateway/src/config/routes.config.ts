@@ -1,14 +1,6 @@
-const userBasePath = '/user';
 const authBasePath = '/auth';
 
 export const routesConfig = {
-  user: {
-    root: userBasePath,
-    byId: {
-      path: `${userBasePath}/:id`,
-      link: (serviceUrl: string, id: string) => `${serviceUrl}${userBasePath}/${id}`,
-    },
-  },
   auth: {
     root: authBasePath,
     login: {
@@ -19,14 +11,26 @@ export const routesConfig = {
       path: `${authBasePath}/register`,
       link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/register`,
     },
+    changePassword: {
+      path: `${authBasePath}/change-password`,
+      link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/change-password`,
+    },
+    forgetPasswordRequest: {
+      path: `${authBasePath}/forget-password-request`,
+      link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/forget-password-request`,
+    },
+    forgetPasswordConfirm: {
+      path: `${authBasePath}/forget-password-confirm`,
+      link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/forget-password-confirm`,
+    },
     token: {
       revoke: {
-        path: `${authBasePath}/token/revoke`,
-        link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/token/revoke`,
+        path: `${authBasePath}/revoke-token`,
+        link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/revoke-token`,
       },
       refresh: {
-        path: `${authBasePath}/token/refresh`,
-        link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/token/refresh`,
+        path: `${authBasePath}/refresh-token`,
+        link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/refresh-token`,
       },
     },
   },

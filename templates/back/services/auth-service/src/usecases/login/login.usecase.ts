@@ -4,6 +4,7 @@ import { AuthToken } from '../../entities/auth-token.entity';
 import { IAuthRepository } from '../../repositories/auth.repository';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { LoginDto, LoginResponseDto } from './login.dto';
+import { hashPassword } from '../../shared/utils';
 
 @Injectable()
 export class LoginUseCase {
@@ -19,7 +20,7 @@ export class LoginUseCase {
       throw new UnauthorizedException('User not found');
     }
 
-    const hashedPassword = this.hashPassword(dto.password);
+    const hashedPassword = hashPassword(dto.password);
 
     if (auth.password !== hashedPassword) {
       throw new UnauthorizedException('Invalid credentials');
@@ -41,10 +42,6 @@ export class LoginUseCase {
       token,
       expiredAt,
     };
-  }
-
-  private hashPassword(password: string): string {
-    return crypto.createHash('sha256').update(password).digest('hex');
   }
 
   private generateToken(): string {

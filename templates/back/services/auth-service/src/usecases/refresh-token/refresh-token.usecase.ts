@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, BadRequestException, } from '@nestjs/common';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { RefreshTokenDto, RefreshTokenResponseDto } from './refresh-token.dto';
 
@@ -24,6 +24,10 @@ export class RefreshTokenUseCase {
       dto.token,
       newExpiredAt,
     );
+
+    if (!updatedToken) {
+      throw new BadRequestException('Invalid token');
+    }
 
     return {
       token: updatedToken.token,

@@ -15,6 +15,12 @@ import { RevokeTokenUseCase } from './usecases/revoke-token/revoke-token.usecase
 import { RevokeTokenController } from './usecases/revoke-token/revoke-token.controller';
 import { RefreshTokenUseCase } from './usecases/refresh-token/refresh-token.usecase';
 import { RefreshTokenController } from './usecases/refresh-token/refresh-token.controller';
+import { ChangePasswordController } from './usecases/change-password/change-password.controller';
+import { ChangePasswordUseCase } from './usecases/change-password/change-password.usecase';
+import { ForgetPasswordRequestUseCase } from './usecases/forget-password-request/forget-password-request.usecase';
+import { ForgetPasswordConfirmController } from './usecases/forget-password-confirm/forget-password-confirm.controller';
+import { ForgetPasswordRequestController } from './usecases/forget-password-request/forget-password-request.controller';
+import { ForgetPasswordConfirmUseCase } from './usecases/forget-password-confirm/forget-password-confirm.usecase';
 
 @Module({
   imports: [
@@ -42,6 +48,9 @@ import { RefreshTokenController } from './usecases/refresh-token/refresh-token.c
     LoginController,
     RevokeTokenController,
     RefreshTokenController,
+    ChangePasswordController,
+    ForgetPasswordRequestController,
+    ForgetPasswordConfirmController,
   ],
   providers: [
     {
@@ -56,6 +65,9 @@ import { RefreshTokenController } from './usecases/refresh-token/refresh-token.c
     LoginUseCase,
     RevokeTokenUseCase,
     RefreshTokenUseCase,
+    ChangePasswordUseCase,
+    ForgetPasswordRequestUseCase,
+    ForgetPasswordConfirmUseCase
   ],
 })
 export class AppModule {}
