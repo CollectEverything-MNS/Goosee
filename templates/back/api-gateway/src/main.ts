@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,13 +15,11 @@ async function bootstrap() {
     app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
 
     const config = new DocumentBuilder()
-        .setTitle(`Projet Goosee Generator - ${nodeEnv}`)
-        .setDescription(
-            "API Gateway pour le projet Goosee Generator",
-        )
-        .setVersion('1.0')
-        .addTag('User', 'Gestion des utilisateurs')
-        .build();
+      .setTitle(`Projet Goosee Generator - ${nodeEnv}`)
+      .setDescription('API Gateway pour le projet Goosee Generator')
+      .setVersion('1.0')
+      .addTag('User', 'Gestion des utilisateurs')
+      .build();
 
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);

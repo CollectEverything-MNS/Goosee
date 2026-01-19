@@ -5,19 +5,9 @@ import { GetUserController } from './usecases/get-user/get-user.controller';
 import { GetUserService } from './usecases/get-user/get-user.service';
 
 @Module({
-    imports: [
-        ConfigModule,
-        HttpModule,
-    ],
-    controllers: [
-        GetUserController,
-
-    ],
-    providers: [
-        GetUserService,
-    ],
-    exports: [
-        GetUserService,
-    ],
+  imports: [ConfigModule, HttpModule],
+  controllers: [GetUserController],
+  providers: [GetUserService],
+  exports: [GetUserService],
 })
 export class UserModule {}

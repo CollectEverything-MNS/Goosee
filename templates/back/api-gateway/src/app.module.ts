@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import {UserModule} from "./services/user/user.module";
+import { UserModule } from './services/user/user.module';
 
 @Module({
   imports: [
