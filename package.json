@@ -9,7 +9,8 @@
         "start:prod": "docker compose --env-file env/.env.prod -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml -f docker/prod/docker-compose.back.prod.yml up --build",
         "stop:prod": "docker compose --env-file env/.env.prod -f docker/prod/docker-compose.front.prod.yml -f docker/prod/docker-compose.infra.prod.yml -f docker/prod/docker-compose.back.prod.yml down",
         "restart:prod": "yarn stop:prod && yarn start:prod",
-        "generate:service": "./scripts/create-service.sh"
+        "generate:service": "./scripts/create-service.sh",
+        "prepare": "husky install"
     },
     "workspaces": [
         "templates/*",
@@ -17,9 +18,14 @@
     ],
     "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
     "devDependencies": {
+        "@commitlint/cli": "^20.3.1",
+        "@commitlint/config-conventional": "^20.3.1",
+        "commitizen": "^4.3.1",
+        "cz-conventional-changelog": "^3.3.0",
         "eslint": "^9.39.2",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",
+        "husky": "^9.1.7",
         "prettier": "^3.8.0"
     }
 }
