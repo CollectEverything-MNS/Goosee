@@ -17,14 +17,11 @@ async function bootstrap() {
     app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
 
     const config = new DocumentBuilder()
-        .setTitle(`Projet Goosee Generator - ${nodeEnv}`)
-        .setDescription(
-            "API Gateway pour le projet Goosee Generator",
-        )
-        .setVersion('1.0')
-        .addTag('User', 'Gestion des utilisateurs')
-        .addTag('Auth', 'Authentification')
-        .build();
+      .setTitle(`Projet Goosee Generator - ${nodeEnv}`)
+      .setDescription('API Gateway pour le projet Goosee Generator')
+      .setVersion('1.0')
+      .addTag('User', 'Gestion des utilisateurs')
+      .build();
 
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);

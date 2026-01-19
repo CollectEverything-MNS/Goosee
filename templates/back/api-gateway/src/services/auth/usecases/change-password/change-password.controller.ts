@@ -10,7 +10,7 @@ export class ChangePasswordController {
   constructor(private readonly changePasswordService: ChangePasswordService) {}
 
   @Put(routesConfig.auth.changePassword.path)
-  @ApiOperation({ summary: 'Changement de mot de passe d\'un utilisateur' })
+  @ApiOperation({ summary: "Changement de mot de passe d'un utilisateur" })
   async changePassword(@Body() dto: ChangePasswordDto) {
     return this.changePasswordService.execute(dto);
   }
