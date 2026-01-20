@@ -10,7 +10,7 @@ export class RegisterController {
   constructor(private readonly registerService: RegisterService) {}
 
   @Post(routesConfig.auth.register.path)
-  @ApiOperation({ summary: 'Inscription d\'un utilisateur' })
+  @ApiOperation({ summary: "Inscription d'un utilisateur" })
   async register(@Body() dto: RegisterDto) {
     return this.registerService.execute(dto);
   }

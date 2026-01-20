@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put } from '@nestjs/common';
+import { Body, Controller, Put } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ForgetPasswordRequestService } from './forget-password-request.service';
 import { ForgetPasswordRequestDto } from './forget-password-request.dto';

@@ -67,7 +67,7 @@ import { ForgetPasswordConfirmUseCase } from './usecases/forget-password-confirm
     RefreshTokenUseCase,
     ChangePasswordUseCase,
     ForgetPasswordRequestUseCase,
-    ForgetPasswordConfirmUseCase
+    ForgetPasswordConfirmUseCase,
   ],
 })
 export class AppModule {}

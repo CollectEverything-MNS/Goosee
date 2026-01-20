@@ -10,7 +10,7 @@ export class LoginController {
   constructor(private readonly loginService: LoginService) {}
 
   @Post(routesConfig.auth.login.path)
-  @ApiOperation({ summary: 'Connexion d\'un utilisateur' })
+  @ApiOperation({ summary: "Connexion d'un utilisateur" })
   async login(@Body() dto: LoginDto) {
     return this.loginService.execute(dto);
   }
