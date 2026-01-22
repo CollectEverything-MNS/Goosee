@@ -18,6 +18,7 @@ export interface PageComponent {
   type: ComponentType;
   props: Record<string, unknown>;
   order: number;
+  children?: PageComponent[];
 }
 
 export interface Page {
@@ -38,7 +39,13 @@ export type ComponentType =
   | 'heading'
   | 'text'
   | 'image'
-  | 'spacer';
+  | 'spacer'
+  | 'button'
+  | 'divider'
+  | 'quote'
+  | 'list'
+  | 'video'
+  | 'grid';
 
 export type ComponentCategory = 'basic' | 'layout';
 
@@ -58,5 +65,4 @@ export const COMPONENT_CATEGORIES: Record<ComponentCategory, { label: string; ic
 export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
   ...CATEGORY_BASIC_COMPONENTS,
   ...CATEGORY_LAYOUT_COMPONENTS
-
 ];

@@ -5,10 +5,9 @@ import { CSS } from '@dnd-kit/utilities';
 import { COMPONENT_DEFINITIONS, PageComponent } from '../../types/page.types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Copy, GripVertical, Trash2 } from 'lucide-react';
+import { CameraIcon, Copy, Grid3X3, GripVertical, Trash2, VideoIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDroppable } from '@dnd-kit/core';
-import { BlockRenderer } from '@/components/page-blocks';
 
 interface PageBuilderCanvasProps {
   components: PageComponent[];
@@ -16,6 +15,8 @@ interface PageBuilderCanvasProps {
   onSelectComponent: (id: string) => void;
   onDeleteComponent: (id: string) => void;
   onDuplicateComponent: (id: string) => void;
+  onAddToGrid?: (gridId: string, component: PageComponent) => void;
+  onRemoveFromGrid?: (gridId: string, componentId: string) => void;
 }
 
 interface SortableComponentProps {
@@ -105,6 +106,48 @@ function SortableComponent({
   );
 }
 
+function GridDropZone({ gridId, gridChildren = [] }: { gridId: string; gridChildren?: PageComponent[] }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `grid-${gridId}`,
+    data: {
+      isGridDropZone: true,
+      gridId,
+    },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        'min-h-[60px] rounded border-2 border-dashed p-2 transition-colors',
+        isOver ? 'border-primary bg-primary/10' : 'border-muted-foreground/30 bg-muted/30'
+      )}
+    >
+      {gridChildren.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2">
+          {gridChildren
+            .sort((a, b) => a.order - b.order)
+            .map((child) => {
+              const def = COMPONENT_DEFINITIONS.find((d) => d.type === child.type);
+              return (
+                <div
+                  key={child.id}
+                  className="rounded bg-card px-2 py-1 text-xs border"
+                >
+                  {def?.label || child.type}
+                </div>
+              );
+            })}
+        </div>
+      ) : (
+        <p className="text-xs text-center text-muted-foreground">
+          Glissez des composants ici
+        </p>
+      )}
+    </div>
+  );
+}
+
 function ComponentPreview({ component }: { component: PageComponent }) {
   const props = component.props;
 
@@ -136,54 +179,53 @@ function ComponentPreview({ component }: { component: PageComponent }) {
       case 'image':
         return (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">📷</div>
+            <div className="h-8 w-8 rounded bg-muted flex items-center justify-center"><CameraIcon size={20} /></div>
             {(props.alt as string) || 'Image'}
-          </div>
-        );
-      case 'cta':
-        return (
-          <div className="rounded bg-primary/10 p-2 text-center text-sm">
-            {(props.title as string) || 'Call to Action'}
-          </div>
-        );
-      case 'product-grid':
-        return (
-          <div className="grid grid-cols-4 gap-1">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square rounded bg-muted text-[8px] flex items-center justify-center">🛍️</div>
-            ))}
-          </div>
-        );
-      case 'features':
-        return (
-          <div className="flex gap-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex-1 rounded bg-muted p-1 text-center text-[10px]">Feature {i}</div>
-            ))}
-          </div>
-        );
-      case 'testimonials':
-        return (
-          <div className="text-xs text-muted-foreground italic">&quot;Témoignages clients...&quot;</div>
-        );
-      case 'contact-form':
-        return (
-          <div className="space-y-1">
-            <div className="h-2 w-full rounded bg-muted" />
-            <div className="h-2 w-3/4 rounded bg-muted" />
-            <div className="h-4 w-1/2 rounded bg-primary/20" />
-          </div>
-        );
-      case 'gallery':
-        return (
-          <div className="grid grid-cols-3 gap-1">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="aspect-square rounded bg-muted text-[8px] flex items-center justify-center">🖼️</div>
-            ))}
           </div>
         );
       case 'spacer':
         return <div className="h-4 border-y border-dashed border-muted-foreground/30" />;
+      case 'button':
+        return (
+          <div className="inline-block rounded bg-primary px-3 py-1 text-xs text-primary-foreground">
+            {String(props.text || 'Bouton')}
+          </div>
+        );
+      case 'divider':
+        return <hr className="border-t-2 border-muted" />;
+      case 'quote':
+        return (
+          <div className="border-l-2 border-primary pl-2 text-xs italic text-muted-foreground">
+            &ldquo;{String(props.content || 'Citation...')}&rdquo;
+          </div>
+        );
+      case 'list':
+        return (
+          <div className="text-xs text-muted-foreground">
+            <div>• Élément 1</div>
+            <div>• Élément 2</div>
+          </div>
+        );
+      case 'video':
+        return (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="h-8 w-12 rounded bg-muted flex items-center justify-center"><VideoIcon size={20} />️</div>
+            {String(props.title || 'Vidéo')}
+          </div>
+        );
+      case 'grid': {
+        const columns = Number(props.columns) || 2;
+        const childrenCount = component.children?.length || 0;
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Grid3X3 className="h-4 w-4" />
+              <span>{columns} colonnes • {childrenCount} élément{childrenCount > 1 ? 's' : ''}</span>
+            </div>
+            <GridDropZone gridId={component.id} gridChildren={component.children} />
+          </div>
+        );
+      }
       default:
         return <div className="text-xs italic text-muted-foreground">Aperçu</div>;
     }

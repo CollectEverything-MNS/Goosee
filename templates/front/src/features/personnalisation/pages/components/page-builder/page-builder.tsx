@@ -33,7 +33,25 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
 
   const debouncedComponents = useDebounce(components, 150);
 
-  const selectedComponent = components.find((c) => c.id === selectedComponentId);
+  // Find component at root level or inside grids
+  const findComponent = (id: string | null): PageComponent | undefined => {
+    if (!id) return undefined;
+
+    // Check root level
+    const rootComponent = components.find((c) => c.id === id);
+    if (rootComponent) return rootComponent;
+
+    // Check inside grids
+    for (const c of components) {
+      if (c.children) {
+        const childComponent = c.children.find((child) => child.id === id);
+        if (childComponent) return childComponent;
+      }
+    }
+    return undefined;
+  };
+
+  const selectedComponent = findComponent(selectedComponentId);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -63,6 +81,10 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
 
     if (!over) return;
 
+    // Check if dropping into a grid container
+    const isGridDrop = over.data.current?.isGridDropZone;
+    const gridId = over.data.current?.gridId;
+
     if (active.data.current?.fromSidebar) {
       const componentType = active.data.current.type as ComponentType;
       const definition = COMPONENT_DEFINITIONS.find((d) => d.type === componentType);
@@ -73,10 +95,29 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
         id: crypto.randomUUID(),
         type: componentType,
         props: { ...definition.defaultProps },
-        order: components.length,
+        order: 0,
       };
 
+      // If dropping into a grid
+      if (isGridDrop && gridId) {
+        const newComponents = components.map((c) => {
+          if (c.id === gridId) {
+            const existingChildren = c.children || [];
+            newComponent.order = existingChildren.length;
+            return {
+              ...c,
+              children: [...existingChildren, newComponent],
+            };
+          }
+          return c;
+        });
+        onChange(newComponents);
+        setSelectedComponentId(newComponent.id);
+        return;
+      }
+
       // If dropping on a specific component, insert after it
+      newComponent.order = components.length;
       if (over.id !== 'canvas-droppable') {
         const overIndex = components.findIndex((c) => c.id === over.id);
         const newComponents = [...components];
@@ -91,7 +132,7 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
     }
 
     // Reordering within canvas
-    if (active.id !== over.id && over.id !== 'canvas-droppable') {
+    if (active.id !== over.id && over.id !== 'canvas-droppable' && !isGridDrop) {
       const oldIndex = components.findIndex((c) => c.id === active.id);
       const newIndex = components.findIndex((c) => c.id === over.id);
 
@@ -106,7 +147,26 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
   };
 
   const handleDeleteComponent = (id: string) => {
-    onChange(components.filter((c) => c.id !== id));
+    // Check if component is at root level
+    const isRootLevel = components.some((c) => c.id === id);
+
+    if (isRootLevel) {
+      onChange(components.filter((c) => c.id !== id));
+    } else {
+      // Component is inside a grid, find and remove it
+      onChange(
+        components.map((c) => {
+          if (c.children?.some((child) => child.id === id)) {
+            return {
+              ...c,
+              children: c.children.filter((child) => child.id !== id),
+            };
+          }
+          return c;
+        })
+      );
+    }
+
     if (selectedComponentId === id) {
       setSelectedComponentId(null);
     }
@@ -129,9 +189,29 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
   };
 
   const handleUpdateComponent = (id: string, props: Record<string, unknown>) => {
-    onChange(
-      components.map((c) => (c.id === id ? { ...c, props: { ...c.props, ...props } } : c))
-    );
+    // Check if component is at root level
+    const isRootLevel = components.some((c) => c.id === id);
+
+    if (isRootLevel) {
+      onChange(
+        components.map((c) => (c.id === id ? { ...c, props: { ...c.props, ...props } } : c))
+      );
+    } else {
+      // Component is inside a grid, find and update it
+      onChange(
+        components.map((c) => {
+          if (c.children?.some((child) => child.id === id)) {
+            return {
+              ...c,
+              children: c.children.map((child) =>
+                child.id === id ? { ...child, props: { ...child.props, ...props } } : child
+              ),
+            };
+          }
+          return c;
+        })
+      );
+    }
   };
 
   return (

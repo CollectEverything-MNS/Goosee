@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Palette, Settings, Type, X } from 'lucide-react';
 
@@ -55,13 +55,39 @@ export function PageBuilderComponentEditor({
       backgroundImage: 'Image de fond',
       textColor: 'Couleur du texte',
       color: 'Couleur',
+      text: 'Texte',
+      link: 'Lien',
+      size: 'Taille',
+      style: 'Style',
+      author: 'Auteur',
+      items: 'Éléments',
+      url: 'URL',
+      aspectRatio: 'Format',
+      padding: 'Espacement interne',
     };
     return labels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim();
   };
 
-  const renderContentField = (key: string, value: unknown) => {
+  const renderField = (key: string, value: unknown) => {
+    // Boolean fields
+    if (typeof value === 'boolean') {
+      return (
+        <div key={key} className="flex items-center gap-2">
+          <input
+            id={key}
+            type="checkbox"
+            checked={value}
+            onChange={(e) => handleChange(key, e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <Label htmlFor={key}>{formatLabel(key)}</Label>
+        </div>
+      );
+    }
+
     if (typeof value !== 'string' && typeof value !== 'number') return null;
 
+    // Level (h1-h6)
     if (key === 'level') {
       return (
         <div key={key} className="space-y-2">
@@ -83,6 +109,7 @@ export function PageBuilderComponentEditor({
       );
     }
 
+    // Textarea for content/description
     if (key.toLowerCase().includes('content') || key.toLowerCase().includes('description')) {
       return (
         <div key={key} className="space-y-2">
@@ -97,6 +124,7 @@ export function PageBuilderComponentEditor({
       );
     }
 
+    // Alignment
     if (key.toLowerCase().includes('alignment')) {
       return (
         <div key={key} className="space-y-2">
@@ -115,6 +143,7 @@ export function PageBuilderComponentEditor({
       );
     }
 
+    // Variant
     if (key === 'variant') {
       return (
         <div key={key} className="space-y-2">
@@ -127,17 +156,13 @@ export function PageBuilderComponentEditor({
               <SelectItem value="primary">Principal</SelectItem>
               <SelectItem value="secondary">Secondaire</SelectItem>
               <SelectItem value="outline">Contour</SelectItem>
-              <SelectItem value="cards">Cartes</SelectItem>
-              <SelectItem value="icons">Icônes</SelectItem>
-              <SelectItem value="list">Liste</SelectItem>
-              <SelectItem value="grid">Grille</SelectItem>
-              <SelectItem value="carousel">Carrousel</SelectItem>
             </SelectContent>
           </Select>
         </div>
       );
     }
 
+    // Height / Gap
     if (key === 'height' || key === 'gap') {
       return (
         <div key={key} className="space-y-2">
@@ -158,6 +183,7 @@ export function PageBuilderComponentEditor({
       );
     }
 
+    // Width
     if (key === 'width') {
       return (
         <div key={key} className="space-y-2">
@@ -170,12 +196,14 @@ export function PageBuilderComponentEditor({
               <SelectItem value="sm">Petite</SelectItem>
               <SelectItem value="md">Moyenne</SelectItem>
               <SelectItem value="lg">Grande</SelectItem>
+              <SelectItem value="full">Pleine largeur</SelectItem>
             </SelectContent>
           </Select>
         </div>
       );
     }
 
+    // Columns
     if (key === 'columns') {
       return (
         <div key={key} className="space-y-2">
@@ -195,6 +223,149 @@ export function PageBuilderComponentEditor({
       );
     }
 
+    // Style (divider/list)
+    if (key === 'style') {
+      const isDivider = component.type === 'divider';
+      const isList = component.type === 'list';
+
+      if (isDivider) {
+        return (
+          <div key={key} className="space-y-2">
+            <Label>{formatLabel(key)}</Label>
+            <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="solid">Solide</SelectItem>
+                <SelectItem value="dashed">Tirets</SelectItem>
+                <SelectItem value="dotted">Pointillés</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      }
+
+      if (isList) {
+        return (
+          <div key={key} className="space-y-2">
+            <Label>{formatLabel(key)}</Label>
+            <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bullet">Puces</SelectItem>
+                <SelectItem value="number">Numéros</SelectItem>
+                <SelectItem value="check">Coches</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      }
+    }
+
+    // Size
+    if (key === 'size') {
+      return (
+        <div key={key} className="space-y-2">
+          <Label>{formatLabel(key)}</Label>
+          <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sm">Petit</SelectItem>
+              <SelectItem value="md">Moyen</SelectItem>
+              <SelectItem value="lg">Grand</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    // Aspect Ratio
+    if (key === 'aspectRatio') {
+      return (
+        <div key={key} className="space-y-2">
+          <Label>{formatLabel(key)}</Label>
+          <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="16:9">16:9 (Paysage)</SelectItem>
+              <SelectItem value="4:3">4:3 (Standard)</SelectItem>
+              <SelectItem value="1:1">1:1 (Carré)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    // Padding
+    if (key === 'padding') {
+      return (
+        <div key={key} className="space-y-2">
+          <Label>{formatLabel(key)}</Label>
+          <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Aucun</SelectItem>
+              <SelectItem value="sm">Petit</SelectItem>
+              <SelectItem value="md">Moyen</SelectItem>
+              <SelectItem value="lg">Grand</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    // Background Type
+    if (key === 'backgroundType') {
+      return (
+        <div key={key} className="space-y-2">
+          <Label>{formatLabel(key)}</Label>
+          <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="color">Couleur unie</SelectItem>
+              <SelectItem value="image">Image</SelectItem>
+              <SelectItem value="gradient">Dégradé</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    // Color picker
+    if (key.toLowerCase().includes('color')) {
+      return (
+        <div key={key} className="space-y-2">
+          <Label>{formatLabel(key)}</Label>
+          <div className="flex gap-2">
+            <Input
+              type="color"
+              value={(value as string) || '#000000'}
+              onChange={(e) => handleChange(key, e.target.value)}
+              className="h-10 w-14 cursor-pointer p-1"
+            />
+            <Input
+              value={value as string}
+              onChange={(e) => handleChange(key, e.target.value)}
+              placeholder="#000000"
+              className="flex-1"
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // Number input
     if (typeof value === 'number') {
       return (
         <div key={key} className="space-y-2">
@@ -209,6 +380,7 @@ export function PageBuilderComponentEditor({
       );
     }
 
+    // Default text input
     return (
       <div key={key} className="space-y-2">
         <Label htmlFor={key}>{formatLabel(key)}</Label>
@@ -221,113 +393,37 @@ export function PageBuilderComponentEditor({
     );
   };
 
-  const renderStyleField = (key: string, value: unknown) => {
-    if (typeof value !== 'string') return null;
-
-    if (key.toLowerCase().includes('alignment')) {
-      return (
-        <div key={key} className="space-y-2">
-          <Label>{formatLabel(key)}</Label>
-          <Select value={value} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="left">Gauche</SelectItem>
-              <SelectItem value="center">Centre</SelectItem>
-              <SelectItem value="right">Droite</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      );
-    }
-
-    if (key === 'backgroundType') {
-      return (
-        <div key={key} className="space-y-2">
-          <Label>{formatLabel(key)}</Label>
-          <Select value={value} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="color">Couleur unie</SelectItem>
-              <SelectItem value="image">Image</SelectItem>
-              <SelectItem value="gradient">Dégradé</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      );
-    }
-
-    if (key.toLowerCase().includes('color')) {
-      return (
-        <div key={key} className="space-y-2">
-          <Label>{formatLabel(key)}</Label>
-          <div className="flex gap-2">
-            <Input
-              type="color"
-              value={value || '#000000'}
-              onChange={(e) => handleChange(key, e.target.value)}
-              className="h-10 w-14 cursor-pointer p-1"
-            />
-            <Input
-              value={value}
-              onChange={(e) => handleChange(key, e.target.value)}
-              placeholder="#000000"
-              className="flex-1"
-            />
-          </div>
-        </div>
-      );
-    }
-
-    if (key === 'backgroundImage') {
-      return (
-        <div key={key} className="space-y-2">
-          <Label>{formatLabel(key)}</Label>
-          <Input
-            value={value}
-            onChange={(e) => handleChange(key, e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
-      );
-    }
-
-    return null;
-  };
-
-  const renderBooleanField = (key: string, value: boolean) => {
-    return (
-      <div key={key} className="flex items-center gap-2">
-        <input
-          id={key}
-          type="checkbox"
-          checked={value}
-          onChange={(e) => handleChange(key, e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300"
-        />
-        <Label htmlFor={key}>{formatLabel(key)}</Label>
-      </div>
-    );
-  };
-
+  // Categorize props
   const contentProps: [string, unknown][] = [];
   const styleProps: [string, unknown][] = [];
-  const settingsProps: [string, unknown][] = [];
+  const optionsProps: [string, unknown][] = [];
 
   Object.entries(component.props).forEach(([key, value]) => {
     if (Array.isArray(value) || (typeof value === 'object' && value !== null)) return;
 
+    // Style props: colors, alignment, background
     if (key.toLowerCase().includes('color') || key === 'backgroundType' || key === 'backgroundImage' || key.toLowerCase().includes('alignment')) {
       styleProps.push([key, value]);
-    } else if (typeof value === 'boolean' || key === 'columns' || key === 'limit' || key === 'height' || key === 'gap' || key === 'width') {
-      settingsProps.push([key, value]);
-    } else {
+    }
+    // Options props: dimensions, layout, toggles
+    else if (typeof value === 'boolean' || key === 'columns' || key === 'limit' || key === 'height' || key === 'gap' || key === 'width' || key === 'size' || key === 'style' || key === 'aspectRatio' || key === 'padding' || key === 'rounded' || key === 'overlay') {
+      optionsProps.push([key, value]);
+    }
+    // Content props: text, links, etc.
+    else {
       contentProps.push([key, value]);
     }
   });
+
+  // Determine which sections to show
+  const hasContent = contentProps.length > 0;
+  const hasStyle = styleProps.length > 0;
+  const hasOptions = optionsProps.length > 0;
+
+  // Default open sections
+  const defaultOpen = [];
+  if (hasContent) defaultOpen.push('content');
+  if (hasStyle) defaultOpen.push('style');
 
   return (
     <div className="absolute right-0 top-0 z-50 flex h-full w-80 flex-col border-l bg-card shadow-lg">
@@ -341,59 +437,57 @@ export function PageBuilderComponentEditor({
         </Button>
       </div>
 
-      <Tabs defaultValue="content" className="flex flex-1 flex-col">
-        <TabsList className="mx-3 mt-2 grid w-auto grid-cols-3">
-          <TabsTrigger value="content" className="text-xs">
-            <Type className="mr-1 h-3 w-3" />
-            Contenu
-          </TabsTrigger>
-          <TabsTrigger value="style" className="text-xs">
-            <Palette className="mr-1 h-3 w-3" />
-            Style
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="text-xs">
-            <Settings className="mr-1 h-3 w-3" />
-            Options
-          </TabsTrigger>
-        </TabsList>
+      <ScrollArea className="flex-1">
+        <Accordion type="multiple" defaultValue={defaultOpen} className="px-3 py-2">
+          {hasContent && (
+            <AccordionItem value="content" className="border-b-0">
+              <AccordionTrigger className="py-2 hover:no-underline">
+                <div className="flex items-center gap-2 text-sm">
+                  <Type className="h-4 w-4 text-muted-foreground" />
+                  <span>Contenu</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pb-2">
+                  {contentProps.map(([key, value]) => renderField(key, value))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
-        <ScrollArea className="flex-1">
-          <TabsContent value="content" className="m-0 p-3">
-            <div className="space-y-4">
-              {contentProps.length > 0 ? (
-                contentProps.map(([key, value]) => renderContentField(key, value))
-              ) : (
-                <p className="text-sm text-muted-foreground">Aucun contenu à modifier</p>
-              )}
-            </div>
-          </TabsContent>
+          {hasStyle && (
+            <AccordionItem value="style" className="border-b-0">
+              <AccordionTrigger className="py-2 hover:no-underline">
+                <div className="flex items-center gap-2 text-sm">
+                  <Palette className="h-4 w-4 text-muted-foreground" />
+                  <span>Style</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pb-2">
+                  {styleProps.map(([key, value]) => renderField(key, value))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
-          <TabsContent value="style" className="m-0 p-3">
-            <div className="space-y-4">
-              {styleProps.length > 0 ? (
-                styleProps.map(([key, value]) => renderStyleField(key, value as string))
-              ) : (
-                <p className="text-sm text-muted-foreground">Aucun style disponible</p>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="settings" className="m-0 p-3">
-            <div className="space-y-4">
-              {settingsProps.length > 0 ? (
-                settingsProps.map(([key, value]) => {
-                  if (typeof value === 'boolean') {
-                    return renderBooleanField(key, value);
-                  }
-                  return renderContentField(key, value);
-                })
-              ) : (
-                <p className="text-sm text-muted-foreground">Aucune option disponible</p>
-              )}
-            </div>
-          </TabsContent>
-        </ScrollArea>
-      </Tabs>
+          {hasOptions && (
+            <AccordionItem value="options" className="border-b-0">
+              <AccordionTrigger className="py-2 hover:no-underline">
+                <div className="flex items-center gap-2 text-sm">
+                  <Settings className="h-4 w-4 text-muted-foreground" />
+                  <span>Options</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pb-2">
+                  {optionsProps.map(([key, value]) => renderField(key, value))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+        </Accordion>
+      </ScrollArea>
     </div>
   );
 }

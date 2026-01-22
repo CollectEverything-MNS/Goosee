@@ -29,4 +29,28 @@ export const CATEGORY_LAYOUT_COMPONENTS: ComponentDefinition[] = [
       height: 'md',
     },
   },
+  {
+    type: 'video',
+    label: 'Vidéo',
+    icon: 'play',
+    category: 'layout',
+    defaultProps: {
+      url: '',
+      title: 'Vidéo',
+      aspectRatio: '16:9',
+      alignment: 'center',
+    },
+  },
+  {
+    type: 'grid',
+    label: 'Grille',
+    icon: 'grid-3x3',
+    category: 'layout',
+    defaultProps: {
+      columns: 2,
+      gap: 'md',
+      backgroundColor: '',
+      padding: 'md',
+    },
+  },
 ]

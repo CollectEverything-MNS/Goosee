@@ -8,6 +8,12 @@ import { HeadingBlock } from './heading-block';
 import { TextBlock } from './text-block';
 import { ImageBlock } from './image-block';
 import { SpacerBlock } from './spacer-block';
+import { ButtonBlock } from './button-block';
+import { DividerBlock } from './divider-block';
+import { QuoteBlock } from './quote-block';
+import { ListBlock } from './list-block';
+import { VideoBlock } from './video-block';
+import { GridBlock } from './grid-block';
 
 const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   hero: HeroBlock,
@@ -15,6 +21,12 @@ const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   text: TextBlock,
   image: ImageBlock,
   spacer: SpacerBlock,
+  button: ButtonBlock,
+  divider: DividerBlock,
+  quote: QuoteBlock,
+  list: ListBlock,
+  video: VideoBlock,
+  grid: GridBlock,
 };
 
 interface BlockRendererProps {
@@ -28,8 +40,19 @@ export function BlockRenderer({ component, context }: BlockRendererProps) {
   if (!BlockComponent) {
     return (
       <div className="rounded-lg border border-dashed border-destructive bg-destructive/10 p-4 text-center text-destructive">
-        èxiste pas {component.type}
+        Composant inconnu: {component.type}
       </div>
+    );
+  }
+
+  // Pass children for container components like grid
+  if (component.type === 'grid') {
+    return (
+      <BlockComponent
+        {...component.props}
+        gridChildren={component.children}
+        context={context}
+      />
     );
   }
 

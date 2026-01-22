@@ -8,10 +8,14 @@ import {
   Heading,
   Image,
   Layout,
+  List,
   Mail,
   Megaphone,
   MessageSquareQuote,
+  Minus,
+  MousePointerClick,
   MoveVertical,
+  Play,
   ShoppingBag,
   Sparkles,
   Type,
@@ -32,6 +36,10 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   sparkles: Sparkles,
   quote: MessageSquareQuote,
   'separator-horizontal': MoveVertical,
+  'mouse-pointer-click': MousePointerClick,
+  minus: Minus,
+  list: List,
+  play: Play,
 };
 
 const CATEGORY_ICONS: Record<ComponentCategory, React.ComponentType<{ className?: string }>> = {
@@ -80,7 +88,7 @@ export function PageBuilderSidebar() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pb-2">
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     {components.map((definition) => {
                       const Icon = ICONS[definition.icon] || Layout;
 

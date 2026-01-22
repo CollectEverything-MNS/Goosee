@@ -34,7 +34,7 @@ export function PageBuilderSidebarDraggableItem({
       style={style}
       variant="outline"
       className={cn(
-        'flex h-20 flex-col items-center justify-center gap-2',
+        'flex h-20 min-w-[70px] flex-1 basis-[calc(50%-4px)] flex-col items-center justify-center gap-2',
         isDragging && 'opacity-50'
       )}
       {...listeners}
