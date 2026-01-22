@@ -1,12 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
-import { AxiosError } from 'axios';
+import { HttpProxyService } from '../../../../shared/services/http-proxy.service';
 import { serviceUrl, ServiceUrls } from '../../../../config/services.config';
 import { routesConfig } from '../../../../config/routes.config';
 import { ChangePasswordDto } from './change-password.dto';
-import { HttpProxyService } from '../../../../shared/services/http-proxy.service';
 
 @Injectable()
 export class ChangePasswordService {
@@ -21,6 +18,6 @@ export class ChangePasswordService {
 
   async execute(dto: ChangePasswordDto) {
     const url = routesConfig.auth.changePassword.link(this.services.auth);
-    return this.httpProxy.post(url, dto, 'Change password failed');
+    return this.httpProxy.put(url, dto, 'Change password failed');
   }
 }

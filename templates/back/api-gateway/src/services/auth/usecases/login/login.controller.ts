@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginService } from './login.service';
 import { LoginDto } from './login.dto';
 import { routesConfig } from '../../../../config/routes.config';
