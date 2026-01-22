@@ -24,7 +24,7 @@ export function DataTableSearch({ table }: Props) {
       placeholder={t('admin.search')}
       value={value}
       onChange={(e) => setValue(e.target.value)}
-      className="focus:none h-8 w-64 bg-white"
+      className="h-8 w-64 bg-card"
     />
   )
 }

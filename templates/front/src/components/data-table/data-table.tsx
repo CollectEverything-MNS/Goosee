@@ -63,7 +63,7 @@ export function DataTable<TData, TValue>({
     <div className="w-full space-y-4">
       {Toolbar && <Toolbar table={table} />}
       <div className="overflow-hidden rounded-md border">
-        <Table className={'bg-white'}>
+        <Table className="bg-card">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -103,7 +103,7 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center space-x-2 text-sm">
           <span>{t('admin.display')}</span>
           <select
-            className="rounded border bg-white px-2 py-1"
+            className="rounded border bg-card px-2 py-1 text-foreground"
             value={table.getState().pagination.pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
           >

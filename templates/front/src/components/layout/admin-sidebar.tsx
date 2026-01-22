@@ -45,7 +45,7 @@ export function AdminSidebar() {
                 href={routes.gooseeAdmin.dashboard.getHref(locale)}
                 className="flex items-center justify-center gap-3 px-4"
               >
-                <span className="text-3xl font-bold text-[#043e52]">
+                <span className="text-3xl font-bold text-[#043e52] dark:text-white">
                   Goos<span className="text-[#fea341]">ee</span>
                 </span>
               </Link>
@@ -126,7 +126,7 @@ export function AdminSidebar() {
       <SidebarFooter className="bg-sidebar-accent p-2">
         <Link
           href={routes.gooseeAdmin.login.getHref(locale)}
-          className="flex w-full items-center justify-center gap-2 rounded-md p-4 text-sm font-medium hover:bg-gray-200"
+          className="flex w-full items-center justify-center gap-2 rounded-md p-4 text-sm font-medium hover:bg-sidebar-accent"
         >
           <LogOut size={20} /> {t('admin.sidebar.logout')}
         </Link>

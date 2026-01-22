@@ -11,9 +11,9 @@ export function AdminTitle({ size, title }: Props) {
   return (
     <Tag
       className={cn({
-        'mb-6 text-2xl font-semibold text-primary': size === 'h1',
-        'mb-4 text-xl': size === 'h2',
-        'mb-2 text-lg': size === 'h3',
+        'mb-6 text-2xl font-semibold text-primary dark:text-white': size === 'h1',
+        'mb-4 text-xl dark:text-white': size === 'h2',
+        'mb-2 text-lg dark:text-white': size === 'h3',
       })}
     >
       {title}

@@ -14,6 +14,40 @@
       "support": "Support",
       "logout": "Logout"
     },
+    "settings": {
+      "title": "Settings",
+      "sidebarTitle": "Settings",
+      "nav": {
+        "account": "Account",
+        "preferences": "Preferences",
+        "security": "Security"
+      },
+      "account": {
+        "title": "Account",
+        "profile": "Profile",
+        "createPortrait": "Create your portrait",
+        "name": "Name",
+        "accountSecurity": "Account security",
+        "email": "Email address",
+        "password": "Password",
+        "changePassword": "Change your password",
+        "change": "Change",
+        "modify": "Modify"
+      },
+      "preferences": {
+        "title": "Preferences",
+        "display": "Display",
+        "language": "Language",
+        "languageDescription": "Select the interface language",
+        "theme": "Theme",
+        "themeDescription": "Customize the app appearance",
+        "themes": {
+          "light": "Light",
+          "dark": "Dark",
+          "system": "System"
+        }
+      }
+    },
     "login": {
       "title": "Goosee Administration",
       "email": "Email",

@@ -13,6 +13,40 @@
       "support": "Support",
       "logout": "Déconnexion"
     },
+    "settings": {
+      "title": "Paramètres",
+      "sidebarTitle": "Paramètres",
+      "nav": {
+        "account": "Compte",
+        "preferences": "Préférences",
+        "security": "Sécurité"
+      },
+      "account": {
+        "title": "Compte",
+        "profile": "Profil",
+        "createPortrait": "Créer votre portrait",
+        "name": "Nom",
+        "accountSecurity": "Sécurité du compte",
+        "email": "Adresse e-mail",
+        "password": "Mot de passe",
+        "changePassword": "Modifiez votre mot de passe",
+        "change": "Changer",
+        "modify": "Modifier"
+      },
+      "preferences": {
+        "title": "Préférences",
+        "display": "Affichage",
+        "language": "Langue",
+        "languageDescription": "Sélectionnez la langue de l'interface",
+        "theme": "Thème",
+        "themeDescription": "Personnalisez l'apparence de l'application",
+        "themes": {
+          "light": "Clair",
+          "dark": "Sombre",
+          "system": "Système"
+        }
+      }
+    },
     "login": {
         "title": "Goose Administration",
         "email": "Email",
