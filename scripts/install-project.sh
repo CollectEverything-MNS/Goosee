@@ -2,14 +2,25 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SERVICES_DIR="$ROOT_DIR/templates/back/services"
+FRONT_DIR="$ROOT_DIR/templates/front"
+API_GATEWAY_DIR="$ROOT_DIR/templates/back/api-gateway"
 
+# Vérification de Yarn
 if ! command -v yarn >/dev/null 2>&1; then
   echo "yarn n'est pas installé ou introuvable dans le PATH. Installez Yarn d'abord." >&2
   exit 1
 fi
 
-FRONT_DIR="$ROOT_DIR/templates/front"
-API_GATEWAY_DIR="$ROOT_DIR/templates/back/api-gateway"
+# Installation à la racine du projet
+echo "\n=== Installation des dépendances à la racine du projet ==="
+if [ -f "$ROOT_DIR/package.json" ]; then
+  yarn --cwd "$ROOT_DIR" install || {
+    echo "Échec de yarn install à la racine du projet" >&2
+    exit 1
+  }
+else
+  echo "Skipping root (pas de package.json)"
+fi
 
 # Installation du frontend
 echo "\n=== Installation des dépendances pour: frontend ==="
@@ -34,7 +45,7 @@ else
 fi
 
 # Installation des microservices
-echo "\n🔍 Recherche des services dans: $SERVICES_DIR"
+echo "\nRecherche des services dans: $SERVICES_DIR"
 if [ ! -d "$SERVICES_DIR" ]; then
   echo "Le dossier services/ est introuvable: $SERVICES_DIR" >&2
   exit 1
@@ -54,4 +65,4 @@ for d in "$SERVICES_DIR"/*/; do
   fi
 done
 
-echo "\n✅ Installation terminée pour le frontend, l'API Gateway et tous les microservices."
+echo "\nInstallation terminée pour le frontend, l'API Gateway et tous les microservices."
