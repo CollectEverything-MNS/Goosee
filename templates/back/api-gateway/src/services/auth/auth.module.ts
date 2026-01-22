@@ -29,8 +29,8 @@ import { HttpProxyService } from '../../shared/services/http-proxy.service';
     ForgetPasswordConfirmController,
   ],
   providers: [
-    LoginService,
     HttpProxyService,
+    LoginService,
     RegisterService,
     RevokeTokenService,
     RefreshTokenService,

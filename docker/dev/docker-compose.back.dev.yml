@@ -46,6 +46,48 @@ services:
     networks:
       - goosee_net
 
+  goosee-auth-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-auth-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    expose:
+      - "${AUTH_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
+  goosee-notifier-service-dev:
+    container_name: goosee-notifier-service-dev
+    build:
+      context: ../../templates/back/services/notifier-service
+      dockerfile: Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SECURE: ${SMTP_SECURE}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+    restart: unless-stopped
+    networks:
+      - goosee_net
+
+volumes:
+  auth_db_data:
+
 networks:
   goosee_net:
     driver: bridge

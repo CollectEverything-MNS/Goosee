@@ -9,28 +9,14 @@ services:
     networks:
       - goosee_net
 
-  goosee-auth-db-dev:
-    image: postgres:16-alpine
-    container_name: goosee-auth-db-dev
+  goosee-adminer-service:
+    container_name: goosee-adminer-service
+    image: adminer
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${AUTH_DB_USER}
-      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
-      POSTGRES_DB: ${AUTH_DB_NAME}
-    volumes:
-      - auth_db_data:/var/lib/postgresql/data
-    expose:
-      - "${AUTH_DB_PORT}"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+    ports:
+      - "${ADMINER_PORT}:8080"
     networks:
       - goosee_net
-
-volumes:
-  auth_db_data:
 
 networks:
   goosee_net:
