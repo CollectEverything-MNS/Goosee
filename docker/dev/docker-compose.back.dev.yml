@@ -85,8 +85,57 @@ services:
     networks:
       - goosee_net
 
+  goosee-page-service-dev:
+    container_name: goosee-page-service-dev
+    build:
+      context: ../../templates/back/services/page-service
+      dockerfile: Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
+      PAGE_DB_HOST: ${PAGE_DB_HOST}
+      PAGE_DB_PORT: ${PAGE_DB_PORT}
+      PAGE_DB_USER: ${PAGE_DB_USER}
+      PAGE_DB_PASSWORD: ${PAGE_DB_PASSWORD}
+      PAGE_DB_NAME: ${PAGE_DB_NAME}
+    expose:
+      - "${PAGE_SERVICE_PORT}"
+    depends_on:
+      goosee-page-db-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-page-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-page-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PAGE_DB_USER}
+      POSTGRES_PASSWORD: ${PAGE_DB_PASSWORD}
+      POSTGRES_DB: ${PAGE_DB_NAME}
+    volumes:
+      - page_db_data:/var/lib/postgresql/data
+    expose:
+      - "${PAGE_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PAGE_DB_USER} -d ${PAGE_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
 volumes:
   auth_db_data:
+  page_db_data:
 
 networks:
   goosee_net:

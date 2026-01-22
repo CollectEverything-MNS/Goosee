@@ -32,6 +32,12 @@ export const routes = {
     pages: {
       getHref: (locale: string) => `/${locale}/goosee-admin/pages`,
     },
+    pagesCreate: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/pages/create`,
+    },
+    pagesEdit: {
+      getHref: (locale: string, id: string) => `/${locale}/goosee-admin/pages/${id}/edit`,
+    },
     templates: {
       getHref: (locale: string) => `/${locale}/goosee-admin/templates`,
     },

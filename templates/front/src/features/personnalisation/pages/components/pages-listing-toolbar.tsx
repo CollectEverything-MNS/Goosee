@@ -3,7 +3,8 @@ import { DataTableViewOptions } from '@/components/data-table/data-table-view-op
 import { Button } from '@/components/ui/button'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { Plus } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
+import Link from 'next/link'
 
 interface Props {
   table: any
@@ -11,6 +12,7 @@ interface Props {
 
 export function PagesListingToolbar({ table }: Props) {
   const t = useTranslations()
+  const locale = useLocale()
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -30,9 +32,11 @@ export function PagesListingToolbar({ table }: Props) {
         )}
       </div>
       <div className={'flex items-center'}>
-        <Button variant="default">
-          <Plus /> <div className={'hidden md:block'}>{t('admin.pages.addNewPage')}</div>
-        </Button>
+        <Link href={`/${locale}/goosee-admin/pages/create`}>
+          <Button variant="default">
+            <Plus /> <div className={'hidden md:block'}>{t('admin.pages.addNewPage')}</div>
+          </Button>
+        </Link>
       </div>
     </div>
   )
