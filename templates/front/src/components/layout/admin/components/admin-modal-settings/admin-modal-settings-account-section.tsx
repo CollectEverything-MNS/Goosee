@@ -1,10 +1,21 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { AdminModalSettingsRaw } from './admin-modal-settings-raw';
+import { useTranslations } from 'next-intl';
+import {
+  AdminModalSettingsAccountChangePasswordModal,
+} from '@/components/layout/admin/components/admin-modal-settings/admin-modal-settings-account-change-password-modal';
+import {
+  AdminModalSettingsAccountChangeEmailModal,
+} from '@/components/layout/admin/components/admin-modal-settings/admin-modal-settings-account-email-modal';
 
 export function AdminModalSettingsAccountSection() {
   const t = useTranslations('admin.settings.account');
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [isEmailOpen, setIsEmailOpen] = useState(false);
 
   return (
     <div className="space-y-8">
@@ -21,11 +32,8 @@ export function AdminModalSettingsAccountSection() {
         </div>
 
         <div className="max-w-sm">
-          <label className="text-xs text-muted-foreground">{t('name')}</label>
-          <input
-            className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
-            defaultValue="Romain"
-          />
+          <Label>{t('name')}</Label>
+          <Input className="mt-1" defaultValue="Romain" />
         </div>
       </section>
 
@@ -36,14 +44,26 @@ export function AdminModalSettingsAccountSection() {
           title={t('email')}
           description="romain@lesentrecodeurs.com"
           action={t('change')}
+          onClick={() => setIsEmailOpen(true)}
+
         />
 
         <AdminModalSettingsRaw
           title={t('password')}
           description={t('changePassword')}
           action={t('modify')}
+          onClick={() => setIsPasswordOpen(true)}
         />
       </section>
+
+      <AdminModalSettingsAccountChangePasswordModal
+        open={isPasswordOpen}
+        onOpenChange={setIsPasswordOpen}
+      />
+      <AdminModalSettingsAccountChangeEmailModal
+        open={isEmailOpen}
+        onOpenChange={setIsEmailOpen}
+      />
     </div>
-  )
+  );
 }

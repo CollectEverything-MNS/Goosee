@@ -29,9 +29,30 @@
         "accountSecurity": "Sécurité du compte",
         "email": "Adresse e-mail",
         "password": "Mot de passe",
-        "changePassword": "Modifiez votre mot de passe",
+        "changePassword": "Changer votre mot de passe",
         "change": "Changer",
-        "modify": "Modifier"
+        "modify": "Modifier",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "saveChanges": "Enregistrer les modifications",
+        "modifyPassword": "Modifier le mot de passe",
+        "passwordInstructions": "Le mot de passe doit contenir au moins 8 caractères et inclure un mélange de lettres, chiffres et caractères spéciaux.",
+        "enterCurrentEmail": "Saisir votre email actuel",
+        "currentEmailInstructions": "Entrez l'email actuellement associé à votre compte pour continuer.",
+        "currentEmail": "Email actuel",
+        "verifyOtp": "Vérifier le code OTP",
+        "otpInstructions": "Saisissez le code OTP que vous avez reçu par email.",
+        "otp": "Code OTP",
+        "enterNewEmail": "Saisir le nouvel email",
+        "newEmailInstructions": "Entrez le nouvel email que vous souhaitez associer à votre compte.",
+        "newEmail": "Nouvel email",
+        "next": "Suivant",
+        "verify": "Vérifier",
+        "save": "Enregistrer",
+        "close": "Fermer",
+        "required": "Requis",
+        "emailUpdateSuccess": "Votre email a été mis à jour avec succès."
       },
       "preferences": {
         "title": "Préférences",
@@ -46,6 +67,13 @@
           "system": "Système"
         }
       }
+    },
+    "support": {
+      "title": "Support",
+      "description": "Vous pouvez contacter notre équipe de support par email ou par téléphone.",
+      "emailLabel": "Email :",
+      "phoneLabel": "Téléphone :",
+      "close": "Fermer"
     },
     "login": {
         "title": "Goose Administration",
@@ -87,6 +115,27 @@
       "addNewPage": "Ajouter une page",
       "table": {
         "title": "Titre",
+        "status": "Statut",
+        "actions": "Actions"
+      }
+    },
+    "users": {
+      "addNewUser": "Ajouter un utilisateur",
+      "table": {
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "email": "Email",
+        "role": "Rôle",
+        "status": "Statut",
+        "actions": "Actions"
+      }
+    },
+    "clients": {
+      "addNewClient": "Ajouter un client",
+      "table": {
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "email": "Email",
         "status": "Statut",
         "actions": "Actions"
       }

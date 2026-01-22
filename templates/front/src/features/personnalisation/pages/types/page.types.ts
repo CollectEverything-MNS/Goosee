@@ -1,3 +1,6 @@
+import { CATEGORY_BASIC_COMPONENTS } from '@/features/personnalisation/pages/types/categories/page-basic.types';
+import { CATEGORY_LAYOUT_COMPONENTS } from '@/features/personnalisation/pages/types/categories/page-layout.types';
+
 export enum PageStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
@@ -35,39 +38,25 @@ export type ComponentType =
   | 'heading'
   | 'text'
   | 'image'
-  | 'gallery'
-  | 'cta'
-  | 'contact-form'
-  | 'product-grid'
-  | 'features'
-  | 'testimonials'
   | 'spacer';
+
+export type ComponentCategory = 'basic' | 'layout';
 
 export interface ComponentDefinition {
   type: ComponentType;
   label: string;
   icon: string;
+  category: ComponentCategory;
   defaultProps: Record<string, unknown>;
 }
 
+export const COMPONENT_CATEGORIES: Record<ComponentCategory, { label: string; icon: string }> = {
+  basic: { label: 'Basique', icon: 'type' },
+  layout: { label: 'Mise en page', icon: 'layout' },
+};
+
 export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
-  {
-    type: 'heading',
-    label: 'Titre',
-    icon: 'heading',
-    defaultProps: {
-      content: 'Votre titre',
-      level: 'h2',
-      alignment: 'left',
-    },
-  },
-  {
-    type: 'text',
-    label: 'Bloc de texte',
-    icon: 'type',
-    defaultProps: {
-      content: 'Votre texte ici...',
-      alignment: 'left',
-    },
-  }
+  ...CATEGORY_BASIC_COMPONENTS,
+  ...CATEGORY_LAYOUT_COMPONENTS
+
 ];

@@ -1,10 +1,10 @@
 'use client';
 
-import AdminLayout from '@/components/layout/layout';
 import { PageEditor } from '@/features/personnalisation/pages/components/page-editor/page-editor';
 import { Page, PageStatus, PageType } from '@/features/personnalisation/pages/types/page.types';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import AdminLayout from '@/components/layout/admin/components/layout';
 
 // Mock data for now - will be replaced with API call
 const mockPage: Page = {
@@ -64,14 +64,9 @@ export default function EditPagePage() {
   const params = useParams();
   const pageId = params.id as string;
 
-  // TODO: Fetch page data from API using pageId
   const page = mockPage;
 
   const handleSave = async (data: Partial<Page>) => {
-    // TODO: Call API to update page
-    console.log('Updating page:', pageId, data);
-
-    // Redirect to pages list after update
     router.push(`/${locale}/goosee-admin/pages`);
   };
 

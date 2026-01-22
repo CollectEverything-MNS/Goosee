@@ -1,17 +1,19 @@
 'use client';
 
-import { COMPONENT_DEFINITIONS } from '../../types/page.types';
+import { COMPONENT_CATEGORIES, COMPONENT_DEFINITIONS, ComponentCategory } from '../../types/page.types';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
   Grid3X3,
+  Heading,
   Image,
   Layout,
-  List,
   Mail,
   Megaphone,
-  MessageCircle,
+  MessageSquareQuote,
   MoveVertical,
   ShoppingBag,
+  Sparkles,
   Type,
 } from 'lucide-react';
 import {
@@ -21,41 +23,81 @@ import {
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   layout: Layout,
   type: Type,
+  heading: Heading,
   image: Image,
-  grid: Grid3X3,
+  'grid-3x3': Grid3X3,
   megaphone: Megaphone,
   mail: Mail,
   'shopping-bag': ShoppingBag,
-  list: List,
-  'message-circle': MessageCircle,
-  'move-vertical': MoveVertical,
+  sparkles: Sparkles,
+  quote: MessageSquareQuote,
+  'separator-horizontal': MoveVertical,
 };
 
+const CATEGORY_ICONS: Record<ComponentCategory, React.ComponentType<{ className?: string }>> = {
+  basic: Type,
+  layout: Layout,
+};
+
+const CATEGORY_ORDER: ComponentCategory[] = ['layout', 'basic'];
 
 export function PageBuilderSidebar() {
+  const componentsByCategory = COMPONENT_DEFINITIONS.reduce((acc, def) => {
+    if (!acc[def.category]) {
+      acc[def.category] = [];
+    }
+    acc[def.category].push(def);
+    return acc;
+  }, {} as Record<ComponentCategory, typeof COMPONENT_DEFINITIONS>);
+
   return (
-    <div className="w-64 border-r bg-card">
-      <div className="border-b p-4">
-        <h3 className="font-semibold">Composants</h3>
+    <div className="flex h-full flex-col border-r bg-card">
+      <div className="border-b p-3">
+        <h3 className="font-semibold text-sm">Composants</h3>
         <p className="text-xs text-muted-foreground">
-          Glissez un composant dans la page
+          Glissez dans la page
         </p>
       </div>
 
-      <ScrollArea className="h-[calc(100%-80px)]">
-        <div className="grid grid-cols-2 gap-2 p-4">
-          {COMPONENT_DEFINITIONS.map((definition) => {
-            const Icon = ICONS[definition.icon] || Layout;
+      <ScrollArea className="flex-1">
+        <Accordion type="multiple" defaultValue={['layout', 'basic']} className="px-2">
+          {CATEGORY_ORDER.map((categoryKey) => {
+            const components = componentsByCategory[categoryKey];
+            if (!components || components.length === 0) return null;
+
+            const category = COMPONENT_CATEGORIES[categoryKey];
+            const CategoryIcon = CATEGORY_ICONS[categoryKey];
 
             return (
-              <PageBuilderSidebarDraggableItem
-                key={definition.type}
-                definition={definition}
-                Icon={Icon}
-              />
+              <AccordionItem key={categoryKey} value={categoryKey} className="border-b-0">
+                <AccordionTrigger className="py-2 text-sm hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <CategoryIcon className="h-4 w-4 text-muted-foreground" />
+                    <span>{category.label}</span>
+                    <span className="ml-auto mr-2 text-xs text-muted-foreground">
+                      {components.length}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-2">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {components.map((definition) => {
+                      const Icon = ICONS[definition.icon] || Layout;
+
+                      return (
+                        <PageBuilderSidebarDraggableItem
+                          key={definition.type}
+                          definition={definition}
+                          Icon={Icon}
+                        />
+                      );
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             );
           })}
-        </div>
+        </Accordion>
       </ScrollArea>
     </div>
   );

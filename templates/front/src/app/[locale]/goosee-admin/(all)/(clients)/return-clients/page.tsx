@@ -1,6 +1,6 @@
-import { AdminTitle } from '@/components/layout/admin-title'
-import { ReturnClientsBreadcrumb } from '@/features/clients/components/return-clients/return-clients-breadcrumb'
-import AdminLayout from '@/components/layout/layout'
+import { AdminTitle } from '@/components/layout/admin/components/admin-title';
+import AdminLayout from '@/components/layout/admin/components/layout';
+import { ReturnClientsBreadcrumb } from '@/features/clients/return-clients/components/return-clients-breadcrumb';
 
 export default function Page() {
   return (

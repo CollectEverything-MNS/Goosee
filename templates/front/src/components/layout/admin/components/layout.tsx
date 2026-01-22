@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { Separator } from '@/components/ui/separator'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import React from 'react'
-import { AdminSidebar } from '@/components/layout/admin-sidebar'
-import { AdminSearchbar } from '@/components/layout/admin-searchbar'
-import { AdminProfileDropdown } from '@/components/layout/admin-profile-dropdown'
+import { Separator } from '@/components/ui/separator';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import React from 'react';
+import { AdminSidebar } from '@/components/layout/admin/components/admin-sidebar';
+import { AdminSearchbar } from '@/components/layout/admin/components/admin-searchbar';
+import { AdminProfileDropdown } from './admin-profile-dropdown';
 
 interface Props {
   children: React.ReactNode

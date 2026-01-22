@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Copy, GripVertical, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDroppable } from '@dnd-kit/core';
+import { BlockRenderer } from '@/components/page-blocks';
 
 interface PageBuilderCanvasProps {
   components: PageComponent[];
@@ -107,49 +108,92 @@ function SortableComponent({
 function ComponentPreview({ component }: { component: PageComponent }) {
   const props = component.props;
 
-  switch (component.type) {
-    case 'hero':
-      return (
-        <div className="rounded bg-muted/50 p-4 text-center">
-          <div className="font-semibold">{props.title as string}</div>
-          <div className="text-xs">{props.subtitle as string}</div>
-        </div>
-      );
-    case 'text':
-      return (
-        <div
-          className="line-clamp-2 text-xs"
-          dangerouslySetInnerHTML={{ __html: (props.content as string) || '' }}
-        />
-      );
-    case 'cta':
-      return (
-        <div className="rounded bg-primary/10 p-2 text-center">
-          <div className="font-medium">{props.title as string}</div>
-          <div className="text-xs">{props.description as string}</div>
-        </div>
-      );
-    case 'product-grid':
-      return (
-        <div className="grid grid-cols-4 gap-1">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-square rounded bg-muted" />
-          ))}
-        </div>
-      );
-    case 'contact-form':
-      return (
-        <div className="space-y-1">
-          <div className="h-2 w-full rounded bg-muted" />
-          <div className="h-2 w-full rounded bg-muted" />
-          <div className="h-4 w-full rounded bg-muted" />
-        </div>
-      );
-    case 'spacer':
-      return <div className="h-4 border-y border-dashed" />;
-    default:
-      return <div className="text-xs italic">Aperçu non disponible</div>;
-  }
+  // Afficher un aperçu simplifié selon le type
+  const getPreviewContent = () => {
+    switch (component.type) {
+      case 'hero': {
+        const subtitle = props.subtitle as string | undefined;
+        return (
+          <div className="rounded bg-gradient-to-r from-primary/20 to-primary/5 p-3 text-center">
+            <div className="font-medium text-sm">{String(props.title || 'Hero')}</div>
+            {subtitle && <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>}
+          </div>
+        );
+      }
+      case 'heading':
+        return (
+          <div className="text-sm font-medium">
+            {String(props.content || 'Titre')}
+            <span className="ml-2 text-xs text-muted-foreground">({String(props.level || 'h2')})</span>
+          </div>
+        );
+      case 'text':
+        return (
+          <div className="text-xs text-muted-foreground line-clamp-2">
+            {(props.content as string)?.replace(/<[^>]*>/g, '') || 'Texte...'}
+          </div>
+        );
+      case 'image':
+        return (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">📷</div>
+            {(props.alt as string) || 'Image'}
+          </div>
+        );
+      case 'cta':
+        return (
+          <div className="rounded bg-primary/10 p-2 text-center text-sm">
+            {(props.title as string) || 'Call to Action'}
+          </div>
+        );
+      case 'product-grid':
+        return (
+          <div className="grid grid-cols-4 gap-1">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="aspect-square rounded bg-muted text-[8px] flex items-center justify-center">🛍️</div>
+            ))}
+          </div>
+        );
+      case 'features':
+        return (
+          <div className="flex gap-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex-1 rounded bg-muted p-1 text-center text-[10px]">Feature {i}</div>
+            ))}
+          </div>
+        );
+      case 'testimonials':
+        return (
+          <div className="text-xs text-muted-foreground italic">&quot;Témoignages clients...&quot;</div>
+        );
+      case 'contact-form':
+        return (
+          <div className="space-y-1">
+            <div className="h-2 w-full rounded bg-muted" />
+            <div className="h-2 w-3/4 rounded bg-muted" />
+            <div className="h-4 w-1/2 rounded bg-primary/20" />
+          </div>
+        );
+      case 'gallery':
+        return (
+          <div className="grid grid-cols-3 gap-1">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="aspect-square rounded bg-muted text-[8px] flex items-center justify-center">🖼️</div>
+            ))}
+          </div>
+        );
+      case 'spacer':
+        return <div className="h-4 border-y border-dashed border-muted-foreground/30" />;
+      default:
+        return <div className="text-xs italic text-muted-foreground">Aperçu</div>;
+    }
+  };
+
+  return (
+    <div className="pointer-events-none">
+      {getPreviewContent()}
+    </div>
+  );
 }
 
 export function PageBuilderCanvas({
@@ -164,9 +208,9 @@ export function PageBuilderCanvas({
   });
 
   return (
-    <div ref={setNodeRef} className="flex-1 bg-muted/30">
+    <div ref={setNodeRef} className="h-full overflow-hidden bg-muted/30">
       <ScrollArea className="h-full">
-        <div className="mx-auto space-y-4 p-8">
+        <div className="space-y-3 p-4">
           {components.length === 0 ? (
             <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed">
               <p className="text-muted-foreground">

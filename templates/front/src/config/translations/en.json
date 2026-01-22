@@ -32,7 +32,28 @@
         "password": "Password",
         "changePassword": "Change your password",
         "change": "Change",
-        "modify": "Modify"
+        "modify": "Modify",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "saveChanges": "Save changes",
+        "modifyPassword": "Modify Password",
+        "passwordInstructions": "Password must be at least 8 characters long and include a mix of letters, numbers, and special characters.",
+        "enterCurrentEmail": "Enter your current email",
+        "currentEmailInstructions": "Enter the email currently associated with your account to continue.",
+        "currentEmail": "Current Email",
+        "verifyOtp": "Verify OTP",
+        "otpInstructions": "Enter the OTP code you received by email.",
+        "otp": "OTP Code",
+        "enterNewEmail": "Enter new email",
+        "newEmailInstructions": "Enter the new email you want to associate with your account.",
+        "newEmail": "New Email",
+        "next": "Next",
+        "verify": "Verify",
+        "save": "Save",
+        "close": "Close",
+        "required": "Required",
+        "emailUpdateSuccess": "Your email has been successfully updated."
       },
       "preferences": {
         "title": "Preferences",
@@ -47,6 +68,13 @@
           "system": "System"
         }
       }
+    },
+    "support": {
+      "title": "Support",
+      "description": "You can contact our support team by email or phone.",
+      "emailLabel": "Email:",
+      "phoneLabel": "Phone:",
+      "close": "Close"
     },
     "login": {
       "title": "Goosee Administration",
@@ -87,6 +115,27 @@
       "addNewPage": "Add New Page",
       "table": {
         "title": "Title",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "users": {
+      "addNewUser": "Add New User",
+      "table": {
+        "firstname": "Firstname",
+        "lastname": "Lastname",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "clients": {
+      "addNewClient": "Add New Client",
+      "table": {
+        "firstname": "Firstname",
+        "lastname": "Lastname",
+        "email": "Email",
         "status": "Status",
         "actions": "Actions"
       }

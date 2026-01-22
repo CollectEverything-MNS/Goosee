@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { HelpCircle, LogOut, Settings } from 'lucide-react'
+import { useState } from 'react';
+import { HelpCircle, LogOut, Settings } from 'lucide-react';
 
-import { Avatar } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
+import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,13 +12,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useTranslations } from 'next-intl'
-import { AdminModalSettings } from './admin-modal-settings/admin-modal-settings'
+} from '@/components/ui/dropdown-menu';
+import { useTranslations } from 'next-intl';
+import { AdminModalSettings } from './admin-modal-settings/admin-modal-settings';
+import { AdminSupportModal } from '@/components/layout/admin/components/admin-modal-settings/admin-modal-support';
 
 export function AdminProfileDropdown() {
   const t = useTranslations()
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [supportOpen, setSupportOpen] = useState(false)
 
   return (
     <>
@@ -40,7 +42,7 @@ export function AdminProfileDropdown() {
             <Settings />
             {t('admin.profileDropdown.settings')}
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setSupportOpen(true)}>
             <HelpCircle />
             {t('admin.profileDropdown.support')}
           </DropdownMenuItem>
@@ -53,6 +55,7 @@ export function AdminProfileDropdown() {
       </DropdownMenu>
 
       <AdminModalSettings open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <AdminSupportModal open={supportOpen} onOpenChange={setSupportOpen} />
     </>
   )
 }

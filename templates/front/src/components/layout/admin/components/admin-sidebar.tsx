@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import Link from 'next/link'
-import { ChevronRight, LogOut, LucideIcon } from 'lucide-react'
-import { routes } from '@/config/routes.config'
-import { usePathname } from 'next/navigation'
+import * as React from 'react';
+import Link from 'next/link';
+import { ChevronRight, LogOut, LucideIcon } from 'lucide-react';
+import { routes } from '@/config/routes.config';
+import { usePathname } from 'next/navigation';
 
 import {
   Sidebar,
@@ -19,10 +19,10 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-} from '@/components/ui/sidebar'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
-import { getAdminMenu } from '@/config/menu-admin.config'
-import { useLocale, useTranslations } from 'next-intl'
+} from '@/components/ui/sidebar';
+import { getAdminMenu } from '@/config/menu-admin.config';
+import { useLocale, useTranslations } from 'next-intl';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 type TItem = {
   name: string

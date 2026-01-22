@@ -12,11 +12,14 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { useDebounce } from '@/hooks/use-debounce';
 import { COMPONENT_DEFINITIONS, ComponentType, PageComponent } from '../../types/page.types';
 import { PageBuilderSidebar } from './page-builder-sidebar';
 import { PageBuilderCanvas } from './page-builder-canvas';
 import { PageBuilderComponentEditor } from './page-builder-component-editor';
 import { PageBuilderDragOverlay } from './page-builder-drag-overlay';
+import { PageBuilderPreview } from './page-builder-preview';
 
 interface PageBuilderProps {
   components: PageComponent[];
@@ -27,6 +30,8 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeDragType, setActiveDragType] = useState<'sidebar' | 'canvas' | null>(null);
+
+  const debouncedComponents = useDebounce(components, 150);
 
   const selectedComponent = components.find((c) => c.id === selectedComponentId);
 
@@ -58,7 +63,6 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
 
     if (!over) return;
 
-    // Dragging from sidebar to canvas
     if (active.data.current?.fromSidebar) {
       const componentType = active.data.current.type as ComponentType;
       const definition = COMPONENT_DEFINITIONS.find((d) => d.type === componentType);
@@ -137,18 +141,36 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-[calc(100vh-200px)] gap-0 overflow-hidden rounded-lg border">
-        <PageBuilderSidebar />
+      <div className="relative h-[calc(100vh-200px)] overflow-hidden rounded-lg border">
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={15} minSize={12} maxSize={20}>
+            <PageBuilderSidebar />
+          </ResizablePanel>
 
-        <SortableContext items={components.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          <PageBuilderCanvas
-            components={components}
-            selectedComponentId={selectedComponentId}
-            onSelectComponent={setSelectedComponentId}
-            onDeleteComponent={handleDeleteComponent}
-            onDuplicateComponent={handleDuplicateComponent}
-          />
-        </SortableContext>
+          <ResizableHandle withHandle />
+
+          <ResizablePanel defaultSize={35} minSize={20} maxSize={50}>
+            <SortableContext items={components.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+              <PageBuilderCanvas
+                components={components}
+                selectedComponentId={selectedComponentId}
+                onSelectComponent={setSelectedComponentId}
+                onDeleteComponent={handleDeleteComponent}
+                onDuplicateComponent={handleDuplicateComponent}
+              />
+            </SortableContext>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
+
+          <ResizablePanel defaultSize={50} minSize={30}>
+            <PageBuilderPreview
+              components={debouncedComponents}
+              selectedComponentId={selectedComponentId}
+              onSelectComponent={setSelectedComponentId}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
 
         {selectedComponent && (
           <PageBuilderComponentEditor

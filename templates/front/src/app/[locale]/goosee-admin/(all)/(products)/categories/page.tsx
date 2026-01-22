@@ -1,6 +1,6 @@
-import { AdminTitle } from '@/components/layout/admin-title'
-import { CategoriesBreadcrumb } from '@/features/products/components/categories/categories-breadcrumb'
-import AdminLayout from '@/components/layout/layout'
+import { AdminTitle } from '@/components/layout/admin/components/admin-title';
+import AdminLayout from '@/components/layout/admin/components/layout';
+import { CategoriesBreadcrumb } from '@/features/products/components/categories/categories-breadcrumb';
 
 export default function Page() {
   return (
