@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { HttpProxyService } from '../../../../shared/services/http-proxy.service';
 import { serviceUrl, ServiceUrls } from '../../../../config/services.config';
 import { routesConfig } from '../../../../config/routes.config';
 import { ForgetPasswordConfirmDto } from './forget-password-confirm.dto';
-import { HttpProxyService } from '../../../../shared/services/http-proxy.service';
 
 @Injectable()
 export class ForgetPasswordConfirmService {
@@ -17,7 +17,7 @@ export class ForgetPasswordConfirmService {
   }
 
   async execute(dto: ForgetPasswordConfirmDto) {
-    const url = routesConfig.auth.forgetPasswordRequest.link(this.services.auth);
-    return this.httpProxy.post(url, dto, 'Forget password confirm failed');
+    const url = routesConfig.auth.forgetPasswordConfirm.link(this.services.auth);
+    return this.httpProxy.put(url, dto, 'Forget password confirm failed');
   }
 }
