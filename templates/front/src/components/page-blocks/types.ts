@@ -1,6 +1,6 @@
 
 export interface BlockContext {
-  mode: 'preview' | 'storefront';
+  mode: 'preview' | 'front';
   isSelected?: boolean;
   onSelect?: () => void;
 }
