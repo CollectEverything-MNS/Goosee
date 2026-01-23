@@ -8,7 +8,7 @@ import { IPageRepository } from '../page.repository';
 export class TypeOrmPageRepository extends IPageRepository {
   constructor(
     @InjectRepository(Page)
-    private readonly pageRepository: Repository<Page>,
+    private readonly pageRepository: Repository<Page>
   ) {
     super();
   }
@@ -33,8 +33,12 @@ export class TypeOrmPageRepository extends IPageRepository {
   }
 
   async update(id: string, page: Partial<Page>): Promise<Page | null> {
-    await this.pageRepository.update(id, page);
-    return this.findById(id);
+    const existingPage = await this.findById(id);
+    if (!existingPage) {
+      return null;
+    }
+    const updatedPage = this.pageRepository.merge(existingPage, page);
+    return this.pageRepository.save(updatedPage);
   }
 
   async delete(id: string): Promise<void> {

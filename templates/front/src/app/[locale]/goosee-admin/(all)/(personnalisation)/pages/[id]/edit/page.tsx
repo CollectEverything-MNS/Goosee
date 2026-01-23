@@ -1,40 +1,37 @@
 'use client';
 
+import { use } from 'react';
 import { PageEditor } from '@/features/personnalisation/pages/components/page-editor/page-editor';
-import { Page, PageStatus, PageType } from '@/features/personnalisation/pages/types/page.types';
 import AdminLayout from '@/components/layout/admin/components/layout';
+import { Loader2 } from 'lucide-react';
+import { usePage } from '@/features/personnalisation/pages/usecases/get-page-by-id/use-get-page-by-id';
+import { LoaderError } from '@/components/ux/loader-error';
 
-// Mock data for now - will be replaced with API call
-const mockPage: Page = {
-  id: '1',
-  title: 'Accueil',
-  slug: 'accueil',
-  status: PageStatus.PUBLISHED,
-  type: PageType.HOME,
-  components: [
-    {
-      id: '1',
-      type: 'hero',
-      order: 0,
-      props: {
-        title: 'Bienvenue sur notre boutique',
-        subtitle: 'Découvrez nos produits exceptionnels',
-        buttonText: 'Voir le catalogue',
-        buttonLink: '/catalog',
-        alignment: 'center',
-      },
-    }
-  ],
-  metaTitle: 'Accueil - Ma Boutique',
-  metaDescription: 'Bienvenue sur notre boutique en ligne',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
+interface EditPagePageProps {
+  params: Promise<{ id: string }>;
+}
 
-export default function EditPagePage() {
+export default function EditPagePage({ params }: EditPagePageProps) {
+  const { id } = use(params);
+  const { data: page, isLoading, error } = usePage(id);
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return <LoaderError message={error.message} />;
+  }
+
   return (
     <AdminLayout>
-      <PageEditor page={mockPage} />
+      <PageEditor page={page} />
     </AdminLayout>
   );
 }

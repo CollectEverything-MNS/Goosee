@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import { Search } from 'lucide-react'
+import * as React from 'react';
+import { Search } from 'lucide-react';
 
 import {
   CommandDialog,
@@ -12,13 +12,18 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from '@/components/ui/command'
-import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/command';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
 
 export function AdminSearchbar() {
   const t = useTranslations()
   const [open, setOpen] = React.useState(false)
+  const [isMac, setIsMac] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsMac(navigator.platform.includes('Mac'))
+  }, [])
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -43,7 +48,7 @@ export function AdminSearchbar() {
         </div>
 
         <div className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-          <span className="text-xs">{navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}</span>K
+          <span className="text-xs">{isMac ? '⌘' : 'Ctrl'}</span>K
         </div>
       </Button>
       <Button variant={'ghost'} onClick={() => setOpen(true)} className={'text-white md:hidden'}>

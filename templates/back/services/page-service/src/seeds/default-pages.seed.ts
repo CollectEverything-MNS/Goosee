@@ -22,44 +22,6 @@ export const DEFAULT_PAGES: Partial<Page>[] = [
           alignment: 'center',
         },
       },
-      {
-        id: 'features-1',
-        type: 'features',
-        order: 1,
-        props: {
-          title: 'Pourquoi nous choisir ?',
-          features: [
-            { icon: 'truck', title: 'Livraison rapide', description: 'En 24-48h' },
-            { icon: 'shield', title: 'Paiement sécurisé', description: '100% sécurisé' },
-            { icon: 'refresh', title: 'Retours gratuits', description: 'Sous 30 jours' },
-          ],
-          columns: 3,
-        },
-      },
-      {
-        id: 'products-1',
-        type: 'product-grid',
-        order: 2,
-        props: {
-          title: 'Nos produits populaires',
-          columns: 4,
-          limit: 8,
-          category: '',
-          showPrice: true,
-        },
-      },
-      {
-        id: 'cta-1',
-        type: 'cta',
-        order: 3,
-        props: {
-          title: 'Prêt à découvrir notre collection ?',
-          description: 'Parcourez notre catalogue et trouvez le produit parfait',
-          buttonText: 'Voir tous les produits',
-          buttonLink: '/catalog',
-          variant: 'primary',
-        },
-      },
     ],
   },
   {
@@ -81,18 +43,6 @@ export const DEFAULT_PAGES: Partial<Page>[] = [
           buttonText: '',
           buttonLink: '',
           alignment: 'center',
-        },
-      },
-      {
-        id: 'products-catalog',
-        type: 'product-grid',
-        order: 1,
-        props: {
-          title: '',
-          columns: 4,
-          limit: 20,
-          category: '',
-          showPrice: true,
         },
       },
     ],
@@ -123,26 +73,9 @@ export const DEFAULT_PAGES: Partial<Page>[] = [
         type: 'text',
         order: 1,
         props: {
-          content: '<p>Vous avez une question ? N\'hésitez pas à nous contacter via le formulaire ci-dessous ou par email à contact@votresite.com</p>',
+          content:
+            "<p>Vous avez une question ? N'hésitez pas à nous contacter via le formulaire ci-dessous ou par email à contact@votresite.com</p>",
           alignment: 'center',
-        },
-      },
-      {
-        id: 'form-contact',
-        type: 'contact-form',
-        order: 2,
-        props: {
-          title: 'Envoyez-nous un message',
-          fields: ['name', 'email', 'phone', 'message'],
-          submitText: 'Envoyer',
-        },
-      },
-      {
-        id: 'spacer-contact',
-        type: 'spacer',
-        order: 3,
-        props: {
-          height: 'lg',
         },
       },
     ],

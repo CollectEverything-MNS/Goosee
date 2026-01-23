@@ -1,8 +1,9 @@
 'use client';
 
-import { COMPONENT_CATEGORIES, COMPONENT_DEFINITIONS, ComponentCategory } from '../../types/page.types';
+import { COMPONENT_DEFINITIONS, ComponentCategory } from '../../types/page.types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useTranslations } from 'next-intl';
 import {
   Grid3X3,
   Heading,
@@ -50,6 +51,8 @@ const CATEGORY_ICONS: Record<ComponentCategory, React.ComponentType<{ className?
 const CATEGORY_ORDER: ComponentCategory[] = ['layout', 'basic'];
 
 export function PageBuilderSidebar() {
+  const t = useTranslations('admin.pageBuilder');
+
   const componentsByCategory = COMPONENT_DEFINITIONS.reduce((acc, def) => {
     if (!acc[def.category]) {
       acc[def.category] = [];
@@ -61,9 +64,9 @@ export function PageBuilderSidebar() {
   return (
     <div className="flex h-full flex-col border-r bg-card">
       <div className="border-b p-3">
-        <h3 className="font-semibold text-sm">Composants</h3>
+        <h3 className="font-semibold text-sm">{t('sidebar.title')}</h3>
         <p className="text-xs text-muted-foreground">
-          Glissez dans la page
+          {t('sidebar.subtitle')}
         </p>
       </div>
 
@@ -73,7 +76,6 @@ export function PageBuilderSidebar() {
             const components = componentsByCategory[categoryKey];
             if (!components || components.length === 0) return null;
 
-            const category = COMPONENT_CATEGORIES[categoryKey];
             const CategoryIcon = CATEGORY_ICONS[categoryKey];
 
             return (
@@ -81,7 +83,7 @@ export function PageBuilderSidebar() {
                 <AccordionTrigger className="py-2 text-sm hover:no-underline">
                   <div className="flex items-center gap-2">
                     <CategoryIcon className="h-4 w-4 text-muted-foreground" />
-                    <span>{category.label}</span>
+                    <span>{t(`categories.${categoryKey}`)}</span>
                     <span className="ml-auto mr-2 text-xs text-muted-foreground">
                       {components.length}
                     </span>
@@ -91,11 +93,12 @@ export function PageBuilderSidebar() {
                   <div className="flex flex-wrap gap-1.5">
                     {components.map((definition) => {
                       const Icon = ICONS[definition.icon] || Layout;
+                      const translatedLabel = t(`components.${definition.type}`);
 
                       return (
                         <PageBuilderSidebarDraggableItem
                           key={definition.type}
-                          definition={definition}
+                          definition={{ ...definition, label: translatedLabel }}
                           Icon={Icon}
                         />
                       );

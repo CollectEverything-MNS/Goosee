@@ -3,5 +3,5 @@
 import { AdminBreadcrumbGeneric } from '@/components/layout/admin/components/admin-breadcrumb-generic';
 
 export function PagesBreadcrumb() {
-  return <AdminBreadcrumbGeneric items={[{ label: 'Pages' }, { label: 'Test' }]} />
+  return <AdminBreadcrumbGeneric items={[{ label: 'Pages' }]} />
 }

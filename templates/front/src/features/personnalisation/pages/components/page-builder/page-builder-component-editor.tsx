@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Palette, Settings, Type, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface PageBuilderComponentEditorProps {
   component: PageComponent;
@@ -21,51 +22,24 @@ export function PageBuilderComponentEditor({
   onUpdate,
   onClose,
 }: PageBuilderComponentEditorProps) {
+  const tComponents = useTranslations('admin.pageBuilder.components');
+  const tEditor = useTranslations('admin.pageBuilder.editor');
+  const tLabels = useTranslations('admin.pageBuilder.editor.labels');
+  const tOptions = useTranslations('admin.pageBuilder.editor.options');
+
   const definition = COMPONENT_DEFINITIONS.find((d) => d.type === component.type);
+  const componentLabel = tComponents(component.type as never);
 
   const handleChange = (key: string, value: unknown) => {
     onUpdate({ [key]: value });
   };
 
   const formatLabel = (key: string): string => {
-    const labels: Record<string, string> = {
-      title: 'Titre',
-      subtitle: 'Sous-titre',
-      content: 'Contenu',
-      description: 'Description',
-      buttonText: 'Texte du bouton',
-      buttonLink: 'Lien du bouton',
-      alignment: 'Alignement',
-      level: 'Niveau',
-      height: 'Hauteur',
-      variant: 'Variante',
-      src: 'URL de l\'image',
-      alt: 'Texte alternatif',
-      width: 'Largeur',
-      rounded: 'Coins arrondis',
-      columns: 'Colonnes',
-      gap: 'Espacement',
-      limit: 'Limite',
-      showPrice: 'Afficher prix',
-      showAddToCart: 'Bouton panier',
-      submitText: 'Texte du bouton',
-      overlay: 'Overlay sombre',
-      backgroundType: 'Type de fond',
-      backgroundColor: 'Couleur de fond',
-      backgroundImage: 'Image de fond',
-      textColor: 'Couleur du texte',
-      color: 'Couleur',
-      text: 'Texte',
-      link: 'Lien',
-      size: 'Taille',
-      style: 'Style',
-      author: 'Auteur',
-      items: 'Éléments',
-      url: 'URL',
-      aspectRatio: 'Format',
-      padding: 'Espacement interne',
-    };
-    return labels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim();
+    try {
+      return tLabels(key as never);
+    } catch {
+      return key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim();
+    }
   };
 
   const renderField = (key: string, value: unknown) => {
@@ -97,12 +71,12 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="h1">H1 - Très grand</SelectItem>
-              <SelectItem value="h2">H2 - Grand</SelectItem>
-              <SelectItem value="h3">H3 - Moyen-grand</SelectItem>
-              <SelectItem value="h4">H4 - Moyen</SelectItem>
-              <SelectItem value="h5">H5 - Petit</SelectItem>
-              <SelectItem value="h6">H6 - Très petit</SelectItem>
+              <SelectItem value="h1">{tOptions('level.h1')}</SelectItem>
+              <SelectItem value="h2">{tOptions('level.h2')}</SelectItem>
+              <SelectItem value="h3">{tOptions('level.h3')}</SelectItem>
+              <SelectItem value="h4">{tOptions('level.h4')}</SelectItem>
+              <SelectItem value="h5">{tOptions('level.h5')}</SelectItem>
+              <SelectItem value="h6">{tOptions('level.h6')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -134,9 +108,9 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="left">Gauche</SelectItem>
-              <SelectItem value="center">Centre</SelectItem>
-              <SelectItem value="right">Droite</SelectItem>
+              <SelectItem value="left">{tOptions('alignment.left')}</SelectItem>
+              <SelectItem value="center">{tOptions('alignment.center')}</SelectItem>
+              <SelectItem value="right">{tOptions('alignment.right')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -153,9 +127,9 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="primary">Principal</SelectItem>
-              <SelectItem value="secondary">Secondaire</SelectItem>
-              <SelectItem value="outline">Contour</SelectItem>
+              <SelectItem value="primary">{tOptions('variant.primary')}</SelectItem>
+              <SelectItem value="secondary">{tOptions('variant.secondary')}</SelectItem>
+              <SelectItem value="outline">{tOptions('variant.outline')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -172,11 +146,11 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="sm">Petit</SelectItem>
-              <SelectItem value="md">Moyen</SelectItem>
-              <SelectItem value="lg">Grand</SelectItem>
-              <SelectItem value="xl">Très grand</SelectItem>
-              {key === 'height' && <SelectItem value="full">Plein écran</SelectItem>}
+              <SelectItem value="sm">{tOptions('size.sm')}</SelectItem>
+              <SelectItem value="md">{tOptions('size.md')}</SelectItem>
+              <SelectItem value="lg">{tOptions('size.lg')}</SelectItem>
+              <SelectItem value="xl">{tOptions('size.xl')}</SelectItem>
+              {key === 'height' && <SelectItem value="full">{tOptions('size.full')}</SelectItem>}
             </SelectContent>
           </Select>
         </div>
@@ -193,10 +167,10 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="sm">Petite</SelectItem>
-              <SelectItem value="md">Moyenne</SelectItem>
-              <SelectItem value="lg">Grande</SelectItem>
-              <SelectItem value="full">Pleine largeur</SelectItem>
+              <SelectItem value="sm">{tOptions('width.sm')}</SelectItem>
+              <SelectItem value="md">{tOptions('width.md')}</SelectItem>
+              <SelectItem value="lg">{tOptions('width.lg')}</SelectItem>
+              <SelectItem value="full">{tOptions('width.full')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -213,10 +187,10 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">1 colonne</SelectItem>
-              <SelectItem value="2">2 colonnes</SelectItem>
-              <SelectItem value="3">3 colonnes</SelectItem>
-              <SelectItem value="4">4 colonnes</SelectItem>
+              <SelectItem value="1">{tOptions('columns.1')}</SelectItem>
+              <SelectItem value="2">{tOptions('columns.2')}</SelectItem>
+              <SelectItem value="3">{tOptions('columns.3')}</SelectItem>
+              <SelectItem value="4">{tOptions('columns.4')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -237,9 +211,9 @@ export function PageBuilderComponentEditor({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="solid">Solide</SelectItem>
-                <SelectItem value="dashed">Tirets</SelectItem>
-                <SelectItem value="dotted">Pointillés</SelectItem>
+                <SelectItem value="solid">{tOptions('dividerStyle.solid')}</SelectItem>
+                <SelectItem value="dashed">{tOptions('dividerStyle.dashed')}</SelectItem>
+                <SelectItem value="dotted">{tOptions('dividerStyle.dotted')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -255,9 +229,9 @@ export function PageBuilderComponentEditor({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="bullet">Puces</SelectItem>
-                <SelectItem value="number">Numéros</SelectItem>
-                <SelectItem value="check">Coches</SelectItem>
+                <SelectItem value="bullet">{tOptions('listStyle.bullet')}</SelectItem>
+                <SelectItem value="number">{tOptions('listStyle.number')}</SelectItem>
+                <SelectItem value="check">{tOptions('listStyle.check')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -275,9 +249,9 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="sm">Petit</SelectItem>
-              <SelectItem value="md">Moyen</SelectItem>
-              <SelectItem value="lg">Grand</SelectItem>
+              <SelectItem value="sm">{tOptions('size.sm')}</SelectItem>
+              <SelectItem value="md">{tOptions('size.md')}</SelectItem>
+              <SelectItem value="lg">{tOptions('size.lg')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -294,9 +268,9 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="16:9">16:9 (Paysage)</SelectItem>
-              <SelectItem value="4:3">4:3 (Standard)</SelectItem>
-              <SelectItem value="1:1">1:1 (Carré)</SelectItem>
+              <SelectItem value="16:9">{tOptions('aspectRatio.16:9')}</SelectItem>
+              <SelectItem value="4:3">{tOptions('aspectRatio.4:3')}</SelectItem>
+              <SelectItem value="1:1">{tOptions('aspectRatio.1:1')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -313,10 +287,10 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">Aucun</SelectItem>
-              <SelectItem value="sm">Petit</SelectItem>
-              <SelectItem value="md">Moyen</SelectItem>
-              <SelectItem value="lg">Grand</SelectItem>
+              <SelectItem value="none">{tOptions('padding.none')}</SelectItem>
+              <SelectItem value="sm">{tOptions('padding.sm')}</SelectItem>
+              <SelectItem value="md">{tOptions('padding.md')}</SelectItem>
+              <SelectItem value="lg">{tOptions('padding.lg')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -333,9 +307,9 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="color">Couleur unie</SelectItem>
-              <SelectItem value="image">Image</SelectItem>
-              <SelectItem value="gradient">Dégradé</SelectItem>
+              <SelectItem value="color">{tOptions('backgroundType.color')}</SelectItem>
+              <SelectItem value="image">{tOptions('backgroundType.image')}</SelectItem>
+              <SelectItem value="gradient">{tOptions('backgroundType.gradient')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -429,8 +403,8 @@ export function PageBuilderComponentEditor({
     <div className="absolute right-0 top-0 z-50 flex h-full w-80 flex-col border-l bg-card shadow-lg">
       <div className="flex items-center justify-between border-b p-3">
         <div>
-          <h3 className="font-semibold text-sm">{definition?.label || component.type}</h3>
-          <p className="text-xs text-muted-foreground">Modifier le composant</p>
+          <h3 className="font-semibold text-sm">{componentLabel || definition?.label || component.type}</h3>
+          <p className="text-xs text-muted-foreground">{tEditor('editComponent')}</p>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-4 w-4" />
@@ -444,7 +418,7 @@ export function PageBuilderComponentEditor({
               <AccordionTrigger className="py-2 hover:no-underline">
                 <div className="flex items-center gap-2 text-sm">
                   <Type className="h-4 w-4 text-muted-foreground" />
-                  <span>Contenu</span>
+                  <span>{tEditor('sections.content')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
@@ -460,7 +434,7 @@ export function PageBuilderComponentEditor({
               <AccordionTrigger className="py-2 hover:no-underline">
                 <div className="flex items-center gap-2 text-sm">
                   <Palette className="h-4 w-4 text-muted-foreground" />
-                  <span>Style</span>
+                  <span>{tEditor('sections.style')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
@@ -476,7 +450,7 @@ export function PageBuilderComponentEditor({
               <AccordionTrigger className="py-2 hover:no-underline">
                 <div className="flex items-center gap-2 text-sm">
                   <Settings className="h-4 w-4 text-muted-foreground" />
-                  <span>Options</span>
+                  <span>{tEditor('sections.options')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>

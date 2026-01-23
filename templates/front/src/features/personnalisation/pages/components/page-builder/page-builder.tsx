@@ -223,7 +223,7 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
     >
       <div className="relative h-[calc(100vh-200px)] overflow-hidden rounded-lg border">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={15} minSize={12} maxSize={20}>
+          <ResizablePanel defaultSize={20} minSize={12} maxSize={20}>
             <PageBuilderSidebar />
           </ResizablePanel>
 

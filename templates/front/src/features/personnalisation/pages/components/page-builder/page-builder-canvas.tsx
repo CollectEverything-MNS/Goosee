@@ -2,12 +2,13 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { COMPONENT_DEFINITIONS, PageComponent } from '../../types/page.types';
+import { PageComponent } from '../../types/page.types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CameraIcon, Copy, Grid3X3, GripVertical, Trash2, VideoIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDroppable } from '@dnd-kit/core';
+import { useTranslations } from 'next-intl';
 
 interface PageBuilderCanvasProps {
   components: PageComponent[];
@@ -25,6 +26,8 @@ interface SortableComponentProps {
   onSelect: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  componentLabel: string;
+  translations: ComponentPreviewProps['translations'];
 }
 
 function SortableComponent({
@@ -33,6 +36,8 @@ function SortableComponent({
   onSelect,
   onDelete,
   onDuplicate,
+  componentLabel,
+  translations,
 }: SortableComponentProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: component.id,
@@ -42,8 +47,6 @@ function SortableComponent({
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
-  const definition = COMPONENT_DEFINITIONS.find((d) => d.type === component.type);
 
   return (
     <div
@@ -95,18 +98,25 @@ function SortableComponent({
 
       <div className="flex items-center gap-2">
         <span className="rounded bg-muted px-2 py-1 text-xs font-medium">
-          {definition?.label || component.type}
+          {componentLabel}
         </span>
       </div>
 
       <div className="mt-2 text-sm text-muted-foreground">
-        <ComponentPreview component={component} />
+        <ComponentPreview component={component} translations={translations} />
       </div>
     </div>
   );
 }
 
-function GridDropZone({ gridId, gridChildren = [] }: { gridId: string; gridChildren?: PageComponent[] }) {
+interface GridDropZoneProps {
+  gridId: string;
+  gridChildren?: PageComponent[];
+  getComponentLabel: (type: string) => string;
+  emptyText: string;
+}
+
+function GridDropZone({ gridId, gridChildren = [], getComponentLabel, emptyText }: GridDropZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `grid-${gridId}`,
     data: {
@@ -127,38 +137,47 @@ function GridDropZone({ gridId, gridChildren = [] }: { gridId: string; gridChild
         <div className="grid grid-cols-2 gap-2">
           {gridChildren
             .sort((a, b) => a.order - b.order)
-            .map((child) => {
-              const def = COMPONENT_DEFINITIONS.find((d) => d.type === child.type);
-              return (
-                <div
-                  key={child.id}
-                  className="rounded bg-card px-2 py-1 text-xs border"
-                >
-                  {def?.label || child.type}
-                </div>
-              );
-            })}
+            .map((child) => (
+              <div
+                key={child.id}
+                className="rounded bg-card px-2 py-1 text-xs border"
+              >
+                {getComponentLabel(child.type)}
+              </div>
+            ))}
         </div>
       ) : (
         <p className="text-xs text-center text-muted-foreground">
-          Glissez des composants ici
+          {emptyText}
         </p>
       )}
     </div>
   );
 }
 
-function ComponentPreview({ component }: { component: PageComponent }) {
-  const props = component.props;
+interface ComponentPreviewProps {
+  component: PageComponent;
+  translations: {
+    getComponentLabel: (type: string) => string;
+    gridDropZoneEmpty: string;
+    columns: string;
+    element: string;
+    elements: string;
+  };
+}
 
-  // Afficher un aperçu simplifié selon le type
+function ComponentPreview({ component, translations }: ComponentPreviewProps) {
+  const props = component.props;
+  const { getComponentLabel, gridDropZoneEmpty, columns: columnsLabel, element, elements } = translations;
+
+  // Display a simplified preview based on type
   const getPreviewContent = () => {
     switch (component.type) {
       case 'hero': {
         const subtitle = props.subtitle as string | undefined;
         return (
           <div className="rounded bg-gradient-to-r from-primary/20 to-primary/5 p-3 text-center">
-            <div className="font-medium text-sm">{String(props.title || 'Hero')}</div>
+            <div className="font-medium text-sm">{String(props.title || getComponentLabel('hero'))}</div>
             {subtitle && <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>}
           </div>
         );
@@ -166,21 +185,21 @@ function ComponentPreview({ component }: { component: PageComponent }) {
       case 'heading':
         return (
           <div className="text-sm font-medium">
-            {String(props.content || 'Titre')}
+            {String(props.content || getComponentLabel('heading'))}
             <span className="ml-2 text-xs text-muted-foreground">({String(props.level || 'h2')})</span>
           </div>
         );
       case 'text':
         return (
           <div className="text-xs text-muted-foreground line-clamp-2">
-            {(props.content as string)?.replace(/<[^>]*>/g, '') || 'Texte...'}
+            {(props.content as string)?.replace(/<[^>]*>/g, '') || `${getComponentLabel('text')}...`}
           </div>
         );
       case 'image':
         return (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <div className="h-8 w-8 rounded bg-muted flex items-center justify-center"><CameraIcon size={20} /></div>
-            {(props.alt as string) || 'Image'}
+            {(props.alt as string) || getComponentLabel('image')}
           </div>
         );
       case 'spacer':
@@ -188,7 +207,7 @@ function ComponentPreview({ component }: { component: PageComponent }) {
       case 'button':
         return (
           <div className="inline-block rounded bg-primary px-3 py-1 text-xs text-primary-foreground">
-            {String(props.text || 'Bouton')}
+            {String(props.text || getComponentLabel('button'))}
           </div>
         );
       case 'divider':
@@ -196,38 +215,43 @@ function ComponentPreview({ component }: { component: PageComponent }) {
       case 'quote':
         return (
           <div className="border-l-2 border-primary pl-2 text-xs italic text-muted-foreground">
-            &ldquo;{String(props.content || 'Citation...')}&rdquo;
+            &ldquo;{String(props.content || `${getComponentLabel('quote')}...`)}&rdquo;
           </div>
         );
       case 'list':
         return (
           <div className="text-xs text-muted-foreground">
-            <div>• Élément 1</div>
-            <div>• Élément 2</div>
+            <div>• Item 1</div>
+            <div>• Item 2</div>
           </div>
         );
       case 'video':
         return (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <div className="h-8 w-12 rounded bg-muted flex items-center justify-center"><VideoIcon size={20} />️</div>
-            {String(props.title || 'Vidéo')}
+            {String(props.title || getComponentLabel('video'))}
           </div>
         );
       case 'grid': {
-        const columns = Number(props.columns) || 2;
+        const columnsCount = Number(props.columns) || 2;
         const childrenCount = component.children?.length || 0;
         return (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Grid3X3 className="h-4 w-4" />
-              <span>{columns} colonnes • {childrenCount} élément{childrenCount > 1 ? 's' : ''}</span>
+              <span>{columnsCount} {columnsLabel} • {childrenCount} {childrenCount > 1 ? elements : element}</span>
             </div>
-            <GridDropZone gridId={component.id} gridChildren={component.children} />
+            <GridDropZone
+              gridId={component.id}
+              gridChildren={component.children}
+              getComponentLabel={getComponentLabel}
+              emptyText={gridDropZoneEmpty}
+            />
           </div>
         );
       }
       default:
-        return <div className="text-xs italic text-muted-foreground">Aperçu</div>;
+        return <div className="text-xs italic text-muted-foreground">{getComponentLabel(component.type)}</div>;
     }
   };
 
@@ -245,9 +269,20 @@ export function PageBuilderCanvas({
                                     onDeleteComponent,
                                     onDuplicateComponent,
                                   }: PageBuilderCanvasProps) {
+  const t = useTranslations('admin.pageBuilder');
   const { setNodeRef } = useDroppable({
     id: 'canvas-droppable',
   });
+
+  const getComponentLabel = (type: string) => t(`components.${type}`);
+
+  const previewTranslations = {
+    getComponentLabel,
+    gridDropZoneEmpty: t('canvas.gridDropZone'),
+    columns: t('editor.labels.columns').toLowerCase(),
+    element: 'element',
+    elements: 'elements',
+  };
 
   return (
     <div ref={setNodeRef} className="h-full overflow-hidden bg-muted/30">
@@ -256,7 +291,7 @@ export function PageBuilderCanvas({
           {components.length === 0 ? (
             <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed">
               <p className="text-muted-foreground">
-                Glissez des composants depuis la barre latérale
+                {t('canvas.emptyState')}
               </p>
             </div>
           ) : (
@@ -266,10 +301,12 @@ export function PageBuilderCanvas({
                 <SortableComponent
                   key={component.id}
                   component={component}
+                  componentLabel={getComponentLabel(component.type)}
                   isSelected={selectedComponentId === component.id}
                   onSelect={() => onSelectComponent(component.id)}
                   onDelete={() => onDeleteComponent(component.id)}
                   onDuplicate={() => onDuplicateComponent(component.id)}
+                  translations={previewTranslations}
                 />
               ))
           )}

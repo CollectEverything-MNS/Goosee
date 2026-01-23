@@ -117,6 +117,22 @@
         "title": "Title",
         "status": "Status",
         "actions": "Actions"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteSuccess": "Page deleted successfully",
+        "deleteError": "Error deleting page",
+        "confirmDelete": "Confirm deletion",
+        "confirmDeleteDescription": "Are you sure you want to delete this page? This action cannot be undone.",
+        "cancel": "Cancel"
+      },
+      "filter": {
+        "status": "Status"
       }
     },
     "users": {
@@ -139,7 +155,194 @@
         "status": "Status",
         "actions": "Actions"
       }
+    },
+    "pageBuilder": {
+      "title": "Page Builder",
+      "sidebar": {
+        "title": "Components",
+        "subtitle": "Drag into the page"
+      },
+      "canvas": {
+        "emptyState": "Drag components from the sidebar",
+        "gridDropZone": "Drop components here"
+      },
+      "preview": {
+        "title": "Preview",
+        "emptyTitle": "Your page is empty",
+        "emptySubtitle": "Drag components from the sidebar to build your page",
+        "viewport": {
+          "desktop": "Desktop",
+          "tablet": "Tablet",
+          "mobile": "Mobile"
+        }
+      },
+      "editor": {
+        "editComponent": "Edit component",
+        "sections": {
+          "content": "Content",
+          "style": "Style",
+          "options": "Options"
+        },
+        "labels": {
+          "title": "Title",
+          "subtitle": "Subtitle",
+          "content": "Content",
+          "description": "Description",
+          "buttonText": "Button text",
+          "buttonLink": "Button link",
+          "alignment": "Alignment",
+          "level": "Level",
+          "height": "Height",
+          "variant": "Variant",
+          "src": "Image URL",
+          "alt": "Alt text",
+          "width": "Width",
+          "rounded": "Rounded corners",
+          "columns": "Columns",
+          "gap": "Gap",
+          "limit": "Limit",
+          "showPrice": "Show price",
+          "showAddToCart": "Add to cart button",
+          "submitText": "Button text",
+          "overlay": "Dark overlay",
+          "backgroundType": "Background type",
+          "backgroundColor": "Background color",
+          "backgroundImage": "Background image",
+          "textColor": "Text color",
+          "color": "Color",
+          "text": "Text",
+          "link": "Link",
+          "size": "Size",
+          "style": "Style",
+          "author": "Author",
+          "items": "Items",
+          "url": "URL",
+          "aspectRatio": "Aspect ratio",
+          "padding": "Padding"
+        },
+        "options": {
+          "level": {
+            "h1": "H1 - Extra large",
+            "h2": "H2 - Large",
+            "h3": "H3 - Medium large",
+            "h4": "H4 - Medium",
+            "h5": "H5 - Small",
+            "h6": "H6 - Extra small"
+          },
+          "alignment": {
+            "left": "Left",
+            "center": "Center",
+            "right": "Right"
+          },
+          "variant": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "outline": "Outline"
+          },
+          "size": {
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large",
+            "xl": "Extra large",
+            "full": "Full screen"
+          },
+          "width": {
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large",
+            "full": "Full width"
+          },
+          "columns": {
+            "1": "1 column",
+            "2": "2 columns",
+            "3": "3 columns",
+            "4": "4 columns"
+          },
+          "dividerStyle": {
+            "solid": "Solid",
+            "dashed": "Dashed",
+            "dotted": "Dotted"
+          },
+          "listStyle": {
+            "bullet": "Bullets",
+            "number": "Numbers",
+            "check": "Checkmarks"
+          },
+          "aspectRatio": {
+            "16:9": "16:9 (Landscape)",
+            "4:3": "4:3 (Standard)",
+            "1:1": "1:1 (Square)"
+          },
+          "padding": {
+            "none": "None",
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large"
+          },
+          "backgroundType": {
+            "color": "Solid color",
+            "image": "Image",
+            "gradient": "Gradient"
+          }
+        }
+      },
+      "categories": {
+        "basic": "Basic",
+        "layout": "Layout"
+      },
+      "components": {
+        "hero": "Hero",
+        "heading": "Heading",
+        "text": "Text",
+        "image": "Image",
+        "button": "Button",
+        "divider": "Divider",
+        "quote": "Quote",
+        "list": "List",
+        "spacer": "Spacer",
+        "video": "Video",
+        "grid": "Grid"
+      },
+      "defaults": {
+        "title": "Your title",
+        "text": "Your text here...",
+        "imageAlt": "Image description",
+        "buttonText": "Click here",
+        "quote": "Your quote here...",
+        "listItems": "Item 1\nItem 2\nItem 3",
+        "heroTitle": "Welcome",
+        "heroSubtitle": "Discover our content",
+        "learnMore": "Learn more",
+        "videoTitle": "Video"
+      },
+      "pageEditor": {
+        "editPage": "Edit page",
+        "newPage": "New page",
+        "editing": "Editing \"{title}\"",
+        "createNew": "Create a new page",
+        "save": "Save",
+        "saveSuccess": "Page saved successfully",
+        "createSuccess": "Page created successfully",
+        "saveError": "Error saving the page",
+        "settings": "Settings",
+        "pageSettings": "Page settings",
+        "pageSettingsDescription": "Configure your page information",
+        "title": "Title",
+        "titlePlaceholder": "Page title",
+        "slug": "Slug",
+        "slugPlaceholder": "page-url",
+        "type": "Type",
+        "metaTitle": "Meta title",
+        "metaTitlePlaceholder": "SEO title",
+        "metaDescription": "Meta description",
+        "metaDescriptionPlaceholder": "SEO description",
+        "types": {
+          "home": "Home",
+          "catalog": "Catalog",
+          "contact": "Contact",
+          "custom": "Custom"
+        }
+      }
     }
-
   }
 }

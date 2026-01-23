@@ -10,11 +10,15 @@ services:
     environment:
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      PAGE_SERVICE_HOST: ${PAGE_SERVICE_HOST}
+      PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
       NODE_ENV: ${NODE_ENV}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
+      - goosee-page-service-dev
     networks:
       - goosee_net
 

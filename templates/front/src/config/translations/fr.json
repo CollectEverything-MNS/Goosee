@@ -117,6 +117,22 @@
         "title": "Titre",
         "status": "Statut",
         "actions": "Actions"
+      },
+      "status": {
+        "draft": "Brouillon",
+        "published": "Publié"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleteSuccess": "Page supprimée avec succès",
+        "deleteError": "Erreur lors de la suppression",
+        "confirmDelete": "Confirmer la suppression",
+        "confirmDeleteDescription": "Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible.",
+        "cancel": "Annuler"
+      },
+      "filter": {
+        "status": "Statut"
       }
     },
     "users": {
@@ -138,6 +154,194 @@
         "email": "Email",
         "status": "Statut",
         "actions": "Actions"
+      }
+    },
+    "pageBuilder": {
+      "title": "Page Builder",
+      "sidebar": {
+        "title": "Composants",
+        "subtitle": "Glissez dans la page"
+      },
+      "canvas": {
+        "emptyState": "Glissez des composants depuis la barre latérale",
+        "gridDropZone": "Glissez des composants ici"
+      },
+      "preview": {
+        "title": "Aperçu",
+        "emptyTitle": "Votre page est vide",
+        "emptySubtitle": "Glissez des composants depuis la sidebar pour construire votre page",
+        "viewport": {
+          "desktop": "Desktop",
+          "tablet": "Tablette",
+          "mobile": "Mobile"
+        }
+      },
+      "editor": {
+        "editComponent": "Modifier le composant",
+        "sections": {
+          "content": "Contenu",
+          "style": "Style",
+          "options": "Options"
+        },
+        "labels": {
+          "title": "Titre",
+          "subtitle": "Sous-titre",
+          "content": "Contenu",
+          "description": "Description",
+          "buttonText": "Texte du bouton",
+          "buttonLink": "Lien du bouton",
+          "alignment": "Alignement",
+          "level": "Niveau",
+          "height": "Hauteur",
+          "variant": "Variante",
+          "src": "URL de l'image",
+          "alt": "Texte alternatif",
+          "width": "Largeur",
+          "rounded": "Coins arrondis",
+          "columns": "Colonnes",
+          "gap": "Espacement",
+          "limit": "Limite",
+          "showPrice": "Afficher prix",
+          "showAddToCart": "Bouton panier",
+          "submitText": "Texte du bouton",
+          "overlay": "Overlay sombre",
+          "backgroundType": "Type de fond",
+          "backgroundColor": "Couleur de fond",
+          "backgroundImage": "Image de fond",
+          "textColor": "Couleur du texte",
+          "color": "Couleur",
+          "text": "Texte",
+          "link": "Lien",
+          "size": "Taille",
+          "style": "Style",
+          "author": "Auteur",
+          "items": "Éléments",
+          "url": "URL",
+          "aspectRatio": "Format",
+          "padding": "Espacement interne"
+        },
+        "options": {
+          "level": {
+            "h1": "H1 - Très grand",
+            "h2": "H2 - Grand",
+            "h3": "H3 - Moyen-grand",
+            "h4": "H4 - Moyen",
+            "h5": "H5 - Petit",
+            "h6": "H6 - Très petit"
+          },
+          "alignment": {
+            "left": "Gauche",
+            "center": "Centre",
+            "right": "Droite"
+          },
+          "variant": {
+            "primary": "Principal",
+            "secondary": "Secondaire",
+            "outline": "Contour"
+          },
+          "size": {
+            "sm": "Petit",
+            "md": "Moyen",
+            "lg": "Grand",
+            "xl": "Très grand",
+            "full": "Plein écran"
+          },
+          "width": {
+            "sm": "Petite",
+            "md": "Moyenne",
+            "lg": "Grande",
+            "full": "Pleine largeur"
+          },
+          "columns": {
+            "1": "1 colonne",
+            "2": "2 colonnes",
+            "3": "3 colonnes",
+            "4": "4 colonnes"
+          },
+          "dividerStyle": {
+            "solid": "Solide",
+            "dashed": "Tirets",
+            "dotted": "Pointillés"
+          },
+          "listStyle": {
+            "bullet": "Puces",
+            "number": "Numéros",
+            "check": "Coches"
+          },
+          "aspectRatio": {
+            "16:9": "16:9 (Paysage)",
+            "4:3": "4:3 (Standard)",
+            "1:1": "1:1 (Carré)"
+          },
+          "padding": {
+            "none": "Aucun",
+            "sm": "Petit",
+            "md": "Moyen",
+            "lg": "Grand"
+          },
+          "backgroundType": {
+            "color": "Couleur unie",
+            "image": "Image",
+            "gradient": "Dégradé"
+          }
+        }
+      },
+      "categories": {
+        "basic": "Basique",
+        "layout": "Mise en page"
+      },
+      "components": {
+        "hero": "Hero",
+        "heading": "Titre",
+        "text": "Texte",
+        "image": "Image",
+        "button": "Bouton",
+        "divider": "Séparateur",
+        "quote": "Citation",
+        "list": "Liste",
+        "spacer": "Espacement",
+        "video": "Vidéo",
+        "grid": "Grille"
+      },
+      "defaults": {
+        "title": "Votre titre",
+        "text": "Votre texte ici...",
+        "imageAlt": "Description de l'image",
+        "buttonText": "Cliquez ici",
+        "quote": "Votre citation ici...",
+        "listItems": "Élément 1\nÉlément 2\nÉlément 3",
+        "heroTitle": "Bienvenue",
+        "heroSubtitle": "Découvrez notre contenu",
+        "learnMore": "En savoir plus",
+        "videoTitle": "Vidéo"
+      },
+      "pageEditor": {
+        "editPage": "Modifier la page",
+        "newPage": "Nouvelle page",
+        "editing": "Édition de \"{title}\"",
+        "createNew": "Créez une nouvelle page",
+        "save": "Enregistrer",
+        "saveSuccess": "Page enregistrée avec succès",
+        "createSuccess": "Page créée avec succès",
+        "saveError": "Erreur lors de l'enregistrement de la page",
+        "settings": "Paramètres",
+        "pageSettings": "Paramètres de la page",
+        "pageSettingsDescription": "Configurez les informations de votre page",
+        "title": "Titre",
+        "titlePlaceholder": "Titre de la page",
+        "slug": "Slug",
+        "slugPlaceholder": "url-de-la-page",
+        "type": "Type",
+        "metaTitle": "Meta titre",
+        "metaTitlePlaceholder": "Titre pour le SEO",
+        "metaDescription": "Meta description",
+        "metaDescriptionPlaceholder": "Description pour le SEO",
+        "types": {
+          "home": "Accueil",
+          "catalog": "Catalogue",
+          "contact": "Contact",
+          "custom": "Personnalisée"
+        }
       }
     }
   }

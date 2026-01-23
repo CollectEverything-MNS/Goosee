@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { PageRenderer } from '@/components/page-blocks';
 import { PageComponent } from '../../types/page.types';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface PageBuilderPreviewProps {
   components: PageComponent[];
@@ -16,30 +17,31 @@ interface PageBuilderPreviewProps {
 
 type ViewportSize = 'desktop' | 'tablet' | 'mobile';
 
-const VIEWPORT_CONFIG: Record<ViewportSize, { width: string; label: string }> = {
-  desktop: { width: '100%', label: 'Desktop' },
-  tablet: { width: '768px', label: 'Tablette' },
-  mobile: { width: '375px', label: 'Mobile' },
-};
-
 export function PageBuilderPreview({
   components,
   selectedComponentId,
   onSelectComponent,
 }: PageBuilderPreviewProps) {
+  const t = useTranslations('admin.pageBuilder.preview');
   const [viewport, setViewport] = useState<ViewportSize>('desktop');
+
+  const VIEWPORT_CONFIG: Record<ViewportSize, { width: string; label: string }> = {
+    desktop: { width: '100%', label: t('viewport.desktop') },
+    tablet: { width: '768px', label: t('viewport.tablet') },
+    mobile: { width: '375px', label: t('viewport.mobile') },
+  };
 
   return (
     <div className="flex h-full flex-col bg-muted/30">
       {/* Viewport Toolbar */}
       <div className="flex items-center justify-between border-b bg-background px-4 py-2">
-        <span className="text-sm font-medium text-muted-foreground">Preview</span>
+        <span className="text-sm font-medium text-muted-foreground">{t('title')}</span>
         <div className="flex items-center gap-1">
           <Button
             variant={viewport === 'desktop' ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => setViewport('desktop')}
-            title="Desktop"
+            title={t('viewport.desktop')}
           >
             <Monitor className="h-4 w-4" />
           </Button>
@@ -47,7 +49,8 @@ export function PageBuilderPreview({
             variant={viewport === 'tablet' ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => setViewport('tablet')}
-            title="Tablette"
+            className={'rotate-90'}
+            title={t('viewport.tablet')}
           >
             <Tablet className="h-4 w-4" />
           </Button>
@@ -55,7 +58,7 @@ export function PageBuilderPreview({
             variant={viewport === 'mobile' ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => setViewport('mobile')}
-            title="Mobile"
+            title={t('viewport.mobile')}
           >
             <Smartphone className="h-4 w-4" />
           </Button>
@@ -78,9 +81,9 @@ export function PageBuilderPreview({
             {components.length === 0 ? (
               <div className="flex h-64 items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <p className="text-lg font-medium">Votre page est vide</p>
+                  <p className="text-lg font-medium">{t('emptyTitle')}</p>
                   <p className="mt-1 text-sm">
-                    Glissez des composants depuis la sidebar pour construire votre page
+                    {t('emptySubtitle')}
                   </p>
                 </div>
               </div>

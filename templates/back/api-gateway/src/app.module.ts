@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './services/auth/auth.module';
+import { PagesModule } from './services/pages/pages.module';
 
 @Module({
   imports: [
@@ -8,6 +9,7 @@ import { AuthModule } from './services/auth/auth.module';
       isGlobal: true,
     }),
     AuthModule,
+    PagesModule,
   ],
   controllers: [],
   providers: [],
