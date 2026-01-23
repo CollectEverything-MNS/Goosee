@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Page } from '../../entities/page.entity';
+import { Page, PageType } from '../../entities/page.entity';
 import { IPageRepository } from '../page.repository';
 
 @Injectable()
@@ -30,6 +30,10 @@ export class TypeOrmPageRepository extends IPageRepository {
 
   async findBySlug(slug: string): Promise<Page | null> {
     return this.pageRepository.findOne({ where: { slug } });
+  }
+
+  async findByType(type: PageType): Promise<Page | null> {
+    return this.pageRepository.findOne({ where: { type } });
   }
 
   async update(id: string, page: Partial<Page>): Promise<Page | null> {

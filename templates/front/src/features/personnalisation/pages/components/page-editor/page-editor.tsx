@@ -22,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Loader2, Save, Settings } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Loader2, Save, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -97,8 +97,17 @@ export function PageEditor({ page }: PageEditorProps) {
         toast.success(t('createSuccess'));
         router.push(`/${locale}/goosee-admin/pages/${newPage.id}/edit`);
       }
-    } catch {
-      toast.error(t('saveError'));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err?.response?.data?.message;
+
+      if (message === 'SLUG_ALREADY_EXISTS') {
+        toast.error(t('slugAlreadyExists'));
+      } else if (message === 'PAGE_TYPE_ALREADY_EXISTS') {
+        toast.error(t('pageTypeAlreadyExists'));
+      } else {
+        toast.error(t('saveError'));
+      }
     }
   };
 
@@ -188,6 +197,21 @@ export function PageEditor({ page }: PageEditorProps) {
               </div>
             </SheetContent>
           </Sheet>
+          {page && slug && (
+            <Button
+              variant="outline"
+              size="icon"
+              asChild
+            >
+              <a
+                href={`/${locale}/p/${slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          )}
           <Select value={status} onValueChange={(value) => setStatus(value as PageStatus)}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />

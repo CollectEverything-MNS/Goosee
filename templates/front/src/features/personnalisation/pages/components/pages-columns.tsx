@@ -2,7 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { PagesTableActions } from '@/features/personnalisation/pages/components/pages-table-actions';
 import { ColumnDef } from '@tanstack/react-table';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Page, PageStatus } from '../types/page.types';
 
@@ -40,7 +40,7 @@ export function usePagesColumns(): ColumnDef<Page>[] {
         const page = row.original;
         return (
           <Link
-            href={`/${locale}/goosee-admin/pages/${page.id}/edit`}
+            href={`/${locale}/p/${page.slug}`}
             className="font-medium hover:underline hover:text-primary transition-colors"
           >
             {page.title}

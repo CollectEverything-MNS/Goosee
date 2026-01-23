@@ -1,7 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { IPageRepository } from '../../repositories/page.repository';
 import { UpdatePageDto } from './update-page.dto';
-import { Page } from '../../entities/page.entity';
+import { Page, PageType } from '../../entities/page.entity';
+
+const UNIQUE_PAGE_TYPES = [PageType.HOME, PageType.CATALOG, PageType.CONTACT];
 
 @Injectable()
 export class UpdatePageUseCase {
@@ -14,10 +16,19 @@ export class UpdatePageUseCase {
       throw new NotFoundException('Page not found');
     }
 
+    // Check for duplicate slug
     if (dto.slug && dto.slug !== page.slug) {
       const existingPage = await this.pageRepository.findBySlug(dto.slug);
       if (existingPage) {
-        throw new ConflictException('A page with this slug already exists');
+        throw new ConflictException('SLUG_ALREADY_EXISTS');
+      }
+    }
+
+    // Check for unique page types (home, catalog, contact can only exist once)
+    if (dto.type && dto.type !== page.type && UNIQUE_PAGE_TYPES.includes(dto.type)) {
+      const existingTypePage = await this.pageRepository.findByType(dto.type);
+      if (existingTypePage) {
+        throw new ConflictException('PAGE_TYPE_ALREADY_EXISTS');
       }
     }
 
