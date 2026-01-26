@@ -2,17 +2,15 @@ services:
   goosee-api-gateway-dev:
     container_name: goosee-api-gateway-dev
     build:
-      context: ../../templates/back/api-gateway
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: templates/back/api-gateway/Dockerfile.dev
     command: yarn dev
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
+      NODE_ENV: ${NODE_ENV}
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
-      NODE_ENV: ${NODE_ENV}
-      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
-      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
     depends_on:
       - goosee-auth-service-dev
     networks:
@@ -21,11 +19,12 @@ services:
   goosee-auth-service-dev:
     container_name: goosee-auth-service-dev
     build:
-      context: ../../templates/back/services/auth-service
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: templates/back/services/auth-service/Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       AUTH_DB_HOST: ${AUTH_DB_HOST}
       AUTH_DB_PORT: ${AUTH_DB_PORT}
@@ -36,6 +35,8 @@ services:
       - "${AUTH_SERVICE_PORT}"
     depends_on:
       goosee-auth-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${AUTH_SERVICE_PORT}"]
@@ -69,8 +70,8 @@ services:
   goosee-notifier-service-dev:
     container_name: goosee-notifier-service-dev
     build:
-      context: ../../templates/back/services/notifier-service
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: templates/back/services/notifier-service/Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
@@ -81,6 +82,9 @@ services:
       SMTP_USER: ${SMTP_USER}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_FROM: ${SMTP_FROM}
+    depends_on:
+      goosee-rabbitmq-dev:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - goosee_net
@@ -90,4 +94,5 @@ volumes:
 
 networks:
   goosee_net:
+    name: goosee_net
     driver: bridge
