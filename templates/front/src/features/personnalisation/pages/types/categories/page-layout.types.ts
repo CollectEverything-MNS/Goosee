@@ -2,6 +2,21 @@ import { ComponentDefinition } from '@/features/personnalisation/pages/types/pag
 
 export const CATEGORY_LAYOUT_COMPONENTS: ComponentDefinition[] = [
   {
+    type: 'header',
+    label: 'Header',
+    icon: 'navigation',
+    category: 'layout',
+    defaultProps: {
+      logoPosition: 'left',
+      showMenu: true,
+      menuAlignment: 'right',
+      backgroundColor: '#ffffff',
+      textColor: '#000000',
+      sticky: false,
+      height: 'md',
+    },
+  },
+  {
     type: 'hero',
     label: 'Hero',
     icon: 'layout',

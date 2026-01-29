@@ -14,6 +14,7 @@ import { QuoteBlock } from './quote-block';
 import { ListBlock } from './list-block';
 import { VideoBlock } from './video-block';
 import { GridBlock } from './grid-block';
+import { HeaderBlock } from './header-block';
 
 const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   hero: HeroBlock,
@@ -27,6 +28,7 @@ const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   list: ListBlock,
   video: VideoBlock,
   grid: GridBlock,
+  header: HeaderBlock,
 };
 
 interface BlockRendererProps {
@@ -45,7 +47,6 @@ export function BlockRenderer({ component, context }: BlockRendererProps) {
     );
   }
 
-  // Pass children for container components like grid
   if (component.type === 'grid') {
     return (
       <BlockComponent

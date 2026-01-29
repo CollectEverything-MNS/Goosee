@@ -54,4 +54,16 @@ export const api = {
 
   delete: <T>(url: string, config?: AxiosRequestConfig) =>
     apiRequest<T>({ ...config, method: 'DELETE', url }),
+
+  upload: <T>(url: string, formData: FormData, config?: AxiosRequestConfig) =>
+    apiRequest<T>({
+      ...config,
+      method: 'POST',
+      url,
+      data: formData,
+      headers: {
+        ...config?.headers,
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
 };

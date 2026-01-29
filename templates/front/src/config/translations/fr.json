@@ -102,7 +102,9 @@
       "personnalisation": {
         "label": "Personnalisation",
         "pages": "Pages",
-        "templates": "Templates"
+        "templates": "Templates",
+        "menu": "Menu",
+        "settings": "Paramètres du site"
       },
       "access": {
         "label": "Accès",
@@ -110,6 +112,81 @@
         "roles": "Rôles"
       },
       "logout": "Déconnexion"
+    },
+    "menu": {
+      "title": "Menu",
+      "addNew": "Ajouter un item",
+      "table": {
+        "label": "Libellé",
+        "type": "Type",
+        "status": "Statut",
+        "order": "Ordre",
+        "actions": "Actions"
+      },
+      "type": {
+        "page": "Page",
+        "external": "Lien externe",
+        "none": "Non défini"
+      },
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "filter": {
+        "status": "Statut"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleteSuccess": "Item supprimé avec succès",
+        "deleteError": "Erreur lors de la suppression",
+        "createSuccess": "Item créé avec succès",
+        "createError": "Erreur lors de la création",
+        "updateSuccess": "Item mis à jour avec succès",
+        "updateError": "Erreur lors de la mise à jour",
+        "confirmDelete": "Confirmer la suppression",
+        "confirmDeleteDescription": "Êtes-vous sûr de vouloir supprimer cet item ? Cette action est irréversible.",
+        "cancel": "Annuler"
+      },
+      "dialog": {
+        "createTitle": "Ajouter un item de menu",
+        "editTitle": "Modifier l'item de menu"
+      },
+      "form": {
+        "label": "Libellé",
+        "labelPlaceholder": "Ex: Accueil",
+        "linkType": "Type de lien",
+        "selectLinkType": "Sélectionner le type de lien",
+        "linkTypePage": "Page interne",
+        "linkTypeExternal": "Lien externe",
+        "page": "Page",
+        "selectPage": "Sélectionner une page",
+        "externalUrl": "URL externe",
+        "parent": "Menu parent",
+        "noParent": "Aucun (niveau racine)",
+        "isActive": "Actif",
+        "openInNewTab": "Nouvel onglet",
+        "cancel": "Annuler",
+        "create": "Créer",
+        "update": "Mettre à jour"
+      }
+    },
+    "siteSettings": {
+      "title": "Paramètres du site",
+      "form": {
+        "title": "Titre du site",
+        "titlePlaceholder": "Mon site",
+        "description": "Description",
+        "descriptionPlaceholder": "Description du site pour le SEO",
+        "logoUrl": "URL du logo",
+        "logoUrlPlaceholder": "https://example.com/logo.png",
+        "faviconUrl": "URL du favicon",
+        "faviconUrlPlaceholder": "https://example.com/favicon.ico",
+        "primaryColor": "Couleur principale",
+        "save": "Enregistrer",
+        "saveSuccess": "Paramètres enregistrés avec succès",
+        "saveError": "Erreur lors de l'enregistrement"
+      }
     },
     "pages": {
       "addNewPage": "Ajouter une page",
@@ -218,7 +295,11 @@
           "items": "Éléments",
           "url": "URL",
           "aspectRatio": "Format",
-          "padding": "Espacement interne"
+          "padding": "Espacement interne",
+          "logoPosition": "Position du logo",
+          "showMenu": "Afficher le menu",
+          "menuAlignment": "Alignement du menu",
+          "sticky": "Sticky (fixé)"
         },
         "options": {
           "level": {
@@ -301,7 +382,8 @@
         "list": "Liste",
         "spacer": "Espacement",
         "video": "Vidéo",
-        "grid": "Grille"
+        "grid": "Grille",
+        "header": "Header"
       },
       "defaults": {
         "title": "Votre titre",

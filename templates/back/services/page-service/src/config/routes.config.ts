@@ -6,3 +6,15 @@ export const pagesRoutes = {
     bySlug: `/slug/:slug`,
   },
 };
+
+export const menusRoutes = {
+  root: `/menus`,
+  menus: {
+    byId: `/:id`,
+    reorder: `/reorder`,
+  },
+};
+
+export const settingsRoutes = {
+  root: `/settings`,
+};

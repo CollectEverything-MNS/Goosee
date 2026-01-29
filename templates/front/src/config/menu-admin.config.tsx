@@ -4,6 +4,7 @@ import {
   Archive,
   Layers,
   LayoutDashboard,
+  Menu,
   MessageSquare,
   Package,
   Palette,
@@ -81,12 +82,22 @@ export function getAdminMenu() {
         {
           name: 'admin.sidebar.personnalisation.pages',
           path: routes.gooseeAdmin.pages.getHref(locale),
-          icon: Settings,
+          icon: Layers,
         },
         {
           name: 'admin.sidebar.personnalisation.templates',
           path: routes.gooseeAdmin.templates.getHref(locale),
-          icon: Layers,
+          icon: Archive,
+        },
+        {
+          name: 'admin.sidebar.personnalisation.menu',
+          path: routes.gooseeAdmin.menu.getHref(locale),
+          icon: Menu,
+        },
+        {
+          name: 'admin.sidebar.personnalisation.settings',
+          path: routes.gooseeAdmin.settings.getHref(locale),
+          icon: Settings,
         },
       ],
     },

@@ -41,6 +41,12 @@ export const routes = {
     templates: {
       getHref: (locale: string) => `/${locale}/goosee-admin/templates`,
     },
+    menu: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/menu`,
+    },
+    settings: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/settings`,
+    },
     users: {
       getHref: (locale: string) => `/${locale}/goosee-admin/users`,
     },

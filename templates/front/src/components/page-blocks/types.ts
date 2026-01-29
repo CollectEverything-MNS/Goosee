@@ -82,6 +82,16 @@ export interface GridBlockProps {
   padding: 'none' | 'sm' | 'md' | 'lg';
 }
 
+export interface HeaderBlockProps {
+  logoPosition: 'left' | 'center';
+  showMenu: boolean;
+  menuAlignment: 'left' | 'center' | 'right';
+  backgroundColor?: string;
+  textColor?: string;
+  sticky: boolean;
+  height: 'sm' | 'md' | 'lg';
+}
+
 export type BlockPropsWithContext<T> = T & {
   context?: BlockContext;
 };

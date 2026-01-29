@@ -45,7 +45,8 @@ export type ComponentType =
   | 'quote'
   | 'list'
   | 'video'
-  | 'grid';
+  | 'grid'
+  | 'header';
 
 export type ComponentCategory = 'basic' | 'layout';
 
