@@ -7,6 +7,10 @@ services:
         command: yarn dev
         ports:
             - "${NEXT_PORT}:${NEXT_PORT}"
+        volumes:
+            - ../../templates/front/src:/usr/src/app/templates/front/src
+            - ../../templates/front/public:/usr/src/app/templates/front/public
+            - ../../templates/front/next.config.ts:/usr/src/app/templates/front/next.config.ts
         environment:
             NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
             NODE_ENV: ${NODE_ENV}

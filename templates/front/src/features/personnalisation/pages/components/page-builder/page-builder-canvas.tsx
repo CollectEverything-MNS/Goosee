@@ -28,6 +28,9 @@ interface SortableComponentProps {
   onDuplicate: () => void;
   componentLabel: string;
   translations: ComponentPreviewProps['translations'];
+  onSelectChild?: (childId: string) => void;
+  onDeleteChild?: (childId: string) => void;
+  selectedChildId?: string | null;
 }
 
 function SortableComponent({
@@ -38,6 +41,9 @@ function SortableComponent({
   onDuplicate,
   componentLabel,
   translations,
+  onSelectChild,
+  onDeleteChild,
+  selectedChildId,
 }: SortableComponentProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: component.id,
@@ -103,7 +109,7 @@ function SortableComponent({
       </div>
 
       <div className="mt-2 text-sm text-muted-foreground">
-        <ComponentPreview component={component} translations={translations} />
+        <ComponentPreview component={component} translations={translations} onSelectChild={onSelectChild} onDeleteChild={onDeleteChild} selectedChildId={selectedChildId} />
       </div>
     </div>
   );
@@ -114,9 +120,12 @@ interface GridDropZoneProps {
   gridChildren?: PageComponent[];
   getComponentLabel: (type: string) => string;
   emptyText: string;
+  onSelectChild?: (childId: string) => void;
+  onDeleteChild?: (childId: string) => void;
+  selectedChildId?: string | null;
 }
 
-function GridDropZone({ gridId, gridChildren = [], getComponentLabel, emptyText }: GridDropZoneProps) {
+function GridDropZone({ gridId, gridChildren = [], getComponentLabel, emptyText, onSelectChild, onDeleteChild, selectedChildId }: GridDropZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `grid-${gridId}`,
     data: {
@@ -140,9 +149,27 @@ function GridDropZone({ gridId, gridChildren = [], getComponentLabel, emptyText 
             .map((child) => (
               <div
                 key={child.id}
-                className="rounded bg-card px-2 py-1 text-xs border"
+                className={cn(
+                  'pointer-events-auto rounded bg-card px-2 py-1 text-xs border flex items-center justify-between gap-1 cursor-pointer transition-all',
+                  selectedChildId === child.id && 'ring-2 ring-primary'
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectChild?.(child.id);
+                }}
               >
-                {getComponentLabel(child.type)}
+                <span className="truncate">{getComponentLabel(child.type)}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 shrink-0 text-destructive hover:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteChild?.(child.id);
+                  }}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </div>
             ))}
         </div>
@@ -164,9 +191,12 @@ interface ComponentPreviewProps {
     element: string;
     elements: string;
   };
+  onSelectChild?: (childId: string) => void;
+  onDeleteChild?: (childId: string) => void;
+  selectedChildId?: string | null;
 }
 
-function ComponentPreview({ component, translations }: ComponentPreviewProps) {
+function ComponentPreview({ component, translations, onSelectChild, onDeleteChild, selectedChildId }: ComponentPreviewProps) {
   const props = component.props;
   const { getComponentLabel, gridDropZoneEmpty, columns: columnsLabel, element, elements } = translations;
 
@@ -246,6 +276,9 @@ function ComponentPreview({ component, translations }: ComponentPreviewProps) {
               gridChildren={component.children}
               getComponentLabel={getComponentLabel}
               emptyText={gridDropZoneEmpty}
+              onSelectChild={onSelectChild}
+              onDeleteChild={onDeleteChild}
+              selectedChildId={selectedChildId}
             />
           </div>
         );
@@ -307,6 +340,9 @@ export function PageBuilderCanvas({
                   onDelete={() => onDeleteComponent(component.id)}
                   onDuplicate={() => onDuplicateComponent(component.id)}
                   translations={previewTranslations}
+                  onSelectChild={onSelectComponent}
+                  onDeleteChild={onDeleteComponent}
+                  selectedChildId={selectedComponentId}
                 />
               ))
           )}

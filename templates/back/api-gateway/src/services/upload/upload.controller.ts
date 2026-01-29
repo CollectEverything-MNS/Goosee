@@ -1,21 +1,22 @@
 import {
+  BadRequestException,
   Controller,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
-  Query,
-  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UploadService } from './upload.service';
+import { routesConfig } from '../../config/routes.config';
 
 @ApiTags('Upload')
-@Controller('upload')
+@Controller()
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post()
+  @Post(routesConfig.upload.file.path)
   @ApiOperation({ summary: 'Upload a file' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -32,10 +33,7 @@ export class UploadController {
   @ApiResponse({ status: 201, description: 'File uploaded successfully' })
   @ApiResponse({ status: 400, description: 'Invalid file' })
   @UseInterceptors(FileInterceptor('file'))
-  async upload(
-    @UploadedFile() file: Express.Multer.File,
-    @Query('folder') folder?: string
-  ) {
+  async upload(@UploadedFile() file: Express.Multer.File, @Query('folder') folder?: string) {
     if (!file) {
       throw new BadRequestException('No file provided');
     }

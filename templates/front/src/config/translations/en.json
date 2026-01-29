@@ -185,8 +185,27 @@
         "primaryColor": "Primary color",
         "save": "Save",
         "saveSuccess": "Settings saved successfully",
-        "saveError": "Error saving settings"
+        "saveError": "Error saving settings",
+        "siteDescription": "Configure your site's general settings",
+        "descriptionHelp": "This description will be used for SEO",
+        "logoHelp": "Site logo displayed in the header",
+        "faviconHelp": "Favicon displayed in the browser tab (max 1MB)"
       }
+    },
+    "pageTitles": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "categories": "Categories",
+      "clients": "Clients",
+      "returnClients": "Customer Returns",
+      "users": "Users",
+      "roles": "Roles",
+      "siteSettings": "Site Settings",
+      "menu": "Menu",
+      "templates": "Style Template",
+      "pages": "Pages",
+      "orders": "Orders",
+      "salesHistory": "History"
     },
     "pages": {
       "addNewPage": "Add New Page",
@@ -255,6 +274,7 @@
       },
       "editor": {
         "editComponent": "Edit component",
+        "uploadImage": "Drag an image or click to select",
         "sections": {
           "content": "Content",
           "style": "Style",

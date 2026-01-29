@@ -1,20 +1,33 @@
-'use client';
+'use client'
 
-import { COMPONENT_DEFINITIONS, PageComponent } from '../../types/page.types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Palette, Settings, Type, X } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { COMPONENT_DEFINITIONS, PageComponent } from '../../types/page.types'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { FileUpload } from '@/components/ui/file-upload'
+import { useUploadFile } from '@/features/personnalisation/settings/usecases/use-upload-file'
+import { Palette, Settings, Type, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface PageBuilderComponentEditorProps {
-  component: PageComponent;
-  onUpdate: (props: Record<string, unknown>) => void;
-  onClose: () => void;
+  component: PageComponent
+  onUpdate: (props: Record<string, unknown>) => void
+  onClose: () => void
 }
 
 export function PageBuilderComponentEditor({
@@ -22,25 +35,36 @@ export function PageBuilderComponentEditor({
   onUpdate,
   onClose,
 }: PageBuilderComponentEditorProps) {
-  const tComponents = useTranslations('admin.pageBuilder.components');
-  const tEditor = useTranslations('admin.pageBuilder.editor');
-  const tLabels = useTranslations('admin.pageBuilder.editor.labels');
-  const tOptions = useTranslations('admin.pageBuilder.editor.options');
+  const tComponents = useTranslations('admin.pageBuilder.components')
+  const tEditor = useTranslations('admin.pageBuilder.editor')
+  const tLabels = useTranslations('admin.pageBuilder.editor.labels')
+  const tOptions = useTranslations('admin.pageBuilder.editor.options')
+  const uploadMutation = useUploadFile()
 
-  const definition = COMPONENT_DEFINITIONS.find((d) => d.type === component.type);
-  const componentLabel = tComponents(component.type as never);
+  const definition = COMPONENT_DEFINITIONS.find((d) => d.type === component.type)
+  const componentLabel = tComponents(component.type as never)
 
   const handleChange = (key: string, value: unknown) => {
-    onUpdate({ [key]: value });
-  };
+    onUpdate({ [key]: value })
+  }
+
+  const handleUpload = async (file: File, folder: string) => {
+    const result = await uploadMutation.mutateAsync({ file, folder })
+    return result
+  }
+
+  const IMAGE_FIELD_KEYS = ['src', 'backgroundImage']
 
   const formatLabel = (key: string): string => {
     try {
-      return tLabels(key as never);
+      return tLabels(key as never)
     } catch {
-      return key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim();
+      return key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, (str) => str.toUpperCase())
+        .trim()
     }
-  };
+  }
 
   const renderField = (key: string, value: unknown) => {
     // Boolean fields
@@ -56,10 +80,27 @@ export function PageBuilderComponentEditor({
           />
           <Label htmlFor={key}>{formatLabel(key)}</Label>
         </div>
-      );
+      )
     }
 
-    if (typeof value !== 'string' && typeof value !== 'number') return null;
+    if (typeof value !== 'string' && typeof value !== 'number') return null
+
+    if (IMAGE_FIELD_KEYS.includes(key)) {
+      return (
+        <div key={key} className="space-y-2">
+          <Label>{formatLabel(key)}</Label>
+          <FileUpload
+            value={value as string}
+            onChange={(url) => handleChange(key, url)}
+            onUpload={(file) => handleUpload(file, 'pages')}
+            accept={{
+              'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'],
+            }}
+            placeholder={tEditor('uploadImage')}
+          />
+        </div>
+      )
+    }
 
     // Level (h1-h6)
     if (key === 'level') {
@@ -80,7 +121,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Textarea for content/description
@@ -95,7 +136,7 @@ export function PageBuilderComponentEditor({
             rows={4}
           />
         </div>
-      );
+      )
     }
 
     // Alignment
@@ -114,7 +155,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Variant
@@ -133,7 +174,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Height / Gap
@@ -154,7 +195,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Width
@@ -174,7 +215,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Columns
@@ -194,13 +235,13 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Style (divider/list)
     if (key === 'style') {
-      const isDivider = component.type === 'divider';
-      const isList = component.type === 'list';
+      const isDivider = component.type === 'divider'
+      const isList = component.type === 'list'
 
       if (isDivider) {
         return (
@@ -217,7 +258,7 @@ export function PageBuilderComponentEditor({
               </SelectContent>
             </Select>
           </div>
-        );
+        )
       }
 
       if (isList) {
@@ -235,7 +276,7 @@ export function PageBuilderComponentEditor({
               </SelectContent>
             </Select>
           </div>
-        );
+        )
       }
     }
 
@@ -255,7 +296,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Aspect Ratio
@@ -274,7 +315,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Padding
@@ -294,7 +335,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Background Type
@@ -313,7 +354,7 @@ export function PageBuilderComponentEditor({
             </SelectContent>
           </Select>
         </div>
-      );
+      )
     }
 
     // Color picker
@@ -336,7 +377,7 @@ export function PageBuilderComponentEditor({
             />
           </div>
         </div>
-      );
+      )
     }
 
     // Number input
@@ -351,7 +392,7 @@ export function PageBuilderComponentEditor({
             onChange={(e) => handleChange(key, Number(e.target.value))}
           />
         </div>
-      );
+      )
     }
 
     // Default text input
@@ -364,46 +405,66 @@ export function PageBuilderComponentEditor({
           onChange={(e) => handleChange(key, e.target.value)}
         />
       </div>
-    );
-  };
+    )
+  }
 
   // Categorize props
-  const contentProps: [string, unknown][] = [];
-  const styleProps: [string, unknown][] = [];
-  const optionsProps: [string, unknown][] = [];
+  const contentProps: [string, unknown][] = []
+  const styleProps: [string, unknown][] = []
+  const optionsProps: [string, unknown][] = []
 
   Object.entries(component.props).forEach(([key, value]) => {
-    if (Array.isArray(value) || (typeof value === 'object' && value !== null)) return;
+    if (Array.isArray(value) || (typeof value === 'object' && value !== null)) return
 
     // Style props: colors, alignment, background
-    if (key.toLowerCase().includes('color') || key === 'backgroundType' || key === 'backgroundImage' || key.toLowerCase().includes('alignment')) {
-      styleProps.push([key, value]);
+    if (
+      key.toLowerCase().includes('color') ||
+      key === 'backgroundType' ||
+      key === 'backgroundImage' ||
+      key.toLowerCase().includes('alignment')
+    ) {
+      styleProps.push([key, value])
     }
     // Options props: dimensions, layout, toggles
-    else if (typeof value === 'boolean' || key === 'columns' || key === 'limit' || key === 'height' || key === 'gap' || key === 'width' || key === 'size' || key === 'style' || key === 'aspectRatio' || key === 'padding' || key === 'rounded' || key === 'overlay') {
-      optionsProps.push([key, value]);
+    else if (
+      typeof value === 'boolean' ||
+      key === 'columns' ||
+      key === 'limit' ||
+      key === 'height' ||
+      key === 'gap' ||
+      key === 'width' ||
+      key === 'size' ||
+      key === 'style' ||
+      key === 'aspectRatio' ||
+      key === 'padding' ||
+      key === 'rounded' ||
+      key === 'overlay'
+    ) {
+      optionsProps.push([key, value])
     }
     // Content props: text, links, etc.
     else {
-      contentProps.push([key, value]);
+      contentProps.push([key, value])
     }
-  });
+  })
 
   // Determine which sections to show
-  const hasContent = contentProps.length > 0;
-  const hasStyle = styleProps.length > 0;
-  const hasOptions = optionsProps.length > 0;
+  const hasContent = contentProps.length > 0
+  const hasStyle = styleProps.length > 0
+  const hasOptions = optionsProps.length > 0
 
   // Default open sections
-  const defaultOpen = [];
-  if (hasContent) defaultOpen.push('content');
-  if (hasStyle) defaultOpen.push('style');
+  const defaultOpen = []
+  if (hasContent) defaultOpen.push('content')
+  if (hasStyle) defaultOpen.push('style')
 
   return (
     <div className="absolute right-0 top-0 z-50 flex h-full w-80 flex-col border-l bg-card shadow-lg">
       <div className="flex items-center justify-between border-b p-3">
         <div>
-          <h3 className="font-semibold text-sm">{componentLabel || definition?.label || component.type}</h3>
+          <h3 className="text-sm font-semibold">
+            {componentLabel || definition?.label || component.type}
+          </h3>
           <p className="text-xs text-muted-foreground">{tEditor('editComponent')}</p>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose}>
@@ -463,5 +524,5 @@ export function PageBuilderComponentEditor({
         </Accordion>
       </ScrollArea>
     </div>
-  );
+  )
 }

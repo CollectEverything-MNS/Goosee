@@ -1,20 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import * as FormData from 'form-data';
+import { HttpProxyService } from '../../shared/services/http-proxy.service';
+import { routesConfig } from '../../config/routes.config';
+import { serviceUrl, ServiceUrls } from '../../config/services.config';
+import FormData from 'form-data';
 
 @Injectable()
 export class UploadService {
-  private readonly pageServiceUrl: string;
+  private readonly serviceUrl: ServiceUrls;
 
   constructor(
-    private readonly httpService: HttpService,
+    private readonly httpProxy: HttpProxyService,
     private readonly configService: ConfigService
   ) {
-    const host = this.configService.get<string>('PAGE_SERVICE_HOST');
-    const port = this.configService.get<string>('PAGE_SERVICE_PORT');
-    this.pageServiceUrl = `http://${host}:${port}`;
+    this.serviceUrl = serviceUrl(this.configService);
   }
 
   async uploadFile(
@@ -28,16 +27,13 @@ export class UploadService {
     });
 
     const queryParams = folder ? `?folder=${folder}` : '';
-    const url = `${this.pageServiceUrl}/upload${queryParams}`;
+    const url = `${routesConfig.upload.file.link(this.serviceUrl.page)}${queryParams}`;
 
-    const response = await firstValueFrom(
-      this.httpService.post<{ url: string; key: string }>(url, formData, {
-        headers: {
-          ...formData.getHeaders(),
-        },
-      })
+    return this.httpProxy.postWithConfig<{ url: string; key: string }>(
+      url,
+      formData,
+      { headers: { ...formData.getHeaders() } },
+      'Failed to upload file'
     );
-
-    return response.data;
   }
 }

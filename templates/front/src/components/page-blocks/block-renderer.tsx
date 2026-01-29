@@ -90,6 +90,8 @@ export function PageRenderer({
               mode: context?.mode || 'preview',
               isSelected: selectedComponentId === component.id,
               onSelect: () => onSelectComponent?.(component.id),
+              onSelectComponent,
+              selectedComponentId,
             }}
           />
         </div>

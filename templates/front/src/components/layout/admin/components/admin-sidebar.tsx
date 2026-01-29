@@ -1,10 +1,11 @@
-'use client';
+'use client'
 
-import * as React from 'react';
-import Link from 'next/link';
-import { ChevronRight, LogOut, LucideIcon } from 'lucide-react';
-import { routes } from '@/config/routes.config';
-import { usePathname } from 'next/navigation';
+import * as React from 'react'
+import Link from 'next/link'
+
+import { ChevronRight, Loader2, LogOut, LucideIcon } from 'lucide-react'
+import { routes } from '@/config/routes.config'
+import { usePathname } from 'next/navigation'
 
 import {
   Sidebar,
@@ -19,10 +20,11 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-} from '@/components/ui/sidebar';
-import { getAdminMenu } from '@/config/menu-admin.config';
-import { useLocale, useTranslations } from 'next-intl';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+} from '@/components/ui/sidebar'
+import { getAdminMenu } from '@/config/menu-admin.config'
+import { useLocale, useTranslations } from 'next-intl'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { useSettings } from '@/features/personnalisation/settings/usecases/use-get-settings'
 
 type TItem = {
   name: string
@@ -35,6 +37,10 @@ export function AdminSidebar() {
   const locale = useLocale()
   const pathname = usePathname()
   const menu = getAdminMenu()
+  const { data: settings, isLoading, dataUpdatedAt } = useSettings()
+  const logoSrc = settings?.logoUrl
+    ? `${settings.logoUrl}${settings.logoUrl.includes('?') ? '&' : '?'}v=${dataUpdatedAt}`
+    : undefined
   return (
     <Sidebar>
       <SidebarHeader>
@@ -45,9 +51,23 @@ export function AdminSidebar() {
                 href={routes.gooseeAdmin.dashboard.getHref(locale)}
                 className="flex items-center justify-center gap-3 px-4"
               >
-                <span className="text-3xl font-bold text-[#043e52] dark:text-white">
-                  Goos<span className="text-[#fea341]">ee</span>
-                </span>
+                {isLoading ? (
+                  <Loader2 className="h-full animate-spin text-muted-foreground" />
+                ) : (
+                  <>
+                    {logoSrc ? (
+                      <img
+                        src={logoSrc}
+                        alt={settings?.title || 'Logo'}
+                        className="h-10 w-auto object-contain"
+                      />
+                    ) : (
+                      <span className="text-3xl font-bold text-[#043e52] dark:text-white">
+                        Goos<span className="text-[#fea341]">ee</span>
+                      </span>
+                    )}
+                  </>
+                )}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

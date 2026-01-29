@@ -168,9 +168,10 @@ export function HeaderBlock({
   height = 'md',
   context,
 }: BlockPropsWithContext<HeaderBlockProps>) {
-  const { data: settings } = useSettings();
+  const { data: settings, dataUpdatedAt } = useSettings();
   const { data: menus = [] } = useMenus();
   const isPreview = context?.mode === 'preview';
+  const logoSrc = settings?.logoUrl ? `${settings.logoUrl}${settings.logoUrl.includes('?') ? '&' : '?'}v=${dataUpdatedAt}` : undefined;
 
   // Filter root menus (no parentId) and flatten for mobile
   const rootMenus = menus.filter((m) => !m.parentId && m.isActive);
@@ -194,10 +195,10 @@ export function HeaderBlock({
             logoPosition === 'center' && 'absolute left-1/2 -translate-x-1/2'
           )}
         >
-          {settings?.logoUrl ? (
+          {logoSrc ? (
             <img
-              src={settings.logoUrl}
-              alt={settings.title || 'Logo'}
+              src={logoSrc}
+              alt={settings?.title || 'Logo'}
               className="h-8 md:h-10 w-auto object-contain"
             />
           ) : (

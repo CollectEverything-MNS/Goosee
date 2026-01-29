@@ -74,8 +74,8 @@ export function SettingsForm() {
       await updateMutation.mutateAsync({
         title: values.title,
         description: values.description || undefined,
-        logoUrl: values.logoUrl || undefined,
-        faviconUrl: values.faviconUrl || undefined,
+        logoUrl: values.logoUrl ?? undefined,
+        faviconUrl: values.faviconUrl ?? undefined,
         primaryColor: values.primaryColor || undefined,
       });
       toast.success(t('form.saveSuccess'));
@@ -97,7 +97,7 @@ export function SettingsForm() {
       <CardHeader>
         <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Configurez les paramètres généraux de votre site
+          {t('form.siteDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -131,7 +131,7 @@ export function SettingsForm() {
                     />
                   </FormControl>
                   <FormDescription>
-                    Cette description sera utilisée pour le référencement SEO
+                    {t('form.descriptionHelp')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -157,7 +157,7 @@ export function SettingsForm() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Logo du site affiché dans le header
+                      {t('form.logoHelp')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -183,7 +183,7 @@ export function SettingsForm() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Favicon affiché dans l'onglet du navigateur (max 1MB)
+                      {t('form.faviconHelp')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

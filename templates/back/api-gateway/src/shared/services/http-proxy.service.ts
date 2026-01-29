@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 
 interface ErrorResponse {
   message?: string | string[];
@@ -43,6 +43,15 @@ export class HttpProxyService {
   async patch<T>(url: string, body: unknown, errorMessage = 'Request failed'): Promise<T> {
     try {
       const { data } = await firstValueFrom(this.http.patch<T>(url, body));
+      return data;
+    } catch (error) {
+      this.handleError(error, errorMessage);
+    }
+  }
+
+  async postWithConfig<T>(url: string, body: unknown, config: AxiosRequestConfig, errorMessage = 'Request failed'): Promise<T> {
+    try {
+      const { data } = await firstValueFrom(this.http.post<T>(url, body, config));
       return data;
     } catch (error) {
       this.handleError(error, errorMessage);

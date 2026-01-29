@@ -185,8 +185,27 @@
         "primaryColor": "Couleur principale",
         "save": "Enregistrer",
         "saveSuccess": "Paramètres enregistrés avec succès",
-        "saveError": "Erreur lors de l'enregistrement"
+        "saveError": "Erreur lors de l'enregistrement",
+        "siteDescription": "Configurez les paramètres généraux de votre site",
+        "descriptionHelp": "Cette description sera utilisée pour le référencement SEO",
+        "logoHelp": "Logo du site affiché dans le header",
+        "faviconHelp": "Favicon affiché dans l'onglet du navigateur (max 1MB)"
       }
+    },
+    "pageTitles": {
+      "dashboard": "Tableau de bord",
+      "products": "Produits",
+      "categories": "Catégories",
+      "clients": "Clients",
+      "returnClients": "Retour clients",
+      "users": "Utilisateurs",
+      "roles": "Rôles",
+      "siteSettings": "Paramètres du site",
+      "menu": "Menu",
+      "templates": "Modèle de style",
+      "pages": "Pages",
+      "orders": "Commandes",
+      "salesHistory": "Historiques"
     },
     "pages": {
       "addNewPage": "Ajouter une page",
@@ -255,6 +274,7 @@
       },
       "editor": {
         "editComponent": "Modifier le composant",
+        "uploadImage": "Glissez une image ou cliquez pour sélectionner",
         "sections": {
           "content": "Contenu",
           "style": "Style",

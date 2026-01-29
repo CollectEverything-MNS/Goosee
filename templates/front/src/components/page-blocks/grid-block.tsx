@@ -56,8 +56,26 @@ export function GridBlock({
     >
       {sortedChildren.length > 0 ? (
         sortedChildren.map((child) => (
-          <div key={child.id} className="min-h-[50px]">
-            <BlockRenderer component={child} context={context} />
+          <div
+            key={child.id}
+            className={cn(
+              'min-h-[50px] cursor-pointer rounded-lg transition-all',
+              context?.selectedComponentId === child.id && 'ring-2 ring-primary'
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              context?.onSelectComponent?.(child.id);
+            }}
+          >
+            <BlockRenderer
+              component={child}
+              context={{
+                ...context,
+                mode: context?.mode || 'preview',
+                isSelected: context?.selectedComponentId === child.id,
+                onSelect: () => context?.onSelectComponent?.(child.id),
+              }}
+            />
           </div>
         ))
       ) : (

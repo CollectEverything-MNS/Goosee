@@ -3,6 +3,8 @@ export interface BlockContext {
   mode: 'preview' | 'front';
   isSelected?: boolean;
   onSelect?: () => void;
+  onSelectComponent?: (id: string) => void;
+  selectedComponentId?: string | null;
 }
 
 export interface HeroBlockProps {
