@@ -89,8 +89,57 @@ services:
     networks:
       - goosee_net
 
+  goosee-user-service-dev:
+    container_name: goosee-user-service-dev
+    build:
+      context: ../../templates/back/services/user-service
+      dockerfile: Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      USER_DB_HOST: ${USER_DB_HOST}
+      USER_DB_PORT: ${USER_DB_PORT}
+      USER_DB_USER: ${USER_DB_USER}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      USER_DB_NAME: ${USER_DB_NAME}
+    expose:
+      - "${USER_SERVICE_PORT}"
+    depends_on:
+      goosee-user-db-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${USER_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-user-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-user-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
+      POSTGRES_DB: ${USER_DB_NAME}
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    expose:
+      - "${USER_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB_USER} -d ${USER_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
 volumes:
   auth_db_data:
+  user_db_data:
 
 networks:
   goosee_net:
