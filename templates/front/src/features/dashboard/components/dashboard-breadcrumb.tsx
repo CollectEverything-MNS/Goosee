@@ -1,7 +1,9 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { AdminBreadcrumbGeneric } from '@/components/layout/admin/components/admin-breadcrumb-generic';
 
 export function DashboardBreadcrumb() {
-  return <AdminBreadcrumbGeneric items={[{ label: 'Tableau de bord' }]} />
+  const t = useTranslations('admin.pageTitles');
+  return <AdminBreadcrumbGeneric items={[{ label: t('dashboard') }]} />
 }
