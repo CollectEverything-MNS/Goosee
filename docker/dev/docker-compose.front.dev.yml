@@ -2,11 +2,11 @@ services:
     goosee-front-dev:
         container_name: goosee-front-dev
         build:
-            context: ../../templates/front
-            dockerfile: Dockerfile.dev
-        command: ["node", "/app/node_modules/next/dist/bin/next", "dev"]
+            context: ../..
+            dockerfile: templates/front/Dockerfile.dev
+        command: yarn dev
         ports:
-            - "3000:3000"
+            - "${NEXT_PORT}:${NEXT_PORT}"
         environment:
             NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
             NODE_ENV: ${NODE_ENV}

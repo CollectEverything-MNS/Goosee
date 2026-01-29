@@ -2,34 +2,34 @@ services:
   goosee-api-gateway-dev:
     container_name: goosee-api-gateway-dev
     build:
-      context: ../../templates/back/api-gateway
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: templates/back/api-gateway/Dockerfile.dev
     command: yarn dev
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
+      NODE_ENV: ${NODE_ENV}
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       PAGE_SERVICE_HOST: ${PAGE_SERVICE_HOST}
       PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
-      NODE_ENV: ${NODE_ENV}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
-      - goosee-page-service-dev
     networks:
       - goosee_net
 
   goosee-auth-service-dev:
     container_name: goosee-auth-service-dev
     build:
-      context: ../../templates/back/services/auth-service
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: templates/back/services/auth-service/Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       AUTH_DB_HOST: ${AUTH_DB_HOST}
       AUTH_DB_PORT: ${AUTH_DB_PORT}
@@ -40,6 +40,10 @@ services:
       - "${AUTH_SERVICE_PORT}"
     depends_on:
       goosee-auth-db-dev:
+        condition: service_healthy
+      goosee-page-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${AUTH_SERVICE_PORT}"]
@@ -70,30 +74,11 @@ services:
     networks:
       - goosee_net
 
-  goosee-notifier-service-dev:
-    container_name: goosee-notifier-service-dev
-    build:
-      context: ../../templates/back/services/notifier-service
-      dockerfile: Dockerfile.dev
-    command: yarn dev
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      RABBITMQ_URL: ${RABBITMQ_URL}
-      SMTP_HOST: ${SMTP_HOST}
-      SMTP_PORT: ${SMTP_PORT}
-      SMTP_SECURE: ${SMTP_SECURE}
-      SMTP_USER: ${SMTP_USER}
-      SMTP_PASSWORD: ${SMTP_PASSWORD}
-      SMTP_FROM: ${SMTP_FROM}
-    restart: unless-stopped
-    networks:
-      - goosee_net
-
   goosee-page-service-dev:
     container_name: goosee-page-service-dev
     build:
-      context: ../../templates/back/services/page-service
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: templates/back/services/page-service/Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
@@ -103,13 +88,20 @@ services:
       PAGE_DB_USER: ${PAGE_DB_USER}
       PAGE_DB_PASSWORD: ${PAGE_DB_PASSWORD}
       PAGE_DB_NAME: ${PAGE_DB_NAME}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
     expose:
       - "${PAGE_SERVICE_PORT}"
     depends_on:
       goosee-page-db-dev:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}"]
+      test: [ "CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}" ]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -130,10 +122,32 @@ services:
     expose:
       - "${PAGE_DB_PORT}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PAGE_DB_USER} -d ${PAGE_DB_NAME}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${PAGE_DB_USER} -d ${PAGE_DB_NAME}" ]
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - goosee_net
+
+  goosee-notifier-service-dev:
+    container_name: goosee-notifier-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/notifier-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SECURE: ${SMTP_SECURE}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+    depends_on:
+      goosee-rabbitmq-dev:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - goosee_net
 
@@ -143,4 +157,5 @@ volumes:
 
 networks:
   goosee_net:
+    name: goosee_net
     driver: bridge
