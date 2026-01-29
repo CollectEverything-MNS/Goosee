@@ -1,0 +1,14 @@
+.git
+.github
+.husky
+.idea
+.vscode
+.DS_Store
+**/node_modules
+**/dist
+**/build
+**/.next
+**/out
+**/coverage
+**/*.log
+env/.env*
