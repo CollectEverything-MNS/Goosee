@@ -10,6 +10,12 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
+  app.enableCors({
+    origin: configService.get<string>('NEXT_PUBLIC_WEB_URL', 'http://localhost:3000'),
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
   const port = configService.get<number>('API_GATEWAY_PORT', 3001);
 

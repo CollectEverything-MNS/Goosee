@@ -11,6 +11,11 @@ services:
       NODE_ENV: ${NODE_ENV}
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      PAGE_SERVICE_HOST: ${PAGE_SERVICE_HOST}
+      PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
     networks:
@@ -35,6 +40,8 @@ services:
       - "${AUTH_SERVICE_PORT}"
     depends_on:
       goosee-auth-db-dev:
+        condition: service_healthy
+      goosee-page-db-dev:
         condition: service_healthy
       goosee-rabbitmq-dev:
         condition: service_healthy
@@ -67,6 +74,61 @@ services:
     networks:
       - goosee_net
 
+  goosee-page-service-dev:
+    container_name: goosee-page-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/page-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
+      PAGE_DB_HOST: ${PAGE_DB_HOST}
+      PAGE_DB_PORT: ${PAGE_DB_PORT}
+      PAGE_DB_USER: ${PAGE_DB_USER}
+      PAGE_DB_PASSWORD: ${PAGE_DB_PASSWORD}
+      PAGE_DB_NAME: ${PAGE_DB_NAME}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
+    expose:
+      - "${PAGE_SERVICE_PORT}"
+    depends_on:
+      goosee-page-db-dev:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-page-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-page-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PAGE_DB_USER}
+      POSTGRES_PASSWORD: ${PAGE_DB_PASSWORD}
+      POSTGRES_DB: ${PAGE_DB_NAME}
+    volumes:
+      - page_db_data:/var/lib/postgresql/data
+    expose:
+      - "${PAGE_DB_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${PAGE_DB_USER} -d ${PAGE_DB_NAME}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
   goosee-notifier-service-dev:
     container_name: goosee-notifier-service-dev
     build:
@@ -92,8 +154,8 @@ services:
   goosee-user-service-dev:
     container_name: goosee-user-service-dev
     build:
-      context: ../../templates/back/services/user-service
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: templates/back/api-gateway/Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
@@ -140,6 +202,7 @@ services:
 volumes:
   auth_db_data:
   user_db_data:
+  page_db_data:
 
 networks:
   goosee_net:

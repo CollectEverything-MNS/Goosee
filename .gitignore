@@ -36,3 +36,6 @@ out/
 
 # Dependency directories
 bower_components/
+
+CLAUDE.md
+.claude/

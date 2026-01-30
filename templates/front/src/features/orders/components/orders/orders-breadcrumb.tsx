@@ -1,6 +1,9 @@
-'use client'
-import { AdminBreadcrumbGeneric } from '@/components/layout/admin-breadcrumb-generic'
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { AdminBreadcrumbGeneric } from '@/components/layout/admin/components/admin-breadcrumb-generic';
 
 export function OrdersBreadcrumb() {
-  return <AdminBreadcrumbGeneric items={[{ label: 'Commandes' }]} />
+  const t = useTranslations('admin.pageTitles');
+  return <AdminBreadcrumbGeneric items={[{ label: t('orders') }]} />
 }

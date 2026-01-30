@@ -32,8 +32,20 @@ export const routes = {
     pages: {
       getHref: (locale: string) => `/${locale}/goosee-admin/pages`,
     },
+    pagesCreate: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/pages/create`,
+    },
+    pagesEdit: {
+      getHref: (locale: string, id: string) => `/${locale}/goosee-admin/pages/${id}/edit`,
+    },
     templates: {
       getHref: (locale: string) => `/${locale}/goosee-admin/templates`,
+    },
+    menu: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/menu`,
+    },
+    settings: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/settings`,
     },
     users: {
       getHref: (locale: string) => `/${locale}/goosee-admin/users`,

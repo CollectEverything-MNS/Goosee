@@ -1,7 +1,16 @@
 const authBasePath = '/auth';
 const usersBasePath = '/users';
+const uploadBasePath = '/upload';
+
 
 export const routesConfig = {
+  upload: {
+    root: uploadBasePath,
+    file: {
+      path: uploadBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${uploadBasePath}`,
+    },
+  },
   auth: {
     root: authBasePath,
     login: {

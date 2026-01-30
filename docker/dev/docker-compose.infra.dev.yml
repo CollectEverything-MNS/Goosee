@@ -23,7 +23,31 @@ services:
     networks:
       - goosee_net
 
+  minio:
+    image: minio/minio:latest
+    container_name: goosee-minio-dev
+    restart: unless-stopped
+    ports:
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - goosee_net
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 networks:
   goosee_net:
     name: goosee_net
     driver: bridge
+
+volumes:
+  minio_data:

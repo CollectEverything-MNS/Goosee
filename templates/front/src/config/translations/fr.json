@@ -29,9 +29,30 @@
         "accountSecurity": "Sécurité du compte",
         "email": "Adresse e-mail",
         "password": "Mot de passe",
-        "changePassword": "Modifiez votre mot de passe",
+        "changePassword": "Changer votre mot de passe",
         "change": "Changer",
-        "modify": "Modifier"
+        "modify": "Modifier",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "saveChanges": "Enregistrer les modifications",
+        "modifyPassword": "Modifier le mot de passe",
+        "passwordInstructions": "Le mot de passe doit contenir au moins 8 caractères et inclure un mélange de lettres, chiffres et caractères spéciaux.",
+        "enterCurrentEmail": "Saisir votre email actuel",
+        "currentEmailInstructions": "Entrez l'email actuellement associé à votre compte pour continuer.",
+        "currentEmail": "Email actuel",
+        "verifyOtp": "Vérifier le code OTP",
+        "otpInstructions": "Saisissez le code OTP que vous avez reçu par email.",
+        "otp": "Code OTP",
+        "enterNewEmail": "Saisir le nouvel email",
+        "newEmailInstructions": "Entrez le nouvel email que vous souhaitez associer à votre compte.",
+        "newEmail": "Nouvel email",
+        "next": "Suivant",
+        "verify": "Vérifier",
+        "save": "Enregistrer",
+        "close": "Fermer",
+        "required": "Requis",
+        "emailUpdateSuccess": "Votre email a été mis à jour avec succès."
       },
       "preferences": {
         "title": "Préférences",
@@ -46,6 +67,13 @@
           "system": "Système"
         }
       }
+    },
+    "support": {
+      "title": "Support",
+      "description": "Vous pouvez contacter notre équipe de support par email ou par téléphone.",
+      "emailLabel": "Email :",
+      "phoneLabel": "Téléphone :",
+      "close": "Fermer"
     },
     "login": {
         "title": "Goose Administration",
@@ -74,7 +102,9 @@
       "personnalisation": {
         "label": "Personnalisation",
         "pages": "Pages",
-        "templates": "Templates"
+        "templates": "Templates",
+        "menu": "Menu",
+        "settings": "Paramètres du site"
       },
       "access": {
         "label": "Accès",
@@ -83,12 +113,339 @@
       },
       "logout": "Déconnexion"
     },
+    "menu": {
+      "title": "Menu",
+      "addNew": "Ajouter un item",
+      "table": {
+        "label": "Libellé",
+        "type": "Type",
+        "status": "Statut",
+        "order": "Ordre",
+        "actions": "Actions"
+      },
+      "type": {
+        "page": "Page",
+        "external": "Lien externe",
+        "none": "Non défini"
+      },
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "filter": {
+        "status": "Statut"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleteSuccess": "Item supprimé avec succès",
+        "deleteError": "Erreur lors de la suppression",
+        "createSuccess": "Item créé avec succès",
+        "createError": "Erreur lors de la création",
+        "updateSuccess": "Item mis à jour avec succès",
+        "updateError": "Erreur lors de la mise à jour",
+        "confirmDelete": "Confirmer la suppression",
+        "confirmDeleteDescription": "Êtes-vous sûr de vouloir supprimer cet item ? Cette action est irréversible.",
+        "cancel": "Annuler"
+      },
+      "dialog": {
+        "createTitle": "Ajouter un item de menu",
+        "editTitle": "Modifier l'item de menu"
+      },
+      "form": {
+        "label": "Libellé",
+        "labelPlaceholder": "Ex: Accueil",
+        "linkType": "Type de lien",
+        "selectLinkType": "Sélectionner le type de lien",
+        "linkTypePage": "Page interne",
+        "linkTypeExternal": "Lien externe",
+        "page": "Page",
+        "selectPage": "Sélectionner une page",
+        "externalUrl": "URL externe",
+        "parent": "Menu parent",
+        "noParent": "Aucun (niveau racine)",
+        "isActive": "Actif",
+        "openInNewTab": "Nouvel onglet",
+        "cancel": "Annuler",
+        "create": "Créer",
+        "update": "Mettre à jour"
+      }
+    },
+    "siteSettings": {
+      "title": "Paramètres du site",
+      "form": {
+        "title": "Titre du site",
+        "titlePlaceholder": "Mon site",
+        "description": "Description",
+        "descriptionPlaceholder": "Description du site pour le SEO",
+        "logoUrl": "URL du logo",
+        "logoUrlPlaceholder": "https://example.com/logo.png",
+        "faviconUrl": "URL du favicon",
+        "faviconUrlPlaceholder": "https://example.com/favicon.ico",
+        "primaryColor": "Couleur principale",
+        "save": "Enregistrer",
+        "saveSuccess": "Paramètres enregistrés avec succès",
+        "saveError": "Erreur lors de l'enregistrement",
+        "siteDescription": "Configurez les paramètres généraux de votre site",
+        "descriptionHelp": "Cette description sera utilisée pour le référencement SEO",
+        "logoHelp": "Logo du site affiché dans le header",
+        "faviconHelp": "Favicon affiché dans l'onglet du navigateur (max 1MB)"
+      }
+    },
+    "pageTitles": {
+      "dashboard": "Tableau de bord",
+      "products": "Produits",
+      "categories": "Catégories",
+      "clients": "Clients",
+      "returnClients": "Retour clients",
+      "users": "Utilisateurs",
+      "roles": "Rôles",
+      "siteSettings": "Paramètres du site",
+      "menu": "Menu",
+      "templates": "Modèle de style",
+      "pages": "Pages",
+      "orders": "Commandes",
+      "salesHistory": "Historiques"
+    },
     "pages": {
       "addNewPage": "Ajouter une page",
       "table": {
         "title": "Titre",
         "status": "Statut",
         "actions": "Actions"
+      },
+      "status": {
+        "draft": "Brouillon",
+        "published": "Publié"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleteSuccess": "Page supprimée avec succès",
+        "deleteError": "Erreur lors de la suppression",
+        "confirmDelete": "Confirmer la suppression",
+        "confirmDeleteDescription": "Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible.",
+        "cancel": "Annuler"
+      },
+      "filter": {
+        "status": "Statut"
+      }
+    },
+    "users": {
+      "addNewUser": "Ajouter un utilisateur",
+      "table": {
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "email": "Email",
+        "role": "Rôle",
+        "status": "Statut",
+        "actions": "Actions"
+      }
+    },
+    "clients": {
+      "addNewClient": "Ajouter un client",
+      "table": {
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "email": "Email",
+        "status": "Statut",
+        "actions": "Actions"
+      }
+    },
+    "pageBuilder": {
+      "title": "Page Builder",
+      "sidebar": {
+        "title": "Composants",
+        "subtitle": "Glissez dans la page"
+      },
+      "canvas": {
+        "emptyState": "Glissez des composants depuis la barre latérale",
+        "gridDropZone": "Glissez des composants ici"
+      },
+      "preview": {
+        "title": "Aperçu",
+        "emptyTitle": "Votre page est vide",
+        "emptySubtitle": "Glissez des composants depuis la sidebar pour construire votre page",
+        "viewport": {
+          "desktop": "Desktop",
+          "tablet": "Tablette",
+          "mobile": "Mobile"
+        }
+      },
+      "editor": {
+        "editComponent": "Modifier le composant",
+        "uploadImage": "Glissez une image ou cliquez pour sélectionner",
+        "sections": {
+          "content": "Contenu",
+          "style": "Style",
+          "options": "Options"
+        },
+        "labels": {
+          "title": "Titre",
+          "subtitle": "Sous-titre",
+          "content": "Contenu",
+          "description": "Description",
+          "buttonText": "Texte du bouton",
+          "buttonLink": "Lien du bouton",
+          "alignment": "Alignement",
+          "level": "Niveau",
+          "height": "Hauteur",
+          "variant": "Variante",
+          "src": "URL de l'image",
+          "alt": "Texte alternatif",
+          "width": "Largeur",
+          "rounded": "Coins arrondis",
+          "columns": "Colonnes",
+          "gap": "Espacement",
+          "limit": "Limite",
+          "showPrice": "Afficher prix",
+          "showAddToCart": "Bouton panier",
+          "submitText": "Texte du bouton",
+          "overlay": "Overlay sombre",
+          "backgroundType": "Type de fond",
+          "backgroundColor": "Couleur de fond",
+          "backgroundImage": "Image de fond",
+          "textColor": "Couleur du texte",
+          "color": "Couleur",
+          "text": "Texte",
+          "link": "Lien",
+          "size": "Taille",
+          "style": "Style",
+          "author": "Auteur",
+          "items": "Éléments",
+          "url": "URL",
+          "aspectRatio": "Format",
+          "padding": "Espacement interne",
+          "logoPosition": "Position du logo",
+          "showMenu": "Afficher le menu",
+          "menuAlignment": "Alignement du menu",
+          "sticky": "Sticky (fixé)"
+        },
+        "options": {
+          "level": {
+            "h1": "H1 - Très grand",
+            "h2": "H2 - Grand",
+            "h3": "H3 - Moyen-grand",
+            "h4": "H4 - Moyen",
+            "h5": "H5 - Petit",
+            "h6": "H6 - Très petit"
+          },
+          "alignment": {
+            "left": "Gauche",
+            "center": "Centre",
+            "right": "Droite"
+          },
+          "variant": {
+            "primary": "Principal",
+            "secondary": "Secondaire",
+            "outline": "Contour"
+          },
+          "size": {
+            "sm": "Petit",
+            "md": "Moyen",
+            "lg": "Grand",
+            "xl": "Très grand",
+            "full": "Plein écran"
+          },
+          "width": {
+            "sm": "Petite",
+            "md": "Moyenne",
+            "lg": "Grande",
+            "full": "Pleine largeur"
+          },
+          "columns": {
+            "1": "1 colonne",
+            "2": "2 colonnes",
+            "3": "3 colonnes",
+            "4": "4 colonnes"
+          },
+          "dividerStyle": {
+            "solid": "Solide",
+            "dashed": "Tirets",
+            "dotted": "Pointillés"
+          },
+          "listStyle": {
+            "bullet": "Puces",
+            "number": "Numéros",
+            "check": "Coches"
+          },
+          "aspectRatio": {
+            "16:9": "16:9 (Paysage)",
+            "4:3": "4:3 (Standard)",
+            "1:1": "1:1 (Carré)"
+          },
+          "padding": {
+            "none": "Aucun",
+            "sm": "Petit",
+            "md": "Moyen",
+            "lg": "Grand"
+          },
+          "backgroundType": {
+            "color": "Couleur unie",
+            "image": "Image",
+            "gradient": "Dégradé"
+          }
+        }
+      },
+      "categories": {
+        "basic": "Basique",
+        "layout": "Mise en page"
+      },
+      "components": {
+        "hero": "Hero",
+        "heading": "Titre",
+        "text": "Texte",
+        "image": "Image",
+        "button": "Bouton",
+        "divider": "Séparateur",
+        "quote": "Citation",
+        "list": "Liste",
+        "spacer": "Espacement",
+        "video": "Vidéo",
+        "grid": "Grille",
+        "header": "Header"
+      },
+      "defaults": {
+        "title": "Votre titre",
+        "text": "Votre texte ici...",
+        "imageAlt": "Description de l'image",
+        "buttonText": "Cliquez ici",
+        "quote": "Votre citation ici...",
+        "listItems": "Élément 1\nÉlément 2\nÉlément 3",
+        "heroTitle": "Bienvenue",
+        "heroSubtitle": "Découvrez notre contenu",
+        "learnMore": "En savoir plus",
+        "videoTitle": "Vidéo"
+      },
+      "pageEditor": {
+        "editPage": "Modifier la page",
+        "newPage": "Nouvelle page",
+        "editing": "Édition de \"{title}\"",
+        "createNew": "Créez une nouvelle page",
+        "save": "Enregistrer",
+        "saveSuccess": "Page enregistrée avec succès",
+        "createSuccess": "Page créée avec succès",
+        "saveError": "Erreur lors de l'enregistrement de la page",
+        "slugAlreadyExists": "Une page avec ce slug existe déjà",
+        "pageTypeAlreadyExists": "Une page de ce type existe déjà (Accueil, Catalogue, Contact sont uniques)",
+        "settings": "Paramètres",
+        "pageSettings": "Paramètres de la page",
+        "pageSettingsDescription": "Configurez les informations de votre page",
+        "title": "Titre",
+        "titlePlaceholder": "Titre de la page",
+        "slug": "Slug",
+        "slugPlaceholder": "url-de-la-page",
+        "type": "Type",
+        "metaTitle": "Meta titre",
+        "metaTitlePlaceholder": "Titre pour le SEO",
+        "metaDescription": "Meta description",
+        "metaDescriptionPlaceholder": "Description pour le SEO",
+        "types": {
+          "home": "Accueil",
+          "catalog": "Catalogue",
+          "contact": "Contact",
+          "custom": "Personnalisée"
+        }
       }
     }
   }
