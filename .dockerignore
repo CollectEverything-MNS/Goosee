@@ -12,3 +12,5 @@
 **/coverage
 **/*.log
 env/.env*
+.claude/
+CLAUDE.md
