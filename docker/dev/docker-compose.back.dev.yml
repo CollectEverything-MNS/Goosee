@@ -155,7 +155,7 @@ services:
     container_name: goosee-user-service-dev
     build:
       context: ../..
-      dockerfile: templates/back/api-gateway/Dockerfile.dev
+      dockerfile: templates/back/services/user-service/Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
@@ -165,10 +165,13 @@ services:
       USER_DB_USER: ${USER_DB_USER}
       USER_DB_PASSWORD: ${USER_DB_PASSWORD}
       USER_DB_NAME: ${USER_DB_NAME}
+      RABBITMQ_URL: ${RABBITMQ_URL}
     expose:
       - "${USER_SERVICE_PORT}"
     depends_on:
       goosee-user-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${USER_SERVICE_PORT}"]

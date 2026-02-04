@@ -2,10 +2,13 @@ services:
   goosee-rabbitmq-dev:
     image: rabbitmq:management
     container_name: goosee-rabbitmq-dev
+    hostname: rabbitmq
     restart: unless-stopped
     ports:
       - "${RABBITMQ_PORT}:5672"
       - "${RABBITMQ_UI_PORT}:15672"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "goosee-secret-cookie"
     healthcheck:
       test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
       interval: 5s
