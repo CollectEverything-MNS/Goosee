@@ -155,10 +155,11 @@ services:
     container_name: goosee-user-service-dev
     build:
       context: ../..
-      dockerfile: templates/back/api-gateway/Dockerfile.dev
+      dockerfile: templates/back/services/user-service/Dockerfile.dev
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_DB_HOST: ${USER_DB_HOST}
       USER_DB_PORT: ${USER_DB_PORT}
