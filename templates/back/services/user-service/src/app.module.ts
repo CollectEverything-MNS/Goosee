@@ -19,7 +19,7 @@ import { GetUserUseCase } from './usecases/get-user/get-user.usecase';
 import { ListUsersUsecase } from './usecases/list-users/list-users.usecase';
 import { UpdateUserUseCase } from './usecases/update-user/update-user.usecase';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-//import { CreateUserEventsListener } from './usecases/create-user/create-user.events';
+import { CreateUserEventsListener } from './usecases/create-user/create-user.event';
 
 
 @Module({
@@ -64,6 +64,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 
   controllers: [
     CreateUserController,
+    CreateUserEventsListener,
     GetUserController,
     ListUsersController,
     UpdateUserController,

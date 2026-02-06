@@ -159,6 +159,7 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_DB_HOST: ${USER_DB_HOST}
       USER_DB_PORT: ${USER_DB_PORT}
