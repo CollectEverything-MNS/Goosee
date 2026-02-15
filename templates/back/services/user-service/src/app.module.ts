@@ -11,12 +11,16 @@ import { CreateUserController } from './usecases/create-user/create-user.control
 import { DeleteUserController } from './usecases/delete-user/delete-user.controller';
 import { GetUserController } from './usecases/get-user/get-user.controller';
 import { ListUsersController } from './usecases/list-users/list-users.controller';
+import { ListCustomersController } from './usecases/list-customers/list-customers.controller';
+import { ListAdminsController } from './usecases/list-admins/list-admins.controller';
 import { UpdateUserController } from './usecases/update-user/update-user.controller';
 
 import { CreateUserUseCase } from './usecases/create-user/create-user.usecase';
 import { DeleteUserUseCase } from './usecases/delete-user/delete-user.usecase';
 import { GetUserUseCase } from './usecases/get-user/get-user.usecase';
 import { ListUsersUsecase } from './usecases/list-users/list-users.usecase';
+import { ListCustomersUseCase } from './usecases/list-customers/list-customers.usecase';
+import { ListAdminsUseCase } from './usecases/list-admins/list-admins.usecase';
 import { UpdateUserUseCase } from './usecases/update-user/update-user.usecase';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 //import { CreateUserEventsListener } from './usecases/create-user/create-user.events';
@@ -64,6 +68,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 
   controllers: [
     CreateUserController,
+    ListCustomersController,
+    ListAdminsController,
     GetUserController,
     ListUsersController,
     UpdateUserController,
@@ -79,6 +85,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     CreateUserUseCase,
     GetUserUseCase,
     ListUsersUsecase,
+    ListCustomersUseCase,
+    ListAdminsUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
   ],
