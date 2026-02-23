@@ -29,8 +29,8 @@ export function getUsersColumns(): ColumnDef<any>[] {
       enableHiding: false,
     },
 
-    { accessorKey: 'firstname', header: t('admin.users.table.firstname') },
-    { accessorKey: 'lastname', header: t('admin.users.table.lastname') },
+    { accessorKey: 'firstName', header: t('admin.users.table.firstname') },
+    { accessorKey: 'lastName', header: t('admin.users.table.lastname') },
     { accessorKey: 'email', header: t('admin.users.table.email') },
     { accessorKey: 'role', header: t('admin.users.table.role') },
     { accessorKey: 'status', header: t('admin.users.table.status') },
