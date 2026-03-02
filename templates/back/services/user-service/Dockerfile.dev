@@ -14,6 +14,6 @@ COPY templates/back/services/user-service ./templates/back/services/user-service
 
 WORKDIR /usr/src/app/templates/back/services/user-service
 
-EXPOSE 3002
+EXPOSE 3000
 
 CMD ["yarn", "dev"]

@@ -22,6 +22,10 @@ import { ForgetPasswordRequestUseCase } from './usecases/forget-password-request
 import { ForgetPasswordConfirmController } from './usecases/forget-password-confirm/forget-password-confirm.controller';
 import { ForgetPasswordRequestController } from './usecases/forget-password-request/forget-password-request.controller';
 import { ForgetPasswordConfirmUseCase } from './usecases/forget-password-confirm/forget-password-confirm.usecase';
+import { VerifyEmailController } from './usecases/verify-email/verify-email.controller';
+import { VerifyEmailUseCase } from './usecases/verify-email/verify-email.usecase';
+import { ResendVerificationEmailController } from './usecases/resend-verification-email/resend-verification-email.controller';
+import { ResendVerificationEmailUseCase } from './usecases/resend-verification-email/resend-verification-email.usecase';
 
 @Module({
   imports: [
@@ -45,12 +49,24 @@ import { ForgetPasswordConfirmUseCase } from './usecases/forget-password-confirm
     TypeOrmModule.forFeature([Auth, AuthToken]),
     ClientsModule.registerAsync([
       {
-        name: 'RMQ_CLIENT',
+        name: 'RMQ_AUTH_CLIENT',
         useFactory: (cfg: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
             urls: [cfg.get<string>('RABBITMQ_URL')!],
             queue: 'auth_events',
+            queueOptions: { durable: true },
+          },
+        }),
+        inject: [ConfigService],
+      },
+      {
+        name: 'RMQ_NOTIF_CLIENT',
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [cfg.get<string>('RABBITMQ_URL')!],
+            queue: 'notifications_queue',
             queueOptions: { durable: true },
           },
         }),
@@ -66,6 +82,8 @@ import { ForgetPasswordConfirmUseCase } from './usecases/forget-password-confirm
     ChangePasswordController,
     ForgetPasswordRequestController,
     ForgetPasswordConfirmController,
+    VerifyEmailController,
+    ResendVerificationEmailController,
   ],
   providers: [
     {
@@ -83,6 +101,8 @@ import { ForgetPasswordConfirmUseCase } from './usecases/forget-password-confirm
     ChangePasswordUseCase,
     ForgetPasswordRequestUseCase,
     ForgetPasswordConfirmUseCase,
+    VerifyEmailUseCase,
+    ResendVerificationEmailUseCase,
   ],
 })
 export class AppModule {}

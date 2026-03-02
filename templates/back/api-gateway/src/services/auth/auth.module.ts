@@ -8,6 +8,8 @@ import { RefreshTokenController } from './usecases/refresh-token/refresh-token.c
 import { ChangePasswordController } from './usecases/change-password/change-password.controller';
 import { ForgetPasswordRequestController } from './usecases/forget-password-request/forget-password-request.controller';
 import { ForgetPasswordConfirmController } from './usecases/forget-password-confirm/forget-password-confirm.controller';
+import { VerifyEmailController } from './usecases/verify-email/verify-email.controller';
+import { ResendVerificationEmailController } from './usecases/resend-verification-email/resend-verification-email.controller';
 import { HttpProxyService } from '../../shared/services/http-proxy.service';
 
 @Module({
@@ -20,6 +22,8 @@ import { HttpProxyService } from '../../shared/services/http-proxy.service';
     ChangePasswordController,
     ForgetPasswordRequestController,
     ForgetPasswordConfirmController,
+    VerifyEmailController,
+    ResendVerificationEmailController,
   ],
   providers: [
     HttpProxyService,

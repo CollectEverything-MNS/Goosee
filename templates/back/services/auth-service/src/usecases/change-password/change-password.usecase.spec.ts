@@ -10,7 +10,7 @@ import * as crypto from 'crypto';
 describe('ChangePasswordUseCase', () => {
   let usecase: ChangePasswordUseCase;
   let authRepo: jest.Mocked<IAuthRepository>;
-  let rmqClient: any;
+  let rmqAuthClient: any;
 
   const mockAuthRepo = {
     findByEmail: jest.fn(),
@@ -19,7 +19,7 @@ describe('ChangePasswordUseCase', () => {
     softDeleteById: jest.fn(),
   };
 
-  const mockRmqClient = {
+  const mockRmqAuthClient = {
     emit: jest.fn(),
   };
 
@@ -32,15 +32,15 @@ describe('ChangePasswordUseCase', () => {
           useValue: mockAuthRepo,
         },
         {
-          provide: 'RMQ_CLIENT',
-          useValue: mockRmqClient,
+          provide: 'RMQ_AUTH_CLIENT',
+          useValue: mockRmqAuthClient,
         },
       ],
     }).compile();
 
     usecase = module.get<ChangePasswordUseCase>(ChangePasswordUseCase);
     authRepo = module.get(IAuthRepository);
-    rmqClient = module.get('RMQ_CLIENT');
+    rmqAuthClient = module.get('RMQ_AUTH_CLIENT');
 
     jest.clearAllMocks();
   });
@@ -81,7 +81,7 @@ describe('ChangePasswordUseCase', () => {
         ...mockAuth,
         password: hashedNewPassword,
       });
-      rmqClient.emit.mockReturnValue(of({}));
+      rmqAuthClient.emit.mockReturnValue(of({}));
 
       const result = await usecase.execute(changePasswordDto);
 
@@ -92,7 +92,7 @@ describe('ChangePasswordUseCase', () => {
           password: hashedNewPassword,
         }),
       );
-      expect(rmqClient.emit).toHaveBeenCalledWith('password.changed', {
+      expect(rmqAuthClient.emit).toHaveBeenCalledWith('password.changed', {
         authId: mockAuth.id,
         password: hashedNewPassword,
       });
@@ -110,7 +110,7 @@ describe('ChangePasswordUseCase', () => {
       );
       expect(authRepo.findById).toHaveBeenCalledWith(changePasswordDto.authId);
       expect(authRepo.save).not.toHaveBeenCalled();
-      expect(rmqClient.emit).not.toHaveBeenCalled();
+      expect(rmqAuthClient.emit).not.toHaveBeenCalled();
     });
 
     it("devrait bloquer si l'ancien mot de passe est incorrect", async () => {
@@ -129,7 +129,7 @@ describe('ChangePasswordUseCase', () => {
         'Invalid old password',
       );
       expect(authRepo.save).not.toHaveBeenCalled();
-      expect(rmqClient.emit).not.toHaveBeenCalled();
+      expect(rmqAuthClient.emit).not.toHaveBeenCalled();
     });
 
     it('devrait hasher le nouveau mot de passe avant de sauvegarder', async () => {
@@ -138,7 +138,7 @@ describe('ChangePasswordUseCase', () => {
         ...mockAuth,
         password: hashedNewPassword,
       });
-      rmqClient.emit.mockReturnValue(of({}));
+      rmqAuthClient.emit.mockReturnValue(of({}));
 
       await usecase.execute(changePasswordDto);
 
@@ -155,12 +155,12 @@ describe('ChangePasswordUseCase', () => {
         ...mockAuth,
         password: hashedNewPassword,
       });
-      rmqClient.emit.mockReturnValue(of({}));
+      rmqAuthClient.emit.mockReturnValue(of({}));
 
       await usecase.execute(changePasswordDto);
 
-      expect(rmqClient.emit).toHaveBeenCalledTimes(1);
-      expect(rmqClient.emit).toHaveBeenCalledWith('password.changed', {
+      expect(rmqAuthClient.emit).toHaveBeenCalledTimes(1);
+      expect(rmqAuthClient.emit).toHaveBeenCalledWith('password.changed', {
         authId: mockAuth.id,
         password: hashedNewPassword,
       });
@@ -170,7 +170,7 @@ describe('ChangePasswordUseCase', () => {
       const authCopy = { ...mockAuth };
       authRepo.findById.mockResolvedValue(authCopy);
       authRepo.save.mockImplementation((auth) => Promise.resolve(auth));
-      rmqClient.emit.mockReturnValue(of({}));
+      rmqAuthClient.emit.mockReturnValue(of({}));
 
       await usecase.execute(changePasswordDto);
 

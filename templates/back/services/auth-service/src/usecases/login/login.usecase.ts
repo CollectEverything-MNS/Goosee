@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as crypto from 'crypto';
-import { AuthToken } from '../../entities/auth-token.entity';
+import { AuthToken, AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
 import { IAuthRepository } from '../../repositories/auth.repository';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { LoginDto, LoginResponseDto } from './login.dto';
@@ -20,6 +20,10 @@ export class LoginUseCase {
       throw new UnauthorizedException('User not found');
     }
 
+    if (!auth.isVerified) {
+      throw new UnauthorizedException('Email not verified');
+    }
+
     const isValid = await comparePassword(dto.password, auth.password);
 
     if (!isValid) {
@@ -33,6 +37,7 @@ export class LoginUseCase {
     const authToken = new AuthToken({
       authId: auth.id,
       token,
+      type: AUTH_TOKEN_TYPES.session,
       expiredAt,
     });
 

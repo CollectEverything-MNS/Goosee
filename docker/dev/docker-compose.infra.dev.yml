@@ -7,8 +7,6 @@ services:
     ports:
       - "${RABBITMQ_PORT}:5672"
       - "${RABBITMQ_UI_PORT}:15672"
-    environment:
-      RABBITMQ_ERLANG_COOKIE: "goosee-secret-cookie"
     healthcheck:
       test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
       interval: 5s
@@ -23,6 +21,16 @@ services:
     restart: unless-stopped
     ports:
       - "${ADMINER_PORT}:8080"
+    networks:
+      - goosee_net
+
+  goosee-mailhog-dev:
+    container_name: goosee-mailhog-dev
+    image: mailhog/mailhog:v1.0.1
+    restart: unless-stopped
+    ports:
+      - "${MAILHOG_SMTP_PORT}:1025"
+      - "${MAILHOG_UI_PORT}:8025"
     networks:
       - goosee_net
 

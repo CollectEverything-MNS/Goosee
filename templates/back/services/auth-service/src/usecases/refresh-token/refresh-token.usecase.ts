@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, UnauthorizedException, BadRequestException, } from '@nestjs/common';
+import { AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { RefreshTokenDto, RefreshTokenResponseDto } from './refresh-token.dto';
 
@@ -11,6 +12,10 @@ export class RefreshTokenUseCase {
 
     if (!authToken) {
       throw new NotFoundException('Token not found');
+    }
+
+    if (authToken.type !== AUTH_TOKEN_TYPES.session) {
+      throw new UnauthorizedException('Invalid token type');
     }
 
     if (new Date() > authToken.expiredAt) {

@@ -3,14 +3,15 @@ import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { IAuthRepository } from '../../repositories/auth.repository';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
-import { AuthToken } from '../../entities/auth-token.entity';
+import { AuthToken, AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ForgetPasswordRequestUseCase {
   constructor(
     private readonly authRepo: IAuthRepository,
     private readonly tokenRepo: IAuthTokenRepository,
-    @Inject('RMQ_CLIENT') private rmq: ClientProxy
+    @Inject('RMQ_NOTIF_CLIENT') private rmq: ClientProxy
   ) {}
 
   async execute(email: string) {
@@ -20,12 +21,13 @@ export class ForgetPasswordRequestUseCase {
       throw new NotFoundException('User not found');
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = crypto.randomInt(100000, 1000000).toString();
 
     await this.tokenRepo.save(
       new AuthToken({
         authId: auth.id,
         token: `OTP_${otp}`,
+        type: AUTH_TOKEN_TYPES.passwordReset,
         expiredAt: new Date(Date.now() + 1000 * 60 * 10), // 10 min
       })
     );

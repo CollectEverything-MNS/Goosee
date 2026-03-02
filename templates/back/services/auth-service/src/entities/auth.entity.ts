@@ -20,6 +20,12 @@ export class Auth {
   @Column()
   password: string;
 
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column({ nullable: true })
+  verifiedAt?: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

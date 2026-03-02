@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { INotificationService } from '../interfaces/notification-service.interface';
 import { EmailData } from '../types/email-data.type';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 @Injectable()
 export class EmailService implements INotificationService {
@@ -10,15 +11,25 @@ export class EmailService implements INotificationService {
   private transporter;
 
   constructor(private readonly config: ConfigService) {
-    this.transporter = nodemailer.createTransport({
+    const smtpPort = Number(this.config.get('SMTP_PORT'));
+    const smtpSecure = this.config.get('SMTP_SECURE') === 'true';
+    const smtpUser = this.config.get('SMTP_USER');
+    const smtpPassword = this.config.get('SMTP_PASSWORD');
+
+    const transportOptions: SMTPTransport.Options = {
       host: this.config.get('SMTP_HOST'),
-      port: this.config.get('SMTP_PORT'),
-      secure: this.config.get('SMTP_SECURE') || false,
-      auth: {
-        user: this.config.get('SMTP_USER'),
-        pass: this.config.get('SMTP_PASSWORD'),
-      },
-    });
+      port: smtpPort,
+      secure: smtpSecure,
+    };
+
+    if (smtpUser && smtpPassword) {
+      transportOptions.auth = {
+        user: smtpUser,
+        pass: smtpPassword,
+      };
+    }
+
+    this.transporter = nodemailer.createTransport(transportOptions);
   }
 
   async send(email: EmailData): Promise<void> {
