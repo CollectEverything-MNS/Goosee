@@ -5,10 +5,21 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { Auth } from './auth.entity';
 
+export const AUTH_TOKEN_TYPES = {
+  session: 'SESSION',
+  passwordReset: 'PASSWORD_RESET',
+  emailVerification: 'EMAIL_VERIFICATION',
+} as const;
+
+export type AuthTokenType =
+  (typeof AUTH_TOKEN_TYPES)[keyof typeof AUTH_TOKEN_TYPES];
+
 @Entity('auth_token')
+@Index(['token', 'type'], { unique: true })
 export class AuthToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -18,6 +29,9 @@ export class AuthToken {
 
   @Column()
   token: string;
+
+  @Column({ default: AUTH_TOKEN_TYPES.session })
+  type: AuthTokenType;
 
   @CreateDateColumn()
   createdAt: Date;

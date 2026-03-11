@@ -9,7 +9,7 @@ import { lastValueFrom } from 'rxjs';
 export class ChangePasswordUseCase {
   constructor(
     private readonly authRepo: IAuthRepository,
-    @Inject('RMQ_CLIENT') private rmq: ClientProxy
+    @Inject('RMQ_AUTH_CLIENT') private rmq: ClientProxy
   ) {}
 
   async execute(dto: ChangePasswordDto) {

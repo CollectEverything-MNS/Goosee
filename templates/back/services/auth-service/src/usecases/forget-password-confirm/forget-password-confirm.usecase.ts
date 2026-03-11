@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { IAuthRepository } from '../../repositories/auth.repository';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { ForgetPasswordConfirmDto } from './forget-password-confirm.dto';
+import { AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
 import { hashPassword } from '../../shared/utils';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class ForgetPasswordConfirmUseCase {
 
     const token = await this.tokenRepo.findByToken(tokenValue);
 
-    if (!token || token.authId !== auth.id) {
+    if (!token || token.authId !== auth.id || token.type !== AUTH_TOKEN_TYPES.passwordReset) {
       throw new BadRequestException('Invalid OTP');
     }
 

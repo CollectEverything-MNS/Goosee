@@ -7,7 +7,7 @@ import {
 import { RefreshTokenUseCase } from './refresh-token.usecase';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { RefreshTokenDto } from './refresh-token.dto';
-import { AuthToken } from '../../entities/auth-token.entity';
+import { AuthToken, AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
 
 describe('RefreshTokenUseCase', () => {
   let usecase: RefreshTokenUseCase;
@@ -50,6 +50,7 @@ describe('RefreshTokenUseCase', () => {
         id: 'uuid-token-1',
         authId: 'uuid-auth-1',
         token: 'valid-token-123',
+        type: AUTH_TOKEN_TYPES.session,
         expiredAt: futureDate,
         createdAt: new Date(),
       } as AuthToken;
@@ -100,6 +101,7 @@ describe('RefreshTokenUseCase', () => {
         id: 'uuid-token-expired',
         authId: 'uuid-auth-1',
         token: 'expired-token',
+        type: AUTH_TOKEN_TYPES.session,
         expiredAt: pastDate,
         createdAt: new Date(),
       } as AuthToken;
@@ -126,6 +128,7 @@ describe('RefreshTokenUseCase', () => {
         id: 'uuid-token-1',
         authId: 'uuid-auth-1',
         token: 'valid-token-123',
+        type: AUTH_TOKEN_TYPES.session,
         expiredAt: futureDate,
         createdAt: new Date(),
       } as AuthToken;
@@ -149,12 +152,14 @@ describe('RefreshTokenUseCase', () => {
         id: 'uuid-token-1',
         authId: 'uuid-auth-1',
         token: 'valid-token-123',
+        type: AUTH_TOKEN_TYPES.session,
         expiredAt: futureDate,
         createdAt: new Date(),
       } as AuthToken;
 
       const updatedToken = {
         ...mockAuthToken,
+        type: AUTH_TOKEN_TYPES.session,
         expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       } as AuthToken;
 

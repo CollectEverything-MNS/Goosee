@@ -21,6 +21,14 @@ export const routesConfig = {
       path: `${authBasePath}/register`,
       link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/register`,
     },
+    verifyEmail: {
+      path: `${authBasePath}/verify-email`,
+      link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/verify-email`,
+    },
+    resendVerificationEmail: {
+      path: `${authBasePath}/resend-verification-email`,
+      link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/resend-verification-email`,
+    },
     changePassword: {
       path: `${authBasePath}/change-password`,
       link: (serviceUrl: string) => `${serviceUrl}${authBasePath}/change-password`,

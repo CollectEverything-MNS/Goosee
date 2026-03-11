@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { RevokeTokenUseCase } from './revoke-token.usecase';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { RevokeTokenDto } from './revoke-token.dto';
-import { AuthToken } from '../../entities/auth-token.entity';
+import { AuthToken, AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
 
 describe('RevokeTokenUseCase', () => {
   let usecase: RevokeTokenUseCase;
@@ -42,6 +42,7 @@ describe('RevokeTokenUseCase', () => {
       id: 'uuid-token-1',
       authId: 'uuid-auth-1',
       token: 'valid-token-123',
+      type: AUTH_TOKEN_TYPES.session,
       expiredAt: new Date(),
       createdAt: new Date(),
     } as AuthToken;

@@ -5,7 +5,7 @@ import { IAuthRepository } from '../../repositories/auth.repository';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { ForgetPasswordConfirmDto } from './forget-password-confirm.dto';
 import { Auth } from '../../entities/auth.entity';
-import { AuthToken } from '../../entities/auth-token.entity';
+import { AuthToken, AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
 import * as crypto from 'crypto';
 
 describe('ForgetPasswordConfirmUseCase', () => {
@@ -81,6 +81,7 @@ describe('ForgetPasswordConfirmUseCase', () => {
       id: 'uuid-otp-token',
       authId: 'uuid-confirm-reset',
       token: 'OTP_123456',
+      type: AUTH_TOKEN_TYPES.passwordReset,
       expiredAt: futureDate,
       createdAt: new Date(),
     } as AuthToken;

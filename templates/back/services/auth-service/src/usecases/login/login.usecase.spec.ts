@@ -61,6 +61,7 @@ describe('LoginUseCase', () => {
       id: 'uuid-123',
       email: 'test@example.com',
       password: hashedPassword,
+      isVerified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
