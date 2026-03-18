@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IUserRepository } from '../user.repository';
-import { User, RoleType } from '../../entities/user.entity';
+import { RoleType, User } from '../../entities/user.entity';
 
 @Injectable()
 export class TypeOrmUserRepository implements IUserRepository {
   constructor(
     @InjectRepository(User)
-    private readonly repository: Repository<User>,
+    private readonly repository: Repository<User>
   ) {}
 
   async save(user: User): Promise<User> {
@@ -37,10 +37,14 @@ export class TypeOrmUserRepository implements IUserRepository {
   async listAdmins(): Promise<User[]> {
     return this.repository
       .createQueryBuilder('user')
-      .where(':adminRole = ANY(user.role) OR :ownerRole = ANY(user.role)', {
-        adminRole: RoleType.ADMIN,
-        ownerRole: RoleType.OWNER,
-      })
+      .where(
+        ':adminRole = ANY(user.role) OR :ownerRole = ANY(user.role) OR :superAdminRole = ANY(user.role)',
+        {
+          adminRole: RoleType.ADMIN,
+          ownerRole: RoleType.OWNER,
+          superAdminRole: RoleType.SUPERADMIN,
+        }
+      )
       .getMany();
   }
 
@@ -48,4 +52,3 @@ export class TypeOrmUserRepository implements IUserRepository {
     await this.repository.delete({ id });
   }
 }
-
