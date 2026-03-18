@@ -1,0 +1,182 @@
+'use client';
+
+import { isAxiosError } from 'axios';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { useClient } from '../context/clients-provider';
+import { useCreateUser } from '@/features/users/usecases/use-create-user';
+import { useUpdateUser } from '@/features/users/usecases/use-update-user';
+
+const formSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().min(2).max(50),
+  lastName: z.string().min(2).max(50),
+  phone: z.string().min(6).max(20).optional().or(z.literal('')),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+export function ClientFormDialog() {
+  const t = useTranslations('admin.clients');
+  const { open, setOpen, currentRow, setCurrentRow } = useClient();
+  const createMutation = useCreateUser();
+  const updateMutation = useUpdateUser();
+
+  const isEditing = open === 'edit' && !!currentRow;
+  const isOpen = open === 'create' || open === 'edit';
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { email: '', firstName: '', lastName: '', phone: '' },
+  });
+
+  useEffect(() => {
+    if (isEditing && currentRow) {
+      form.reset({
+        email: currentRow.email ?? '',
+        firstName: currentRow.firstName ?? '',
+        lastName: currentRow.lastName ?? '',
+        phone: currentRow.phone ?? '',
+      });
+    } else if (open === 'create') {
+      form.reset({ email: '', firstName: '', lastName: '', phone: '' });
+    }
+  }, [open, currentRow, isEditing, form]);
+
+  const handleClose = () => {
+    form.reset();
+    setCurrentRow(null);
+    setOpen(null);
+  };
+
+  const onSubmit = async (values: FormValues) => {
+    try {
+      if (isEditing) {
+        await updateMutation.mutateAsync({
+          id: currentRow.id,
+          data: {
+            email: values.email,
+            firstName: values.firstName,
+            lastName: values.lastName,
+            phone: values.phone || undefined,
+          },
+        });
+        toast.success(t('form.updateSuccess'));
+      } else {
+        await createMutation.mutateAsync({
+          email: values.email,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          phone: values.phone || undefined,
+          role: ['CUSTOMER'],
+        });
+        toast.success(t('form.createSuccess'));
+      }
+      handleClose();
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data?.message) {
+        const msg = error.response.data.message;
+        toast.error(Array.isArray(msg) ? msg.join(', ') : msg);
+      } else {
+        toast.error(isEditing ? t('form.updateError') : t('form.createError'));
+      }
+    }
+  };
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[450px]">
+        <DialogHeader>
+          <DialogTitle>{isEditing ? t('form.editTitle') : t('form.createTitle')}</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.firstName')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t('form.firstNamePlaceholder')} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.lastName')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t('form.lastNamePlaceholder')} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.email')}</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="client@mail.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.phone')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder="+33612345678" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={handleClose}>
+                {t('form.cancel')}
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isEditing ? t('form.update') : t('form.create')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

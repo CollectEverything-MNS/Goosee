@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useClient } from '../context/clients-provider';
 
 interface Props {
   table: any
@@ -11,6 +12,7 @@ interface Props {
 
 export function ClientsListingToolbar({ table }: Props) {
   const t = useTranslations()
+  const { setOpen } = useClient()
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -30,7 +32,7 @@ export function ClientsListingToolbar({ table }: Props) {
         )}
       </div>
       <div className={'flex items-center'}>
-        <Button variant="default">
+        <Button variant="default" onClick={() => setOpen('create')}>
           <Plus /> <div className={'hidden md:block'}>{t('admin.clients.addNewClient')}</div>
         </Button>
       </div>

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useUser } from '../context/users-provider';
 
 interface Props {
   table: any
@@ -11,6 +12,7 @@ interface Props {
 
 export function UsersListingToolbar({ table }: Props) {
   const t = useTranslations()
+  const { setOpen } = useUser()
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -30,7 +32,7 @@ export function UsersListingToolbar({ table }: Props) {
         )}
       </div>
       <div className={'flex items-center'}>
-        <Button variant="default">
+        <Button variant="default" onClick={() => setOpen('create')}>
           <Plus /> <div className={'hidden md:block'}>{t('admin.users.addNewUser')}</div>
         </Button>
       </div>

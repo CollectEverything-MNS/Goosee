@@ -10,12 +10,15 @@ import { Button } from '@/components/ui/button';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Edit, Trash } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
+import { useUser } from '../context/users-provider';
 
 interface Props {
   row: Row<any>
 }
 
 export function UsersTableActions({ row }: Props) {
+  const { setOpen, setCurrentRow } = useUser();
+
   return (
     <>
       <DropdownMenu modal={false}>
@@ -29,14 +32,25 @@ export function UsersTableActions({ row }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(row.original);
+              setOpen('edit');
+            }}
+          >
             Modifier
             <DropdownMenuShortcut>
               <Edit size={16} />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="!text-red-500">
+          <DropdownMenuItem
+            className="!text-red-500"
+            onClick={() => {
+              setCurrentRow(row.original);
+              setOpen('delete');
+            }}
+          >
             Supprimer
             <DropdownMenuShortcut>
               <Trash size={16} />

@@ -76,15 +76,14 @@
       "close": "Fermer"
     },
     "login": {
-        "title": "Goose Administration",
-        "email": "Email",
-        "password": "Mot de passe",
-        "forgotPassword": "Mot de passe oublié ?",
-        "loginButton": "Se connecter"
+      "title": "Goose Administration",
+      "email": "Email",
+      "password": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "loginButton": "Se connecter"
     },
     "sidebar": {
       "toggleSidebar": "Basculer la barre latérale",
-
       "dashboard": "Tableau de bord",
       "products": {
         "label": "Produits",
@@ -240,6 +239,31 @@
         "role": "Rôle",
         "status": "Statut",
         "actions": "Actions"
+      },
+      "form": {
+        "createTitle": "Ajouter un administrateur",
+        "editTitle": "Modifier l'utilisateur",
+        "firstName": "Prénom",
+        "firstNamePlaceholder": "Jean",
+        "lastName": "Nom",
+        "lastNamePlaceholder": "Dupont",
+        "email": "Email",
+        "phone": "Téléphone (optionnel)",
+        "cancel": "Annuler",
+        "create": "Créer",
+        "update": "Mettre à jour",
+        "createSuccess": "Utilisateur créé avec succès",
+        "createError": "Erreur lors de la création",
+        "updateSuccess": "Utilisateur mis à jour avec succès",
+        "updateError": "Erreur lors de la mise à jour"
+      },
+      "delete": {
+        "title": "Supprimer l'utilisateur",
+        "description": "Êtes-vous sûr de vouloir supprimer {name} ? Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer",
+        "success": "Utilisateur supprimé avec succès",
+        "error": "Erreur lors de la suppression"
       }
     },
     "clients": {
@@ -250,6 +274,31 @@
         "email": "Email",
         "status": "Statut",
         "actions": "Actions"
+      },
+      "form": {
+        "createTitle": "Ajouter un client",
+        "editTitle": "Modifier le client",
+        "firstName": "Prénom",
+        "firstNamePlaceholder": "Jean",
+        "lastName": "Nom",
+        "lastNamePlaceholder": "Dupont",
+        "email": "Email",
+        "phone": "Téléphone (optionnel)",
+        "cancel": "Annuler",
+        "create": "Créer",
+        "update": "Mettre à jour",
+        "createSuccess": "Client créé avec succès",
+        "createError": "Erreur lors de la création",
+        "updateSuccess": "Client mis à jour avec succès",
+        "updateError": "Erreur lors de la mise à jour"
+      },
+      "delete": {
+        "title": "Supprimer le client",
+        "description": "Êtes-vous sûr de vouloir supprimer {name} ? Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer",
+        "success": "Client supprimé avec succès",
+        "error": "Erreur lors de la suppression"
       }
     },
     "pageBuilder": {

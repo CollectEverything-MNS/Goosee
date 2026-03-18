@@ -3,6 +3,8 @@ import { DataTable } from '@/components/data-table/data-table';
 import UsersProvider from '@/features/users/context/users-provider';
 import { getUsersColumns } from '@/features/users/components/users-columns';
 import { UsersListingToolbar } from './components/users-listing-toolbar';
+import { UserFormDialog } from './components/user-form-dialog';
+import { UserDeleteDialog } from './components/user-delete-dialog';
 import { useListAdmins } from '@/features/users/usecases/use-list-admins';
 
 export function Users() {
@@ -12,6 +14,8 @@ export function Users() {
     <div>
       <UsersProvider>
         <DataTable columns={getUsersColumns()} data={admins} Toolbar={UsersListingToolbar} />
+        <UserFormDialog />
+        <UserDeleteDialog />
       </UsersProvider>
     </div>
   )

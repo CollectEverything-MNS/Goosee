@@ -240,6 +240,31 @@
         "role": "Role",
         "status": "Status",
         "actions": "Actions"
+      },
+      "form": {
+        "createTitle": "Add an administrator",
+        "editTitle": "Edit user",
+        "firstName": "First name",
+        "firstNamePlaceholder": "John",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Doe",
+        "email": "Email",
+        "phone": "Phone (optional)",
+        "cancel": "Cancel",
+        "create": "Create",
+        "update": "Update",
+        "createSuccess": "User created successfully",
+        "createError": "Error creating user",
+        "updateSuccess": "User updated successfully",
+        "updateError": "Error updating user"
+      },
+      "delete": {
+        "title": "Delete user",
+        "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "success": "User deleted successfully",
+        "error": "Error deleting user"
       }
     },
     "clients": {
@@ -250,6 +275,31 @@
         "email": "Email",
         "status": "Status",
         "actions": "Actions"
+      },
+      "form": {
+        "createTitle": "Add a client",
+        "editTitle": "Edit client",
+        "firstName": "First name",
+        "firstNamePlaceholder": "John",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Doe",
+        "email": "Email",
+        "phone": "Phone (optional)",
+        "cancel": "Cancel",
+        "create": "Create",
+        "update": "Update",
+        "createSuccess": "Client created successfully",
+        "createError": "Error creating client",
+        "updateSuccess": "Client updated successfully",
+        "updateError": "Error updating client"
+      },
+      "delete": {
+        "title": "Delete client",
+        "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "success": "Client deleted successfully",
+        "error": "Error deleting client"
       }
     },
     "pageBuilder": {
