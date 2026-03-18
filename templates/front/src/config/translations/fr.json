@@ -255,7 +255,9 @@
         "createSuccess": "Utilisateur créé avec succès",
         "createError": "Erreur lors de la création",
         "updateSuccess": "Utilisateur mis à jour avec succès",
-        "updateError": "Erreur lors de la mise à jour"
+        "updateError": "Erreur lors de la mise à jour",
+        "role": "Rôle",
+        "rolePlaceholder": "Sélectionner un rôle"
       },
       "delete": {
         "title": "Supprimer l'utilisateur",
@@ -273,7 +275,8 @@
         "lastname": "Nom",
         "email": "Email",
         "status": "Statut",
-        "actions": "Actions"
+        "actions": "Actions",
+        "role": "Rôle"
       },
       "form": {
         "createTitle": "Ajouter un client",
@@ -290,7 +293,9 @@
         "createSuccess": "Client créé avec succès",
         "createError": "Erreur lors de la création",
         "updateSuccess": "Client mis à jour avec succès",
-        "updateError": "Erreur lors de la mise à jour"
+        "updateError": "Erreur lors de la mise à jour",
+        "role": "Rôle",
+        "rolePlaceholder": "Sélectionner un rôle"
       },
       "delete": {
         "title": "Supprimer le client",

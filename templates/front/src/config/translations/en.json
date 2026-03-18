@@ -256,7 +256,9 @@
         "createSuccess": "User created successfully",
         "createError": "Error creating user",
         "updateSuccess": "User updated successfully",
-        "updateError": "Error updating user"
+        "updateError": "Error updating user",
+        "role": "Role",
+        "rolePlaceholder": "Select a role"
       },
       "delete": {
         "title": "Delete user",
@@ -274,7 +276,8 @@
         "lastname": "Lastname",
         "email": "Email",
         "status": "Status",
-        "actions": "Actions"
+        "actions": "Actions",
+        "role": "Role"
       },
       "form": {
         "createTitle": "Add a client",
@@ -291,7 +294,9 @@
         "createSuccess": "Client created successfully",
         "createError": "Error creating client",
         "updateSuccess": "Client updated successfully",
-        "updateError": "Error updating client"
+        "updateError": "Error updating client",
+        "role": "Role",
+        "rolePlaceholder": "Select a role"
       },
       "delete": {
         "title": "Delete client",
