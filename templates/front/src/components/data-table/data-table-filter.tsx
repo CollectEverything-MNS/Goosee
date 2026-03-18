@@ -6,9 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
 import { CirclePlus } from 'lucide-react'
-import { Row } from '@tanstack/react-table'
 
 interface Props {
   title: string
@@ -46,10 +44,7 @@ export function DataTableFilter({ title, options, column, table }: Props) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="h-8 px-2 lg:px-3">
           {selected ? (
-            <>
-              {selected.label}
-              <Badge variant={'secondary'}>{count}</Badge>
-            </>
+            <>{selected.label}</>
           ) : (
             <div className={'flex items-center gap-x-2'}>
               <CirclePlus /> {title}
@@ -65,13 +60,6 @@ export function DataTableFilter({ title, options, column, table }: Props) {
             className={'flex items-center justify-between'}
           >
             {opt.label}
-            <Badge variant={'secondary'}>
-              {
-                table
-                  .getFilteredRowModel()
-                  .rows.filter((r: Row<any>) => r.getValue(column) === opt.value).length
-              }
-            </Badge>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
