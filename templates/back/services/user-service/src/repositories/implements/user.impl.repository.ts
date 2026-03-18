@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IUserRepository } from '../user.repository';
-import { User } from '../../entities/user.entity';
+import { User, RoleType } from '../../entities/user.entity';
 
 @Injectable()
 export class TypeOrmUserRepository implements IUserRepository {
@@ -25,6 +25,23 @@ export class TypeOrmUserRepository implements IUserRepository {
 
   async list(): Promise<User[]> {
     return this.repository.find();
+  }
+
+  async listCustomers(): Promise<User[]> {
+    return this.repository
+      .createQueryBuilder('user')
+      .where(':role = ANY(user.role)', { role: RoleType.CUSTOMER })
+      .getMany();
+  }
+
+  async listAdmins(): Promise<User[]> {
+    return this.repository
+      .createQueryBuilder('user')
+      .where(':adminRole = ANY(user.role) OR :ownerRole = ANY(user.role)', {
+        adminRole: RoleType.ADMIN,
+        ownerRole: RoleType.OWNER,
+      })
+      .getMany();
   }
 
   async deleteById(id: string): Promise<void> {

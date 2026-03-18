@@ -78,5 +78,15 @@ export const routesConfig = {
       path: `${usersBasePath}/delete-user/:id`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}/users/${id}`,
     },
+
+    listCustomers: {
+      path: `${usersBasePath}/customers`,
+      link: (serviceUrl: string) => `${serviceUrl}${usersBasePath}/customers`,
+    },
+
+    listAdmins: {
+      path: `${usersBasePath}/admins`,
+      link: (serviceUrl: string) => `${serviceUrl}${usersBasePath}/admins`,
+    },
   },
 };

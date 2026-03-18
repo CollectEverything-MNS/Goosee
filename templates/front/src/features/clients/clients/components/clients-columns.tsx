@@ -29,8 +29,8 @@ export function getClientsColumns(): ColumnDef<any>[] {
       enableHiding: false,
     },
 
-    { accessorKey: 'firstname', header: t('admin.clients.table.firstname') },
-    { accessorKey: 'lastname', header: t('admin.clients.table.lastname') },
+    { accessorKey: 'firstName', header: t('admin.clients.table.firstname') },
+    { accessorKey: 'lastName', header: t('admin.clients.table.lastname') },
     { accessorKey: 'email', header: t('admin.clients.table.email') },
     { accessorKey: 'status', header: t('admin.clients.table.status') },
     {
