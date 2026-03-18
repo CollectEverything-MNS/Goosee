@@ -1,10 +1,12 @@
 import { DataTableSearch } from '@/components/data-table/data-table-search';
 import { DataTableViewOptions } from '@/components/data-table/data-table-view-options';
+import { DataTableFilter } from '@/components/data-table/data-table-filter';
 import { Button } from '@/components/ui/button';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useUser } from '../context/users-provider';
+import { ROLES_LIST } from '../data/roles.data';
 
 interface Props {
   table: any
@@ -20,6 +22,12 @@ export function UsersListingToolbar({ table }: Props) {
       <div className={'flex items-center gap-x-3'}>
         <DataTableViewOptions table={table} />
         <DataTableSearch table={table} />
+        <DataTableFilter
+          title={t('admin.users.table.role')}
+          options={ROLES_LIST}
+          column="role"
+          table={table}
+        />
         {isFiltered && (
           <Button
             variant="ghost"
