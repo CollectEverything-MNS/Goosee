@@ -20,6 +20,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
@@ -27,12 +34,16 @@ import { toast } from 'sonner';
 import { useClient } from '../context/clients-provider';
 import { useCreateUser } from '@/features/users/usecases/use-create-user';
 import { useUpdateUser } from '@/features/users/usecases/use-update-user';
+import { ROLES_LIST } from '@/features/users/data/roles.data';
+
+const ROLES = ['OWNER', 'SUPERADMIN', 'ADMIN', 'CUSTOMER'] as const;
 
 const formSchema = z.object({
   email: z.string().email(),
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
   phone: z.string().min(6).max(20).optional().or(z.literal('')),
+  role: z.enum(ROLES),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -48,7 +59,7 @@ export function ClientFormDialog() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: '', firstName: '', lastName: '', phone: '' },
+    defaultValues: { email: '', firstName: '', lastName: '', phone: '', role: 'CUSTOMER' },
   });
 
   useEffect(() => {
@@ -58,9 +69,10 @@ export function ClientFormDialog() {
         firstName: currentRow.firstName ?? '',
         lastName: currentRow.lastName ?? '',
         phone: currentRow.phone ?? '',
+        role: currentRow.role?.[0] ?? 'CUSTOMER',
       });
     } else if (open === 'create') {
-      form.reset({ email: '', firstName: '', lastName: '', phone: '' });
+      form.reset({ email: '', firstName: '', lastName: '', phone: '', role: 'CUSTOMER' });
     }
   }, [open, currentRow, isEditing, form]);
 
@@ -80,6 +92,7 @@ export function ClientFormDialog() {
             firstName: values.firstName,
             lastName: values.lastName,
             phone: values.phone || undefined,
+            role: [values.role],
           },
         });
         toast.success(t('form.updateSuccess'));
@@ -89,7 +102,7 @@ export function ClientFormDialog() {
           firstName: values.firstName,
           lastName: values.lastName,
           phone: values.phone || undefined,
-          role: ['CUSTOMER'],
+          role: [values.role],
         });
         toast.success(t('form.createSuccess'));
       }
@@ -162,6 +175,28 @@ export function ClientFormDialog() {
                   <FormControl>
                     <Input placeholder="+33612345678" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.role')}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('form.rolePlaceholder')} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {ROLES_LIST.map((r) => (
+                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
