@@ -10,13 +10,19 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
+  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
+  const webUrl = configService.get<string>('NEXT_PUBLIC_WEB_URL');
+  
+  if (nodeEnv === 'production' && !webUrl) {
+    throw new Error('NEXT_PUBLIC_WEB_URL must be defined in production');
+  }
+
   app.enableCors({
-    origin: configService.get<string>('NEXT_PUBLIC_WEB_URL', 'http://localhost:3000'),
+    origin: webUrl || 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
 
-  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
   const port = configService.get<number>('API_GATEWAY_PORT', 3001);
 
   if (nodeEnv === 'development') {

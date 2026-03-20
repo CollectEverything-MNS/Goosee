@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -7,28 +7,20 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Le token est stocké dans un cookie HTTP-only posé par l'API Gateway.
+  // withCredentials garantit que le navigateur l'envoie sur chaque requête,
+  // même cross-origin (ex: front :3000 → gateway :3001).
+  withCredentials: true,
 });
-
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
-);
 
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
-  async (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('access_token');
-      }
+  (error: AxiosError) => {
+    // En cas de 401, rediriger vers la page de login.
+    // On n'a plus de localStorage à nettoyer : le cookie est HTTP-only et
+    // sera supprimé côté serveur via l'endpoint /auth/token/revoke.
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

@@ -5,7 +5,7 @@ services:
     hostname: rabbitmq
     restart: unless-stopped
     environment:
-      RABBITMQ_ERLANG_COOKIE: "goosee-secret-cookie-dev"
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
     ports:
       - "${RABBITMQ_PORT}:5672"
       - "${RABBITMQ_UI_PORT}:15672"
