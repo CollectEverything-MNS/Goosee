@@ -18,7 +18,6 @@ import { UploadModule } from './services/upload/upload.module';
     MenusModule,
     SettingsModule,
     UploadModule,
-    UserModule,
   ],
   controllers: [],
   providers: [],
