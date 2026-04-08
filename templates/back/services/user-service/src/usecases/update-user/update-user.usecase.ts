@@ -4,16 +4,24 @@ import { UpdateUserDto } from './update-user.dto';
 import { User } from '../../entities/user.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
+import { LogClient } from '../../shared/log-client.service';
 
 
 @Injectable()
 export class UpdateUserUseCase {
-  constructor(private readonly userRepo: IUserRepository, @Inject('RMQ_CLIENT') private rmq: ClientProxy) {}
+  constructor(
+    private readonly userRepo: IUserRepository,
+    @Inject('RMQ_CLIENT') private rmq: ClientProxy,
+    private readonly logClient: LogClient,
+  ) {}
 
   async execute(id: string, dto: UpdateUserDto) {
     const user = await this.userRepo.findById(id);
 
     if (!user) {
+      this.logClient.warning({
+        message: `Tentative de mise à jour d'un utilisateur introuvable : ${id}`,
+      });
       throw new NotFoundException('User not found');
     }
 
@@ -43,12 +51,16 @@ export class UpdateUserUseCase {
     await this.userRepo.save(userUpdated);
 
     await lastValueFrom(
-      this.rmq.emit('user.updated', {    
+      this.rmq.emit('user.updated', {
       email: userUpdated.email,
       userId: userUpdated.id
     }),
   );
 
+    this.logClient.success({
+      message: `Utilisateur mis à jour : ${userUpdated.email}`,
+      userId: userUpdated.id,
+    });
 
     return {
       message: 'User updated successfully',
