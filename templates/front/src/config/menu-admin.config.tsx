@@ -2,6 +2,7 @@
 import { routes } from './routes.config'
 import {
   Archive,
+  FileText,
   Layers,
   LayoutDashboard,
   Menu,
@@ -115,6 +116,11 @@ export function getAdminMenu() {
           name: 'admin.sidebar.access.roles',
           path: routes.gooseeAdmin.roles.getHref(locale),
           icon: Shield,
+        },
+        {
+          name: 'admin.sidebar.access.logs',
+          path: routes.gooseeAdmin.logs.getHref(locale),
+          icon: FileText,
         },
       ],
     },

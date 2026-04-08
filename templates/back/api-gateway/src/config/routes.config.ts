@@ -1,6 +1,7 @@
 const authBasePath = '/auth';
 const usersBasePath = '/users';
 const rolesBasePath = '/roles';
+const logsBasePath = '/logs';
 const uploadBasePath = '/upload';
 
 
@@ -111,6 +112,13 @@ export const routesConfig = {
     deleteRole: {
       path: `${rolesBasePath}/:id`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${rolesBasePath}/${id}`,
+    },
+  },
+
+  log: {
+    listLogs: {
+      path: `${logsBasePath}`,
+      link: (serviceUrl: string) => `${serviceUrl}${logsBasePath}`,
     },
   },
 };

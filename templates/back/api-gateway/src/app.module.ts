@@ -7,6 +7,7 @@ import { MenusModule } from './services/menus/menus.module';
 import { SettingsModule } from './services/settings/settings.module';
 import { UploadModule } from './services/upload/upload.module';
 import { RolesModule } from './services/roles/roles.module';
+import { LogsModule } from './services/logs/logs.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RolesModule } from './services/roles/roles.module';
     SettingsModule,
     UploadModule,
     RolesModule,
+    LogsModule,
   ],
   controllers: [],
   providers: [],

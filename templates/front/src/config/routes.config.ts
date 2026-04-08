@@ -53,5 +53,8 @@ export const routes = {
     roles: {
       getHref: (locale: string) => `/${locale}/goosee-admin/roles`,
     },
+    logs: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/logs`,
+    },
   },
 } as const

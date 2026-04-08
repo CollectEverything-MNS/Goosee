@@ -3,10 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
 import { UsersTableActions } from '@/features/users/components/users-table-actions';
-import { getRoleBadgeClass } from '../data/roles.data';
+import { getRoleBadgeClass, useRoleLabel } from '../data/roles.data';
 
 export function getUsersColumns(): ColumnDef<any>[] {
   const t = useTranslations()
+  const getRoleLabel = useRoleLabel()
   return [
     {
       id: 'select',
@@ -47,7 +48,7 @@ export function getUsersColumns(): ColumnDef<any>[] {
           <div className="flex flex-wrap gap-1">
             {roles.map((r) => (
               <Badge key={r} variant="outline" className={getRoleBadgeClass(r)}>
-                {r}
+                {getRoleLabel(r)}
               </Badge>
             ))}
           </div>

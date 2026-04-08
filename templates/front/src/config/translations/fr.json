@@ -108,7 +108,8 @@
       "access": {
         "label": "Accès",
         "users": "Utilisateurs",
-        "roles": "Rôles"
+        "roles": "Rôles",
+        "logs": "Journal (Logs)"
       },
       "logout": "Déconnexion"
     },
@@ -204,7 +205,8 @@
       "templates": "Modèle de style",
       "pages": "Pages",
       "orders": "Commandes",
-      "salesHistory": "Historiques"
+      "salesHistory": "Historiques",
+      "logs": "Journal (Logs)"
     },
     "pages": {
       "addNewPage": "Ajouter une page",
@@ -538,6 +540,27 @@
         "confirm": "Supprimer",
         "success": "Rôle supprimé avec succès",
         "error": "Erreur lors de la suppression"
+      },
+      "labels": {
+        "OWNER": "Propriétaire",
+        "CUSTOMER": "Client"
+      }
+    },
+    "logs": {
+      "table": {
+        "date": "Date",
+        "level": "Niveau",
+        "service": "Service",
+        "message": "Message",
+        "userId": "Utilisateur"
+      },
+      "levels": {
+        "INFO": "Info",
+        "SUCCESS": "Succès",
+        "WARNING": "Avertissement",
+        "ERROR": "Erreur",
+        "CRITICAL": "Critique",
+        "DEBUG": "Débogage"
       }
     }
   }

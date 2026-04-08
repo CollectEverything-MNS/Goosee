@@ -3,9 +3,11 @@ import { ColumnDef } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
 import { RolesTableActions } from './roles-table-actions';
 import { Role } from '../data/role.types';
+import { useRoleLabel } from '@/features/users/data/roles.data';
 
 export function getRolesColumns(): ColumnDef<Role>[] {
   const t = useTranslations();
+  const getRoleLabel = useRoleLabel();
 
   return [
     {
@@ -15,7 +17,7 @@ export function getRolesColumns(): ColumnDef<Role>[] {
         const role = row.original;
         return (
           <div className="flex items-center gap-2">
-            <span className="font-medium">{role.name}</span>
+            <span className="font-medium">{getRoleLabel(role.name)}</span>
             {role.isSystem && (
               <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">
                 {t('admin.roles.system')}
