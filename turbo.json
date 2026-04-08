@@ -1,0 +1,76 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["env/.env.local"],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "NEXT_PORT",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_WEB_URL",
+    "API_GATEWAY_PORT",
+    "RABBITMQ_PORT",
+    "RABBITMQ_UI_PORT",
+    "RABBITMQ_URL",
+    "USER_SERVICE_HOST",
+    "USER_SERVICE_PORT",
+    "USER_DB_HOST",
+    "USER_DB_PORT",
+    "USER_DB_USER",
+    "USER_DB_PASSWORD",
+    "USER_DB_NAME",
+    "AUTH_SERVICE_HOST",
+    "AUTH_SERVICE_PORT",
+    "AUTH_DB_HOST",
+    "AUTH_DB_PORT",
+    "AUTH_DB_USER",
+    "AUTH_DB_PASSWORD",
+    "AUTH_DB_NAME",
+    "PAGE_SERVICE_HOST",
+    "PAGE_SERVICE_PORT",
+    "PAGE_DB_HOST",
+    "PAGE_DB_PORT",
+    "PAGE_DB_USER",
+    "PAGE_DB_PASSWORD",
+    "PAGE_DB_NAME",
+    "LOG_SERVICE_HOST",
+    "LOG_SERVICE_PORT",
+    "LOG_DB_HOST",
+    "LOG_DB_PORT",
+    "LOG_DB_USER",
+    "LOG_DB_PASSWORD",
+    "LOG_DB_NAME",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_SECURE",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+    "SMTP_FROM",
+    "MINIO_PORT",
+    "MINIO_CONSOLE_PORT",
+    "MINIO_ROOT_USER",
+    "MINIO_ROOT_PASSWORD",
+    "MINIO_ENDPOINT",
+    "MINIO_BUCKET",
+    "MINIO_USE_SSL",
+    "MINIO_PUBLIC_URL"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "format": {
+      "cache": false
+    }
+  }
+}
