@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IUserRepository } from '../../repositories/user.repository';
 import { CreateUserDto } from './create-user.dto';
-import { RoleType, User } from '../../entities/user.entity';
+import { DEFAULT_CUSTOMER_ROLE, User } from '../../entities/user.entity';
 import { LogClient } from '../../shared/log-client.service';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class CreateUserUseCase {
     user.postaleCode = dto.postaleCode ?? '';
     user.city = dto.city ?? '';
     user.country = dto.country ?? '';
-    user.role = dto.role?.length ? dto.role : [RoleType.CUSTOMER];
+    user.role = dto.role?.length ? dto.role : [DEFAULT_CUSTOMER_ROLE];
 
     const saved = await this.userRepo.save(user);
 

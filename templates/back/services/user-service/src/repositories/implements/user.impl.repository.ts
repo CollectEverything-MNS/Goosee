@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IUserRepository } from '../user.repository';
-import { RoleType, User } from '../../entities/user.entity';
+import { DEFAULT_CUSTOMER_ROLE, User } from '../../entities/user.entity';
 
 @Injectable()
 export class TypeOrmUserRepository implements IUserRepository {
@@ -30,21 +30,16 @@ export class TypeOrmUserRepository implements IUserRepository {
   async listCustomers(): Promise<User[]> {
     return this.repository
       .createQueryBuilder('user')
-      .where(':role = ANY(user.role)', { role: RoleType.CUSTOMER })
+      .where(':role = ANY(user.role)', { role: DEFAULT_CUSTOMER_ROLE })
       .getMany();
   }
 
   async listAdmins(): Promise<User[]> {
     return this.repository
       .createQueryBuilder('user')
-      .where(
-        ':adminRole = ANY(user.role) OR :ownerRole = ANY(user.role) OR :superAdminRole = ANY(user.role)',
-        {
-          adminRole: RoleType.ADMIN,
-          ownerRole: RoleType.OWNER,
-          superAdminRole: RoleType.SUPERADMIN,
-        }
-      )
+      .where('NOT (user.role <@ ARRAY[:customer]::text[])', {
+        customer: DEFAULT_CUSTOMER_ROLE,
+      })
       .getMany();
   }
 

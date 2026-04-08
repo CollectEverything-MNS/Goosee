@@ -3,9 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { User } from './entities/user.entity';
+import { Role } from './entities/role.entity';
 
 import { IUserRepository } from './repositories/user.repository';
 import { TypeOrmUserRepository } from './repositories/implements/user.impl.repository';
+import { IRoleRepository } from './repositories/role.repository';
+import { TypeOrmRoleRepository } from './repositories/implements/role.impl.repository';
+import { RoleSeederService } from './shared/role-seeder.service';
 
 import { CreateUserController } from './usecases/create-user/create-user.controller';
 import { DeleteUserController } from './usecases/delete-user/delete-user.controller';
@@ -26,6 +30,17 @@ import { ListCustomersUseCase } from './usecases/list-customers/list-customers.u
 import { ListAdminsUseCase } from './usecases/list-admins/list-admins.usecase';
 import { LogClient } from './shared/log-client.service';
 
+import { CreateRoleController } from './usecases/create-role/create-role.controller';
+import { CreateRoleUseCase } from './usecases/create-role/create-role.usecase';
+import { ListRolesController } from './usecases/list-roles/list-roles.controller';
+import { ListRolesUseCase } from './usecases/list-roles/list-roles.usecase';
+import { GetRoleController } from './usecases/get-role/get-role.controller';
+import { GetRoleUseCase } from './usecases/get-role/get-role.usecase';
+import { UpdateRoleController } from './usecases/update-role/update-role.controller';
+import { UpdateRoleUseCase } from './usecases/update-role/update-role.usecase';
+import { DeleteRoleController } from './usecases/delete-role/delete-role.controller';
+import { DeleteRoleUseCase } from './usecases/delete-role/delete-role.usecase';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,12 +57,12 @@ import { LogClient } from './shared/log-client.service';
         username: configService.get<string>('USER_DB_USER'),
         password: configService.get<string>('USER_DB_PASSWORD'),
         database: configService.get<string>('USER_DB_NAME'),
-        entities: [User],
+        entities: [User, Role],
         synchronize: configService.get<string>('NODE_ENV') === 'development',
       }),
     }),
 
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Role]),
 
     ClientsModule.registerAsync([
       {
@@ -86,6 +101,11 @@ import { LogClient } from './shared/log-client.service';
     ListUsersController,
     UpdateUserController,
     DeleteUserController,
+    CreateRoleController,
+    ListRolesController,
+    GetRoleController,
+    UpdateRoleController,
+    DeleteRoleController,
   ],
 
   providers: [
@@ -93,6 +113,11 @@ import { LogClient } from './shared/log-client.service';
       provide: IUserRepository,
       useClass: TypeOrmUserRepository,
     },
+    {
+      provide: IRoleRepository,
+      useClass: TypeOrmRoleRepository,
+    },
+    RoleSeederService,
 
     CreateUserUseCase,
     GetUserUseCase,
@@ -102,6 +127,11 @@ import { LogClient } from './shared/log-client.service';
     ListCustomersUseCase,
     ListAdminsUseCase,
     LogClient,
+    CreateRoleUseCase,
+    ListRolesUseCase,
+    GetRoleUseCase,
+    UpdateRoleUseCase,
+    DeleteRoleUseCase,
   ],
 })
 export class AppModule {}

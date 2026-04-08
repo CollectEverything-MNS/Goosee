@@ -3,7 +3,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UpdateUserUseCase } from './update-user.usecase';
 import { IUserRepository } from '../../repositories/user.repository';
 import { UpdateUserDto } from './update-user.dto';
-import { RoleType, User } from '../../entities/user.entity';
+import { User } from '../../entities/user.entity';
 
 describe('UpdateUserUseCase', () => {
   let usecase: UpdateUserUseCase;
@@ -45,7 +45,7 @@ describe('UpdateUserUseCase', () => {
       postaleCode: '57000',
       city: 'Metz',
       country: 'France',
-      role: [RoleType.CUSTOMER],
+      role: ['CUSTOMER'],
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
     } as User;
@@ -60,7 +60,7 @@ describe('UpdateUserUseCase', () => {
         postaleCode: '75001',
         city: 'Paris',
         country: 'France',
-        role: [RoleType.ADMIN],
+        role: ['ADMIN'],
       };
 
       userRepo.findById.mockResolvedValue(existingUser);
@@ -162,7 +162,7 @@ describe('UpdateUserUseCase', () => {
 
     it('devrait mettre à jour les rôles de l\'utilisateur', async () => {
       const updateDto: UpdateUserDto = {
-        role: [RoleType.ADMIN, RoleType.SUPERADMIN],
+        role: ['ADMIN', 'SUPERADMIN'],
       };
 
       userRepo.findById.mockResolvedValue(existingUser);

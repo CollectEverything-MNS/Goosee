@@ -501,6 +501,44 @@
           "custom": "Personnalisée"
         }
       }
+    },
+    "roles": {
+      "addNewRole": "Ajouter un rôle",
+      "system": "Système",
+      "table": {
+        "name": "Nom",
+        "description": "Description",
+        "pages": "Pages autorisées",
+        "pagesCount": "{count, plural, =0 {Aucune page} one {# page} other {# pages}}",
+        "actions": "Actions"
+      },
+      "form": {
+        "createTitle": "Créer un rôle",
+        "editTitle": "Modifier le rôle",
+        "description": "Définissez le nom du rôle et les pages auxquelles il donne accès.",
+        "name": "Nom",
+        "namePlaceholder": "Ex : REDACTEUR",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Brève description du rôle (optionnel)",
+        "permissions": "Permissions",
+        "selectAll": "Tout cocher",
+        "deselectAll": "Tout décocher",
+        "cancel": "Annuler",
+        "create": "Créer",
+        "update": "Mettre à jour",
+        "createSuccess": "Rôle créé avec succès",
+        "createError": "Erreur lors de la création du rôle",
+        "updateSuccess": "Rôle mis à jour avec succès",
+        "updateError": "Erreur lors de la mise à jour"
+      },
+      "delete": {
+        "title": "Supprimer le rôle",
+        "description": "Êtes-vous sûr de vouloir supprimer le rôle « {name} » ? Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer",
+        "success": "Rôle supprimé avec succès",
+        "error": "Erreur lors de la suppression"
+      }
     }
   }
 }

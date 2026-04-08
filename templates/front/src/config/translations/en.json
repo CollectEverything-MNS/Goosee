@@ -502,6 +502,44 @@
           "custom": "Custom"
         }
       }
+    },
+    "roles": {
+      "addNewRole": "Add a role",
+      "system": "System",
+      "table": {
+        "name": "Name",
+        "description": "Description",
+        "pages": "Allowed pages",
+        "pagesCount": "{count, plural, =0 {No page} one {# page} other {# pages}}",
+        "actions": "Actions"
+      },
+      "form": {
+        "createTitle": "Create a role",
+        "editTitle": "Edit role",
+        "description": "Set the role name and pages it grants access to.",
+        "name": "Name",
+        "namePlaceholder": "e.g. EDITOR",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Short role description (optional)",
+        "permissions": "Permissions",
+        "selectAll": "Select all",
+        "deselectAll": "Deselect all",
+        "cancel": "Cancel",
+        "create": "Create",
+        "update": "Update",
+        "createSuccess": "Role created successfully",
+        "createError": "Error creating the role",
+        "updateSuccess": "Role updated successfully",
+        "updateError": "Error updating the role"
+      },
+      "delete": {
+        "title": "Delete role",
+        "description": "Are you sure you want to delete the role \"{name}\"? This action is irreversible.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "success": "Role deleted successfully",
+        "error": "Error during deletion"
+      }
     }
   }
 }
