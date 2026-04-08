@@ -83,6 +83,7 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
       PAGE_DB_HOST: ${PAGE_DB_HOST}
       PAGE_DB_PORT: ${PAGE_DB_PORT}
@@ -100,6 +101,8 @@ services:
       - "${PAGE_SERVICE_PORT}"
     depends_on:
       goosee-page-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
         condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}" ]
@@ -205,10 +208,62 @@ services:
     networks:
       - goosee_net
 
+  goosee-log-service-dev:
+    container_name: goosee-log-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/log-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
+      LOG_DB_HOST: ${LOG_DB_HOST}
+      LOG_DB_PORT: ${LOG_DB_PORT}
+      LOG_DB_USER: ${LOG_DB_USER}
+      LOG_DB_PASSWORD: ${LOG_DB_PASSWORD}
+      LOG_DB_NAME: ${LOG_DB_NAME}
+    expose:
+      - "${LOG_SERVICE_PORT}"
+    depends_on:
+      goosee-log-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${LOG_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-log-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-log-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${LOG_DB_USER}
+      POSTGRES_PASSWORD: ${LOG_DB_PASSWORD}
+      POSTGRES_DB: ${LOG_DB_NAME}
+    volumes:
+      - log_db_data:/var/lib/postgresql/data
+    expose:
+      - "${LOG_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LOG_DB_USER} -d ${LOG_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
 volumes:
   auth_db_data:
   user_db_data:
   page_db_data:
+  log_db_data:
 
 networks:
   goosee_net:

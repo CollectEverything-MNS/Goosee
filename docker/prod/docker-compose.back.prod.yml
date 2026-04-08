@@ -2,40 +2,271 @@ services:
   goosee-api-gateway-prod:
     container_name: goosee-api-gateway-prod
     build:
-      context: ../../templates/back/api-gateway
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: templates/back/api-gateway/Dockerfile
     command: node dist/main
+    restart: unless-stopped
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
       NODE_ENV: ${NODE_ENV}
-      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      API_GATEWAY_PORT: ${API_GATEWAY_PORT}
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      PAGE_SERVICE_HOST: ${PAGE_SERVICE_HOST}
+      PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
+      LOG_SERVICE_HOST: ${LOG_SERVICE_HOST}
+      LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
+      NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
+      - goosee-auth-service-prod
       - goosee-user-service-prod
+      - goosee-page-service-prod
+      - goosee-log-service-prod
     networks:
       - goosee_net
 
+  # ─────────── AUTH ───────────
+  goosee-auth-service-prod:
+    container_name: goosee-auth-service-prod
+    build:
+      context: ../../templates/back/services/auth-service
+      dockerfile: Dockerfile
+    command: node dist/main
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      AUTH_DB_HOST: ${AUTH_DB_HOST}
+      AUTH_DB_PORT: ${AUTH_DB_PORT}
+      AUTH_DB_USER: ${AUTH_DB_USER}
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
+      AUTH_DB_NAME: ${AUTH_DB_NAME}
+    expose:
+      - "${AUTH_SERVICE_PORT}"
+    depends_on:
+      goosee-auth-db-prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${AUTH_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - goosee_net
+
+  goosee-auth-db-prod:
+    image: postgres:16-alpine
+    container_name: goosee-auth-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    expose:
+      - "${AUTH_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
+  # ─────────── USER ───────────
   goosee-user-service-prod:
     container_name: goosee-user-service-prod
     build:
-      context: ../../templates/back/services/_template
+      context: ../../templates/back/services/user-service
       dockerfile: Dockerfile
     command: node dist/main
+    restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      USER_DB_HOST: ${USER_DB_HOST}
+      USER_DB_PORT: ${USER_DB_PORT}
+      USER_DB_USER: ${USER_DB_USER}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      USER_DB_NAME: ${USER_DB_NAME}
     expose:
       - "${USER_SERVICE_PORT}"
+    depends_on:
+      goosee-user-db-prod:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${USER_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10
-      start_period: 5s
+      start_period: 10s
     networks:
       - goosee_net
 
+  goosee-user-db-prod:
+    image: postgres:16-alpine
+    container_name: goosee-user-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
+      POSTGRES_DB: ${USER_DB_NAME}
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    expose:
+      - "${USER_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB_USER} -d ${USER_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
+  # ─────────── PAGE ───────────
+  goosee-page-service-prod:
+    container_name: goosee-page-service-prod
+    build:
+      context: ../../templates/back/services/page-service
+      dockerfile: Dockerfile
+    command: node dist/main
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
+      PAGE_DB_HOST: ${PAGE_DB_HOST}
+      PAGE_DB_PORT: ${PAGE_DB_PORT}
+      PAGE_DB_USER: ${PAGE_DB_USER}
+      PAGE_DB_PASSWORD: ${PAGE_DB_PASSWORD}
+      PAGE_DB_NAME: ${PAGE_DB_NAME}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
+    expose:
+      - "${PAGE_SERVICE_PORT}"
+    depends_on:
+      goosee-page-db-prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - goosee_net
+
+  goosee-page-db-prod:
+    image: postgres:16-alpine
+    container_name: goosee-page-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PAGE_DB_USER}
+      POSTGRES_PASSWORD: ${PAGE_DB_PASSWORD}
+      POSTGRES_DB: ${PAGE_DB_NAME}
+    volumes:
+      - page_db_data:/var/lib/postgresql/data
+    expose:
+      - "${PAGE_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PAGE_DB_USER} -d ${PAGE_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
+  # ─────────── LOG ───────────
+  goosee-log-service-prod:
+    container_name: goosee-log-service-prod
+    build:
+      context: ../../templates/back/services/log-service
+      dockerfile: Dockerfile
+    command: node dist/main
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
+      LOG_DB_HOST: ${LOG_DB_HOST}
+      LOG_DB_PORT: ${LOG_DB_PORT}
+      LOG_DB_USER: ${LOG_DB_USER}
+      LOG_DB_PASSWORD: ${LOG_DB_PASSWORD}
+      LOG_DB_NAME: ${LOG_DB_NAME}
+    expose:
+      - "${LOG_SERVICE_PORT}"
+    depends_on:
+      goosee-log-db-prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${LOG_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - goosee_net
+
+  goosee-log-db-prod:
+    image: postgres:16-alpine
+    container_name: goosee-log-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${LOG_DB_USER}
+      POSTGRES_PASSWORD: ${LOG_DB_PASSWORD}
+      POSTGRES_DB: ${LOG_DB_NAME}
+    volumes:
+      - log_db_data:/var/lib/postgresql/data
+    expose:
+      - "${LOG_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LOG_DB_USER} -d ${LOG_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
+  # ─────────── NOTIFIER ───────────
+  goosee-notifier-service-prod:
+    container_name: goosee-notifier-service-prod
+    build:
+      context: ../../templates/back/services/notifier-service
+      dockerfile: Dockerfile
+    command: node dist/main
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SECURE: ${SMTP_SECURE}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+    networks:
+      - goosee_net
+
+volumes:
+  auth_db_data:
+  user_db_data:
+  page_db_data:
+  log_db_data:
+
 networks:
   goosee_net:
+    name: goosee_net
     driver: bridge
