@@ -1,5 +1,6 @@
 const authBasePath = '/auth';
 const usersBasePath = '/users';
+const rolesBasePath = '/roles';
 const uploadBasePath = '/upload';
 
 
@@ -87,6 +88,29 @@ export const routesConfig = {
     listAdmins: {
       path: `${usersBasePath}/admins`,
       link: (serviceUrl: string) => `${serviceUrl}${usersBasePath}/admins`,
+    },
+  },
+
+  role: {
+    createRole: {
+      path: `${rolesBasePath}`,
+      link: (serviceUrl: string) => `${serviceUrl}${rolesBasePath}`,
+    },
+    listRoles: {
+      path: `${rolesBasePath}`,
+      link: (serviceUrl: string) => `${serviceUrl}${rolesBasePath}`,
+    },
+    getRole: {
+      path: `${rolesBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${rolesBasePath}/${id}`,
+    },
+    updateRole: {
+      path: `${rolesBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${rolesBasePath}/${id}`,
+    },
+    deleteRole: {
+      path: `${rolesBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${rolesBasePath}/${id}`,
     },
   },
 };

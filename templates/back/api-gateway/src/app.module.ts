@@ -6,6 +6,7 @@ import { PagesModule } from './services/pages/pages.module';
 import { MenusModule } from './services/menus/menus.module';
 import { SettingsModule } from './services/settings/settings.module';
 import { UploadModule } from './services/upload/upload.module';
+import { RolesModule } from './services/roles/roles.module';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { UploadModule } from './services/upload/upload.module';
     MenusModule,
     SettingsModule,
     UploadModule,
-    UserModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [],

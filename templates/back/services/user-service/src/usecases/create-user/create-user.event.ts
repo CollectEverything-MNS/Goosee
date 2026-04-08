@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { IUserRepository } from '../../repositories/user.repository';
-import { RoleType, User } from '../../entities/user.entity';
+import { DEFAULT_CUSTOMER_ROLE, User } from '../../entities/user.entity';
 
 @Controller()
 export class CreateUserEventsListener {
@@ -23,7 +23,7 @@ export class CreateUserEventsListener {
     user.email = data.email;
     user.firstName = '';
     user.lastName = '';
-    user.role = [RoleType.CUSTOMER];
+    user.role = [DEFAULT_CUSTOMER_ROLE];
 
     await this.userRepo.save(user);
 

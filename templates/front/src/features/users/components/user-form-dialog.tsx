@@ -34,16 +34,14 @@ import { toast } from 'sonner';
 import { useUser } from '../context/users-provider';
 import { useCreateUser } from '../usecases/use-create-user';
 import { useUpdateUser } from '../usecases/use-update-user';
-import { ROLES_LIST } from '../data/roles.data';
-
-const ROLES = ['OWNER', 'SUPERADMIN', 'ADMIN', 'CUSTOMER'] as const;
+import { useRolesOptions } from '../data/roles.data';
 
 const formSchema = z.object({
   email: z.string().email(),
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
   phone: z.string().min(6).max(20).optional().or(z.literal('')),
-  role: z.enum(ROLES),
+  role: z.string().min(1),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,13 +51,14 @@ export function UserFormDialog() {
   const { open, setOpen, currentRow, setCurrentRow } = useUser();
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
+  const { options: rolesOptions } = useRolesOptions();
 
   const isEditing = open === 'edit' && !!currentRow;
   const isOpen = open === 'create' || open === 'edit';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: '', firstName: '', lastName: '', phone: '', role: 'ADMIN' },
+    defaultValues: { email: '', firstName: '', lastName: '', phone: '', role: '' },
   });
 
   useEffect(() => {
@@ -69,10 +68,10 @@ export function UserFormDialog() {
         firstName: currentRow.firstName ?? '',
         lastName: currentRow.lastName ?? '',
         phone: currentRow.phone ?? '',
-        role: currentRow.role?.[0] ?? 'ADMIN',
+        role: currentRow.role?.[0] ?? '',
       });
     } else if (open === 'create') {
-      form.reset({ email: '', firstName: '', lastName: '', phone: '', role: 'ADMIN' });
+      form.reset({ email: '', firstName: '', lastName: '', phone: '', role: '' });
     }
   }, [open, currentRow, isEditing, form]);
 
@@ -192,7 +191,7 @@ export function UserFormDialog() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {ROLES_LIST.map((r) => (
+                      {rolesOptions.map((r) => (
                         <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
                       ))}
                     </SelectContent>

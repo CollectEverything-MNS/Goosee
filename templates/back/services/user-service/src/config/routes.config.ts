@@ -7,3 +7,13 @@ export const usersRoutes = {
     delete: `/:id`,
   },
 };
+
+export const rolesRoutes = {
+  root: `/roles`,
+  role: {
+    create: `/`,
+    getOne: `/:id`,
+    update: `/:id`,
+    delete: `/:id`,
+  },
+};

@@ -3,7 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { CreateUserUseCase } from './create-user.usecase';
 import { IUserRepository } from '../../repositories/user.repository';
 import { CreateUserDto } from './create-user.dto';
-import { RoleType, User } from '../../entities/user.entity';
+import { User } from '../../entities/user.entity';
 
 describe('CreateUserUseCase', () => {
   let usecase: CreateUserUseCase;
@@ -44,7 +44,7 @@ describe('CreateUserUseCase', () => {
       postaleCode: '57000',
       city: 'Metz',
       country: 'France',
-      role: [RoleType.CUSTOMER],
+      role: ['CUSTOMER'],
     };
 
     const savedUser = {
@@ -57,7 +57,7 @@ describe('CreateUserUseCase', () => {
       postaleCode: '57000',
       city: 'Metz',
       country: 'France',
-      role: [RoleType.CUSTOMER],
+      role: ['CUSTOMER'],
       createdAt: new Date(),
       updatedAt: new Date(),
     } as User;
@@ -94,7 +94,7 @@ describe('CreateUserUseCase', () => {
         email: 'minimal@example.com',
         firstName: 'Jane',
         lastName: 'Smith',
-        role: [RoleType.CUSTOMER],
+        role: ['CUSTOMER'],
       };
 
       userRepo.findByEmail.mockResolvedValue(null);
@@ -143,7 +143,7 @@ describe('CreateUserUseCase', () => {
         postaleCode: '',
         city: '',
         country: '',
-        role: [RoleType.CUSTOMER],
+        role: ['CUSTOMER'],
         createdAt: new Date(),
         updatedAt: new Date(),
       } as User;
@@ -161,13 +161,13 @@ describe('CreateUserUseCase', () => {
     it('devrait créer un utilisateur avec plusieurs rôles', async () => {
       const multiRoleDto: CreateUserDto = {
         ...createUserDto,
-        role: [RoleType.CUSTOMER, RoleType.ADMIN],
+        role: ['CUSTOMER', 'ADMIN'],
       };
 
       userRepo.findByEmail.mockResolvedValue(null);
       userRepo.save.mockResolvedValue({
         ...savedUser,
-        role: [RoleType.CUSTOMER, RoleType.ADMIN],
+        role: ['CUSTOMER', 'ADMIN'],
       });
 
       await usecase.execute(multiRoleDto);
@@ -175,7 +175,7 @@ describe('CreateUserUseCase', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(userRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          role: [RoleType.CUSTOMER, RoleType.ADMIN],
+          role: ['CUSTOMER', 'ADMIN'],
         })
       );
     });
@@ -183,7 +183,7 @@ describe('CreateUserUseCase', () => {
     it('devrait utiliser le rôle CUSTOMER par défaut si la liste de rôles est vide', async () => {
       const emptyRoleDto = {
         ...createUserDto,
-        role: [] as RoleType[],
+        role: [] as string[],
       };
 
       userRepo.findByEmail.mockResolvedValue(null);
@@ -194,7 +194,7 @@ describe('CreateUserUseCase', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(userRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          role: [RoleType.CUSTOMER],
+          role: ['CUSTOMER'],
         })
       );
     });
@@ -204,7 +204,7 @@ describe('CreateUserUseCase', () => {
         email: 'test@example.com',
         firstName: 'John',
         lastName: 'Doe',
-        role: [RoleType.CUSTOMER],
+        role: ['CUSTOMER'],
       };
 
       userRepo.findByEmail.mockResolvedValue(null);

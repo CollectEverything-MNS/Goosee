@@ -34,16 +34,14 @@ import { toast } from 'sonner';
 import { useClient } from '../context/clients-provider';
 import { useCreateUser } from '@/features/users/usecases/use-create-user';
 import { useUpdateUser } from '@/features/users/usecases/use-update-user';
-import { ROLES_LIST } from '@/features/users/data/roles.data';
-
-const ROLES = ['OWNER', 'SUPERADMIN', 'ADMIN', 'CUSTOMER'] as const;
+import { useRolesOptions } from '@/features/users/data/roles.data';
 
 const formSchema = z.object({
   email: z.string().email(),
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
   phone: z.string().min(6).max(20).optional().or(z.literal('')),
-  role: z.enum(ROLES),
+  role: z.string().min(1),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,13 +51,14 @@ export function ClientFormDialog() {
   const { open, setOpen, currentRow, setCurrentRow } = useClient();
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
+  const { options: rolesOptions } = useRolesOptions();
 
   const isEditing = open === 'edit' && !!currentRow;
   const isOpen = open === 'create' || open === 'edit';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: '', firstName: '', lastName: '', phone: '', role: 'CUSTOMER' },
+    defaultValues: { email: '', firstName: '', lastName: '', phone: '', role: 'CUSTOMER' as string },
   });
 
   useEffect(() => {
@@ -72,7 +71,7 @@ export function ClientFormDialog() {
         role: currentRow.role?.[0] ?? 'CUSTOMER',
       });
     } else if (open === 'create') {
-      form.reset({ email: '', firstName: '', lastName: '', phone: '', role: 'CUSTOMER' });
+      form.reset({ email: '', firstName: '', lastName: '', phone: '', role: 'CUSTOMER' as string });
     }
   }, [open, currentRow, isEditing, form]);
 
@@ -192,7 +191,7 @@ export function ClientFormDialog() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {ROLES_LIST.map((r) => (
+                      {rolesOptions.map((r) => (
                         <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
                       ))}
                     </SelectContent>

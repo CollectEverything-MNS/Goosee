@@ -3,13 +3,11 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsEmail,
-  IsEnum,
   IsOptional,
   IsString,
   Length,
   Matches,
 } from 'class-validator';
-import { RoleType } from '../../types/role.type';
 
 export class UpdateUserDto {
   @ApiPropertyOptional({ example: 'user@mail.com' })
@@ -62,12 +60,11 @@ export class UpdateUserDto {
 
   @ApiPropertyOptional({
     example: ['CUSTOMER'],
-    enum: RoleType,
     isArray: true,
   })
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
-  @IsEnum(RoleType, { each: true })
-  role?: RoleType[];
+  @IsString({ each: true })
+  role?: string[];
 }

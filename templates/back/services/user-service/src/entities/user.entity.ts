@@ -6,12 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export enum RoleType {
-  OWNER = 'OWNER',
-  SUPERADMIN = 'SUPERADMIN',
-  ADMIN = 'ADMIN',
-  CUSTOMER = 'CUSTOMER',
-}
+export const DEFAULT_CUSTOMER_ROLE = 'CUSTOMER';
 
 @Entity('user')
 export class User {
@@ -42,13 +37,11 @@ export class User {
   @Column({ nullable: true })
   country: string;
 
-  @Column({
-    type: 'enum',
-    enum: RoleType,
+  @Column('text', {
     array: true,
-    default: [RoleType.CUSTOMER],
+    default: [DEFAULT_CUSTOMER_ROLE],
   })
-  role: RoleType[];
+  role: string[];
 
   @CreateDateColumn()
   createdAt: Date;

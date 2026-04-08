@@ -6,7 +6,7 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useUser } from '../context/users-provider';
-import { ROLES_LIST } from '../data/roles.data';
+import { useRolesOptions } from '../data/roles.data';
 
 interface Props {
   table: any
@@ -15,6 +15,7 @@ interface Props {
 export function UsersListingToolbar({ table }: Props) {
   const t = useTranslations()
   const { setOpen } = useUser()
+  const { options: rolesOptions } = useRolesOptions()
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -24,7 +25,7 @@ export function UsersListingToolbar({ table }: Props) {
         <DataTableSearch table={table} />
         <DataTableFilter
           title={t('admin.users.table.role')}
-          options={ROLES_LIST}
+          options={rolesOptions}
           column="role"
           table={table}
         />
