@@ -2,17 +2,24 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { IPageRepository } from '../../repositories/page.repository';
 import { UpdatePageDto } from './update-page.dto';
 import { Page, PageType } from '../../entities/page.entity';
+import { LogClient } from '../../shared/log-client.service';
 
 const UNIQUE_PAGE_TYPES = [PageType.HOME, PageType.CATALOG, PageType.CONTACT];
 
 @Injectable()
 export class UpdatePageUseCase {
-  constructor(private readonly pageRepository: IPageRepository) {}
+  constructor(
+    private readonly pageRepository: IPageRepository,
+    private readonly logClient: LogClient,
+  ) {}
 
   async execute(id: string, dto: UpdatePageDto): Promise<Page> {
     const page = await this.pageRepository.findById(id);
 
     if (!page) {
+      this.logClient.warning({
+        message: `Tentative de mise à jour d'une page introuvable : ${id}`,
+      });
       throw new NotFoundException('Page not found');
     }
 
@@ -37,6 +44,10 @@ export class UpdatePageUseCase {
     if (!updatedPage) {
       throw new NotFoundException('Page not found');
     }
+
+    this.logClient.success({
+      message: `Page mise à jour : ${updatedPage.slug}`,
+    });
 
     return updatedPage;
   }

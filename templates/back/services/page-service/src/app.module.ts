@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { LogClient } from './shared/log-client.service';
 import { Page } from './entities/page.entity';
 import { Menu } from './entities/menu.entity';
 import { SiteSettings } from './entities/site-settings.entity';
@@ -62,6 +64,20 @@ import { UploadFileController } from './usecases/upload-file/upload-file.control
       }),
     }),
     TypeOrmModule.forFeature([Page, Menu, SiteSettings]),
+    ClientsModule.registerAsync([
+      {
+        name: 'LOG_CLIENT',
+        inject: [ConfigService],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [cfg.get<string>('RABBITMQ_URL')!],
+            queue: 'log_events',
+            queueOptions: { durable: true },
+          },
+        }),
+      },
+    ]),
   ],
   controllers: [
     CreatePageController,
@@ -109,6 +125,7 @@ import { UploadFileController } from './usecases/upload-file/upload-file.control
     UpdateSettingsUseCase,
     StorageService,
     UploadFileUseCase,
+    LogClient,
   ],
 })
 export class AppModule {}

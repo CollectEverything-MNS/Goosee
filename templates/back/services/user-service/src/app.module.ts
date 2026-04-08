@@ -24,6 +24,7 @@ import { CreateUserEventsListener } from './usecases/create-user/create-user.eve
 import { UpdateUserUseCase } from './usecases/update-user/update-user.usecase';
 import { ListCustomersUseCase } from './usecases/list-customers/list-customers.usecase';
 import { ListAdminsUseCase } from './usecases/list-admins/list-admins.usecase';
+import { LogClient } from './shared/log-client.service';
 
 @Module({
   imports: [
@@ -61,6 +62,18 @@ import { ListAdminsUseCase } from './usecases/list-admins/list-admins.usecase';
           },
         }),
       },
+      {
+        name: 'LOG_CLIENT',
+        inject: [ConfigService],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [cfg.get<string>('RABBITMQ_URL')!],
+            queue: 'log_events',
+            queueOptions: { durable: true },
+          },
+        }),
+      },
     ]),
   ],
 
@@ -88,6 +101,7 @@ import { ListAdminsUseCase } from './usecases/list-admins/list-admins.usecase';
     DeleteUserUseCase,
     ListCustomersUseCase,
     ListAdminsUseCase,
+    LogClient,
   ],
 })
 export class AppModule {}
