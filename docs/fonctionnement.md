@@ -2,11 +2,86 @@
 
 ## Objectif
 
-Le projet **Goosee Generator** a pour objectif d’automatiser la génération complète d’une infrastructure microservices.
-Il permet de créer rapidement une plateforme basée sur le modèle Goosee, tout en garantissant la modularité, la sécurité et la scalabilité de l’ensemble.
+Le projet **Goosee Generator** a pour objectif d'automatiser la génération complète d'une infrastructure microservices.
+Il permet de créer rapidement une plateforme basée sur le modèle Goosee, tout en garantissant la modularité, la sécurité et la scalabilité de l'ensemble.
 
-### Concept
+## Concept
 
-Actuellement, le projet sert de template technique.
-Ce template représente la base de référence utilisée par le générateur pour produire de nouvelles plateformes complètes.
+Actuellement, le projet sert de **template technique** : la base de référence utilisée par le générateur pour produire de nouvelles plateformes complètes.
 Il définit les standards techniques et structurels communs à toutes les instances Goosee.
+
+---
+
+## Architecture haut-niveau
+
+```
+                      ┌──────────────┐
+                      │  Frontend    │  Next.js 15
+                      │  :3000       │  (Admin + Site client)
+                      └──────┬───────┘
+                             │ HTTP/REST
+                             ▼
+                      ┌──────────────┐
+                      │ API Gateway  │  NestJS
+                      │  :3001       │  CORS, validation, Swagger
+                      └──────┬───────┘
+                             │
+        ┌────────────────────┼─────────────────────┐
+        │ HTTP               │ HTTP                │ HTTP
+        ▼                    ▼                     ▼
+  ┌──────────┐         ┌──────────┐          ┌──────────┐
+  │  auth    │         │  user    │          │  page    │
+  │ :3003    │         │  :3002   │          │  :3004   │
+  └────┬─────┘         └────┬─────┘          └────┬─────┘
+       │                    │                     │
+       │ ──── RabbitMQ ─────┼─────── RabbitMQ ────┤
+       │                    │                     │
+       │                    ▼                     ▼
+       │              ┌──────────┐          ┌──────────┐
+       └─────────────▶│ notifier │          │   log    │
+                      │  (RMQ)   │          │  :3005   │
+                      └──────────┘          └──────────┘
+
+  Chaque microservice ↔ sa propre base PostgreSQL (database-per-service)
+```
+
+---
+
+## Principes directeurs
+
+### 1. Database-per-service
+Chaque microservice possède sa propre base PostgreSQL. Aucun service ne lit la base d'un autre. Les références cross-services se font par UUID, sans foreign key.
+
+### 2. Communication asynchrone par défaut
+Les opérations qui ne nécessitent pas de réponse immédiate (notifications, logs, events) passent par **RabbitMQ**. Les services peuvent tomber sans bloquer les autres.
+
+### 3. Clean Architecture
+Chaque microservice suit la même structure : `entities` → `repositories` (interface + impl) → `usecases` → `controllers`. Voir [Étape 1](./back/1-structure-micro-service.md).
+
+### 4. Une seule porte d'entrée
+Le frontend ne parle qu'à l'API Gateway. La gateway route ensuite vers les microservices internes. Voir [Étape 2](./back/2-structure-api-gateway.md).
+
+### 5. Tout en Docker
+La stack complète (front + back + infra) tourne dans Docker via `yarn start:dev`. Pas d'install locale de Postgres, RabbitMQ ou autre.
+
+---
+
+## Microservices fournis
+
+| Service          | Port  | Rôle                                              |
+|------------------|-------|---------------------------------------------------|
+| api-gateway      | 3001  | Façade HTTP unique pour le frontend               |
+| user-service     | 3002  | Gestion des utilisateurs (CRUD, rôles)            |
+| auth-service     | 3003  | Authentification, JWT, sessions                   |
+| page-service     | 3004  | Pages, menus, settings, uploads d'images          |
+| log-service      | 3005  | Centralisation des logs via RabbitMQ              |
+| notifier-service | —     | Envoi d'emails, SMS, push (RMQ-only, pas d'HTTP)  |
+
+---
+
+## Pour aller plus loin
+
+- [Structure du projet](./structure-projet.md)
+- [Structure d'un microservice](./back/1-structure-micro-service.md)
+- [Structure de l'API Gateway](./back/2-structure-api-gateway.md)
+- [Communication RabbitMQ](./back/9-rabbitmq-patterns.md)

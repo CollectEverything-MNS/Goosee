@@ -1,154 +1,157 @@
 # 🐳 Étape 7 — Configuration Docker Compose (Back-end)
 
-Ce fichier permet de lancer automatiquement :
-- l’**API Gateway**
-- le **User Service**  
-  dans un même réseau Docker (`goosee_net`) afin qu’ils puissent communiquer entre eux sans configuration manuelle.
+Le fichier `docker/dev/docker-compose.back.dev.yml` lance l'ensemble du backend dans un même réseau Docker (`goosee_net`) :
+
+- l'**API Gateway** (point d'entrée HTTP)
+- les **microservices** (`auth-service`, `user-service`, `page-service`, `notifier-service`, `log-service`)
+- une **base PostgreSQL dédiée** par microservice (database-per-service)
+
+L'infrastructure partagée (RabbitMQ, MinIO, Mailhog, Adminer) est définie séparément dans `docker-compose.infra.dev.yml`.
 
 ---
 
 ## 📁 Emplacement
 
-Chemin :
 ```
-/docker/dev/docker-compose.back.dev.yml
-```
-
----
-
-## ⚙️ Contenu complet
-
-```
-services:
-  goosee-api-gateway-dev:
-    container_name: goosee-api-gateway-dev
-    build:
-      context: ../../templates/back/api-gateway
-      dockerfile: Dockerfile.dev
-    command: yarn dev
-    ports:
-      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
-      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
-    depends_on:
-      - goosee-user-service-dev
-    networks:
-      - goosee_net
-
-  goosee-user-service-dev:
-    container_name: goosee-user-service-dev
-    build:
-      context: ../../templates/back/services/_template
-      dockerfile: Dockerfile.dev
-    command: yarn dev
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
-    expose:
-      - "${USER_SERVICE_PORT}"
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost ${USER_SERVICE_PORT}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-      start_period: 5s
-    networks:
-      - goosee_net
-
-networks:
-  goosee_net:
-    driver: bridge
+docker/dev/docker-compose.back.dev.yml
 ```
 
 ---
 
-## 🧠 Explication des sections
+## 🧠 Modèle d'un service backend
 
-### 🔹 `services`
-Définit la liste des containers à exécuter.  
-Ici :
-- `goosee-api-gateway-dev` → API principale (point d’entrée HTTP)
-- `goosee-user-service-dev` → Microservice utilisateur
+Chaque microservice suit le même schéma :
+
+```yaml
+goosee-<nom>-service-dev:
+  container_name: goosee-<nom>-service-dev
+  build:
+    context: ../..
+    dockerfile: templates/back/services/<nom>-service/Dockerfile.dev
+  command: yarn dev
+  environment:
+    NODE_ENV: ${NODE_ENV}
+    RABBITMQ_URL: ${RABBITMQ_URL}            # si le service utilise RMQ
+    <NOM>_SERVICE_PORT: ${<NOM>_SERVICE_PORT}
+    <NOM>_DB_HOST: ${<NOM>_DB_HOST}
+    <NOM>_DB_PORT: ${<NOM>_DB_PORT}
+    <NOM>_DB_USER: ${<NOM>_DB_USER}
+    <NOM>_DB_PASSWORD: ${<NOM>_DB_PASSWORD}
+    <NOM>_DB_NAME: ${<NOM>_DB_NAME}
+  expose:
+    - "${<NOM>_SERVICE_PORT}"
+  depends_on:
+    goosee-<nom>-db-dev:
+      condition: service_healthy
+    goosee-rabbitmq-dev:                     # si RMQ
+      condition: service_healthy
+  healthcheck:
+    test: ["CMD-SHELL", "nc -z localhost ${<NOM>_SERVICE_PORT}"]
+    interval: 5s
+    timeout: 3s
+    retries: 10
+    start_period: 5s
+  networks:
+    - goosee_net
+
+goosee-<nom>-db-dev:
+  image: postgres:16-alpine
+  container_name: goosee-<nom>-db-dev
+  restart: unless-stopped
+  environment:
+    POSTGRES_USER: ${<NOM>_DB_USER}
+    POSTGRES_PASSWORD: ${<NOM>_DB_PASSWORD}
+    POSTGRES_DB: ${<NOM>_DB_NAME}
+  volumes:
+    - <nom>_db_data:/var/lib/postgresql/data
+  expose:
+    - "${<NOM>_DB_PORT}"
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U ${<NOM>_DB_USER} -d ${<NOM>_DB_NAME}"]
+    interval: 5s
+    timeout: 3s
+    retries: 10
+  networks:
+    - goosee_net
+```
 
 ---
 
-### 🔹 `build`
-Indique où Docker doit aller chercher les fichiers du projet :
-- `context:` → chemin du dossier racine du service
-- `dockerfile:` → chemin du Dockerfile à utiliser (`Dockerfile.dev` pour le mode développement)
+## 🔑 Concepts clés
 
----
+### `build.context`
+Les Dockerfiles de dev utilisent le **contexte racine du repo** (`../..`) afin de pouvoir copier `package.json` + `yarn.lock` à la racine et bénéficier des **workspaces yarn**. C'est pour ça qu'on voit :
 
-### 🔹 `command`
-La commande exécutée à l’intérieur du container (ici `yarn dev` pour le hot reload).
+```yaml
+build:
+  context: ../..
+  dockerfile: templates/back/services/user-service/Dockerfile.dev
+```
 
----
+### `expose` vs `ports`
+| Clé      | Effet                                                              |
+|----------|--------------------------------------------------------------------|
+| `ports`  | Ouvre le port sur la machine hôte (ex: l'API Gateway)              |
+| `expose` | Rend le port visible **uniquement** dans `goosee_net` (microservices) |
 
-### 🔹 `ports` / `expose`
-| Clé | Utilisation |
-|------|--------------|
-| `ports:` | Expose un port à l’extérieur du container (pour l’hôte local). |
-| `expose:` | Rends le port visible uniquement **dans le réseau Docker** (communication interne). |
+→ Seul l'**API Gateway** utilise `ports`. Les microservices restent `expose`-only.
 
-👉 Exemple :
-- API Gateway : `ports` (accessible depuis ton navigateur)
-- User Service : `expose` (interne, accessible uniquement par la Gateway)
+### `depends_on` + `condition: service_healthy`
+Permet d'attendre que la base postgres et/ou rabbitmq soient **réellement prêts** avant de démarrer le microservice — pas seulement "container démarré".
 
----
+### `healthcheck`
+- Microservices : test TCP (`nc -z localhost <port>`)
+- Postgres : `pg_isready`
+- RabbitMQ : `rabbitmq-diagnostics ping`
 
-### 🔹 `environment`
-Injecte les variables d’environnement définies dans `.env.dev` :
-- `NODE_ENV`
-- `USER_SERVICE_HOST`
-- `USER_SERVICE_PORT`
+### Volumes nommés
+Chaque base postgres a son propre volume nommé pour persister les données entre redémarrages :
 
-Ces valeurs sont utilisées dans ton code NestJS via `process.env`.
+```yaml
+volumes:
+  auth_db_data:
+  user_db_data:
+  page_db_data:
+  log_db_data:
+```
 
----
+### Réseau partagé `goosee_net`
+Tous les containers backend, frontend et infra sont sur ce réseau bridge. La résolution DNS se fait par `container_name`, donc l'API Gateway contacte le user-service via :
 
-### 🔹 `depends_on`
-Indique à Docker que la **Gateway** dépend du **User Service** :  
-→ le service user doit être prêt avant de démarrer la Gateway.
-
----
-
-### 🔹 `healthcheck`
-Permet de vérifier que le container du microservice répond bien sur son port interne avant de le considérer comme “up”.
-
----
-
-### 🔹 `networks`
-Crée un réseau privé Docker (`goosee_net`) pour la communication entre services.  
-Cela permet à la Gateway de contacter le User Service via :
 ```
 http://goosee-user-service-dev:${USER_SERVICE_PORT}
 ```
 
 ---
 
-## 🧩 Bonnes pratiques
-- Nommer les containers avec le même préfixe (`goosee-`) pour faciliter la maintenance.
-- Utiliser un réseau unique (`goosee_net`) partagé entre tous les services.
-- Utiliser `depends_on` pour contrôler l’ordre de démarrage.
-- Garder les Dockerfile des services dans leurs templates dédiés.
+## ➕ Ajouter un nouveau microservice
+
+1. Définir les vars d'env (étape 6)
+2. Ajouter le bloc service + le bloc db dans `docker-compose.back.dev.yml`
+3. Ajouter le volume nommé dans la section `volumes:` en bas
+4. Si le service utilise RabbitMQ, ne pas oublier `RABBITMQ_URL` + `depends_on goosee-rabbitmq-dev`
+5. Faire la même chose dans `docker-compose.back.prod.yml` (en utilisant le `Dockerfile` prod, pas `Dockerfile.dev`)
 
 ---
 
 ## ✅ Commandes utiles
 
-Lancer le backend complet :
 ```bash
-docker compose -f docker/dev/docker-compose.back.dev.yml --env-file env/.env.dev up --build
-```
+# Lancer toute la stack (front + back + infra)
+yarn start:dev
 
-Arrêter les containers :
-```bash
-docker compose -f docker/dev/docker-compose.back.dev.yml down
-```
+# Rebuild forcé (après modif de package.json ou Dockerfile)
+yarn start:dev:build
 
-Rebuilder uniquement l’API Gateway :
-```bash
-docker compose -f docker/dev/docker-compose.back.dev.yml build goosee-api-gateway-dev
+# Arrêter
+yarn stop:dev
+
+# Reset complet (supprime les volumes — perte de données)
+yarn clean:dev
+
+# Logs d'un container spécifique
+docker logs -f goosee-log-service-dev
+
+# Entrer dans la base d'un service
+docker exec -it goosee-log-db-dev psql -U postgres -d log_db
 ```
