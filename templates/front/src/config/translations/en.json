@@ -563,6 +563,23 @@
         "CRITICAL": "Critical",
         "DEBUG": "Debug"
       }
+    },
+    "dashboard": {
+      "stats": {
+        "admins": "Administrators",
+        "customers": "Customers",
+        "roles": "Roles",
+        "logs": "Log entries"
+      },
+      "recentLogs": "Recent activity",
+      "noLogs": "No logs yet",
+      "quickLinks": {
+        "title": "Quick links",
+        "users": "Users",
+        "roles": "Roles",
+        "logs": "Logs",
+        "pages": "Pages"
+      }
     }
   }
 }
