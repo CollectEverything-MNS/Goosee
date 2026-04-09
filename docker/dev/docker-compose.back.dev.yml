@@ -15,6 +15,8 @@ services:
       PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      LOG_SERVICE_HOST: ${LOG_SERVICE_HOST}
+      LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -33,7 +35,7 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       AUTH_DB_HOST: ${AUTH_DB_HOST}
-      AUTH_DB_PORT: ${AUTH_DB_PORT}
+      AUTH_DB_PORT: 5432
       AUTH_DB_USER: ${AUTH_DB_USER}
       AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
       AUTH_DB_NAME: ${AUTH_DB_NAME}
@@ -41,8 +43,6 @@ services:
       - "${AUTH_SERVICE_PORT}"
     depends_on:
       goosee-auth-db-dev:
-        condition: service_healthy
-      goosee-page-db-dev:
         condition: service_healthy
       goosee-rabbitmq-dev:
         condition: service_healthy
@@ -52,26 +52,6 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
-    networks:
-      - goosee_net
-
-  goosee-auth-db-dev:
-    image: postgres:16-alpine
-    container_name: goosee-auth-db-dev
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${AUTH_DB_USER}
-      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
-      POSTGRES_DB: ${AUTH_DB_NAME}
-    volumes:
-      - auth_db_data:/var/lib/postgresql/data
-    expose:
-      - "${AUTH_DB_PORT}"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
     networks:
       - goosee_net
 
@@ -86,7 +66,7 @@ services:
       RABBITMQ_URL: ${RABBITMQ_URL}
       PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
       PAGE_DB_HOST: ${PAGE_DB_HOST}
-      PAGE_DB_PORT: ${PAGE_DB_PORT}
+      PAGE_DB_PORT: 5432
       PAGE_DB_USER: ${PAGE_DB_USER}
       PAGE_DB_PASSWORD: ${PAGE_DB_PASSWORD}
       PAGE_DB_NAME: ${PAGE_DB_NAME}
@@ -110,26 +90,6 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
-    networks:
-      - goosee_net
-
-  goosee-page-db-dev:
-    image: postgres:16-alpine
-    container_name: goosee-page-db-dev
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${PAGE_DB_USER}
-      POSTGRES_PASSWORD: ${PAGE_DB_PASSWORD}
-      POSTGRES_DB: ${PAGE_DB_NAME}
-    volumes:
-      - page_db_data:/var/lib/postgresql/data
-    expose:
-      - "${PAGE_DB_PORT}"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${PAGE_DB_USER} -d ${PAGE_DB_NAME}" ]
-      interval: 5s
-      timeout: 3s
-      retries: 10
     networks:
       - goosee_net
 
@@ -168,7 +128,7 @@ services:
       RABBITMQ_URL: ${RABBITMQ_URL}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       USER_DB_HOST: ${USER_DB_HOST}
-      USER_DB_PORT: ${USER_DB_PORT}
+      USER_DB_PORT: 5432
       USER_DB_USER: ${USER_DB_USER}
       USER_DB_PASSWORD: ${USER_DB_PASSWORD}
       USER_DB_NAME: ${USER_DB_NAME}
@@ -188,26 +148,6 @@ services:
     networks:
       - goosee_net
 
-  goosee-user-db-dev:
-    image: postgres:16-alpine
-    container_name: goosee-user-db-dev
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${USER_DB_USER}
-      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
-      POSTGRES_DB: ${USER_DB_NAME}
-    volumes:
-      - user_db_data:/var/lib/postgresql/data
-    expose:
-      - "${USER_DB_PORT}"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${USER_DB_USER} -d ${USER_DB_NAME}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    networks:
-      - goosee_net
-
   goosee-log-service-dev:
     container_name: goosee-log-service-dev
     build:
@@ -219,7 +159,7 @@ services:
       RABBITMQ_URL: ${RABBITMQ_URL}
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
       LOG_DB_HOST: ${LOG_DB_HOST}
-      LOG_DB_PORT: ${LOG_DB_PORT}
+      LOG_DB_PORT: 5432
       LOG_DB_USER: ${LOG_DB_USER}
       LOG_DB_PASSWORD: ${LOG_DB_PASSWORD}
       LOG_DB_NAME: ${LOG_DB_NAME}
@@ -238,32 +178,6 @@ services:
       start_period: 5s
     networks:
       - goosee_net
-
-  goosee-log-db-dev:
-    image: postgres:16-alpine
-    container_name: goosee-log-db-dev
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${LOG_DB_USER}
-      POSTGRES_PASSWORD: ${LOG_DB_PASSWORD}
-      POSTGRES_DB: ${LOG_DB_NAME}
-    volumes:
-      - log_db_data:/var/lib/postgresql/data
-    expose:
-      - "${LOG_DB_PORT}"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${LOG_DB_USER} -d ${LOG_DB_NAME}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    networks:
-      - goosee_net
-
-volumes:
-  auth_db_data:
-  user_db_data:
-  page_db_data:
-  log_db_data:
 
 networks:
   goosee_net:
