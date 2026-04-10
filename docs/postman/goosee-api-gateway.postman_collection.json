@@ -1,0 +1,863 @@
+{
+  "info": {
+    "_postman_id": "e8b2d57a-2d6a-4e12-9e66-7cc5bbf3a111",
+    "name": "Goosee - API Gateway Endpoints",
+    "description": "Collection API Gateway avec setup automatique des tokens par role.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const roleHeader = pm.request.headers.get('x-role');",
+          "if (!roleHeader) {",
+          "  pm.request.headers.remove('Authorization');",
+          "  return;",
+          "}",
+          "const role = String(roleHeader).toLowerCase();",
+          "const tokenMap = {",
+          "  owner: pm.environment.get('owner_access_token') || '',",
+          "  manager: pm.environment.get('manager_access_token') || '',",
+          "  customer: pm.environment.get('customer_access_token') || ''",
+          "};",
+          "const token = tokenMap[role];",
+          "if (!token) {",
+          "  console.warn(`No token found for role=${role}. Run setup logins first.`);",
+          "  pm.request.headers.remove('Authorization');",
+          "  return;",
+          "}",
+          "pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${token}` });"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Setup",
+      "item": [
+        {
+          "name": "Login Owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const j = pm.response.json();",
+                  "  const access = j.accessToken || '';",
+                  "  pm.environment.set('owner_access_token', access);",
+                  "  pm.environment.set('owner_refresh_token', j.refreshToken || '');",
+                  "  if (access) {",
+                  "    try {",
+                  "      const base64 = access.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "      const payload = JSON.parse(atob(base64));",
+                  "      if (payload?.sub) pm.environment.set('owner_auth_id', payload.sub);",
+                  "    } catch (e) {",
+                  "      console.warn(`Unable to decode JWT payload: ${e?.message || e}`);",
+                  "    }",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{owner_email}}\",\n  \"password\": \"{{owner_password}}\"\n}"
+            },
+            "url": "{{base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Login Manager",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const j = pm.response.json();",
+                  "  const access = j.accessToken || '';",
+                  "  pm.environment.set('manager_access_token', access);",
+                  "  pm.environment.set('manager_refresh_token', j.refreshToken || '');",
+                  "  if (access) {",
+                  "    try {",
+                  "      const base64 = access.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "      const payload = JSON.parse(atob(base64));",
+                  "      if (payload?.sub) pm.environment.set('manager_auth_id', payload.sub);",
+                  "    } catch (e) {",
+                  "      console.warn(`Unable to decode JWT payload: ${e?.message || e}`);",
+                  "    }",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{manager_email}}\",\n  \"password\": \"{{manager_password}}\"\n}"
+            },
+            "url": "{{base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Login Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const j = pm.response.json();",
+                  "  const access = j.accessToken || '';",
+                  "  pm.environment.set('customer_access_token', access);",
+                  "  pm.environment.set('customer_refresh_token', j.refreshToken || '');",
+                  "  if (access) {",
+                  "    try {",
+                  "      const base64 = access.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "      const payload = JSON.parse(atob(base64));",
+                  "      if (payload?.sub) pm.environment.set('customer_auth_id', payload.sub);",
+                  "    } catch (e) {",
+                  "      console.warn(`Unable to decode JWT payload: ${e?.message || e}`);",
+                  "    }",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customer_email}}\",\n  \"password\": \"{{customer_password}}\"\n}"
+            },
+            "url": "{{base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Create Role USER_MANAGER (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{manager_role_name}}\",\n  \"description\": \"Role to manage users\",\n  \"pageKeys\": [\"users\"]\n}"
+            },
+            "url": "{{base_url}}/roles"
+          }
+        },
+        {
+          "name": "Assign USER_MANAGER to Manager User (Owner)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": [\"{{manager_role_name}}\"]\n}"
+            },
+            "url": "{{base_url}}/users/update-user/{{manager_user_id}}"
+          }
+        },
+        {
+          "name": "Re-Login Manager (refresh role claims)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const j = pm.response.json();",
+                  "  const access = j.accessToken || '';",
+                  "  pm.environment.set('manager_access_token', access);",
+                  "  pm.environment.set('manager_refresh_token', j.refreshToken || '');",
+                  "  if (access) {",
+                  "    try {",
+                  "      const base64 = access.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "      const payload = JSON.parse(atob(base64));",
+                  "      if (payload?.sub) pm.environment.set('manager_auth_id', payload.sub);",
+                  "    } catch (e) {",
+                  "      console.warn(`Unable to decode JWT payload: ${e?.message || e}`);",
+                  "    }",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{manager_email}}\",\n  \"password\": \"{{manager_password}}\"\n}"
+            },
+            "url": "{{base_url}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customer_email}}\",\n  \"password\": \"{{customer_password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/auth/verify-email?token={{verify_email_token}}"
+          }
+        },
+        {
+          "name": "Resend Verification Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/resend-verification-email",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customer_email}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password (Customer)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "customer"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/change-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"{{customer_password}}\",\n  \"newPassword\": \"{{customer_password}}NEW\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Forget Password Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/forget-password-request",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customer_email}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Forget Password Confirm",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/forget-password-confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customer_email}}\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"{{customer_password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Customer Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/refresh-token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{customer_refresh_token}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const j = pm.response.json();",
+                  "  pm.environment.set('customer_access_token', j.accessToken || '');",
+                  "  pm.environment.set('customer_refresh_token', j.refreshToken || '');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Customer Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/revoke-token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{customer_refresh_token}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/users"
+          }
+        },
+        {
+          "name": "List Customers (Manager)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "manager"
+              }
+            ],
+            "url": "{{base_url}}/users/customers"
+          }
+        },
+        {
+          "name": "List Customers (Customer should fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "customer"
+              }
+            ],
+            "url": "{{base_url}}/users/customers"
+          }
+        },
+        {
+          "name": "List Admins (Manager)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "manager"
+              }
+            ],
+            "url": "{{base_url}}/users/admins"
+          }
+        },
+        {
+          "name": "Get User By ID (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/users/get-user/{{user_id}}"
+          }
+        },
+        {
+          "name": "Create User (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/create-user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"new.user@example.com\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\",\n  \"role\": [\"CUSTOMER\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update User (Owner)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/update-user/{{user_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User (Owner)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/users/delete-user/{{user_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "List Roles (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/roles"
+          }
+        },
+        {
+          "name": "Create Role (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/roles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CONTENT_MANAGER\",\n  \"description\": \"Manage pages and menus\",\n  \"pageKeys\": [\"pages\", \"menu\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Role (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/roles/{{role_id}}"
+          }
+        },
+        {
+          "name": "Update Role (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/roles/{{role_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated role description\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Role (Owner)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/roles/{{role_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pages",
+      "item": [
+        {
+          "name": "Get All Pages (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pages"
+          }
+        },
+        {
+          "name": "Get Page By ID (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pages/{{page_id}}"
+          }
+        },
+        {
+          "name": "Get Page By Slug (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pages/slug/{{slug}}"
+          }
+        },
+        {
+          "name": "Create Page (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/pages",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Home\",\n  \"slug\": \"home\",\n  \"status\": \"PUBLISHED\",\n  \"type\": \"STATIC\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Page (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/pages/{{page_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Home Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Page (Owner)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/pages/{{page_id}}"
+          }
+        },
+        {
+          "name": "Seed Pages (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/pages/seed"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menus",
+      "item": [
+        {
+          "name": "Get All Menus (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/menus"
+          }
+        },
+        {
+          "name": "Create Menu (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/menus",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Home\",\n  \"order\": 1,\n  \"isActive\": true,\n  \"openInNewTab\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Menu (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/menus/{{menu_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Home Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Menu (Owner)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/menus/{{menu_id}}"
+          }
+        },
+        {
+          "name": "Reorder Menus (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/menus/reorder",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"id\": \"{{menu_id}}\", \"order\": 1 }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get Settings (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/settings"
+          }
+        },
+        {
+          "name": "Update Settings (Owner)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/settings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Goosee\",\n  \"description\": \"Site description\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Upload File (Owner)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/upload?folder=default",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

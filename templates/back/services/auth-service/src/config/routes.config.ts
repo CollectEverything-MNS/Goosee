@@ -13,5 +13,6 @@ export const authRoutes = {
     revokeToken: `/revoke-token`,
     verifyEmail: `/verify-email`,
     resendVerificationEmail: `/resend-verification-email`,
+    tokenVersion: `/token-version/:authId`,
   }
 };

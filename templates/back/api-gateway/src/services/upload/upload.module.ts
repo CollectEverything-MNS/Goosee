@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { ConfigModule } from '@nestjs/config';
 import { UploadController } from './upload.controller';
 import { UploadService } from './upload.service';
-import { HttpProxyService } from '../../shared/services/http-proxy.service';
+import { SharedSecurityModule } from '../../shared/shared-security.module';
 
 @Module({
-  imports: [ConfigModule, HttpModule],
+  imports: [SharedSecurityModule],
   controllers: [UploadController],
-  providers: [HttpProxyService, UploadService],
+  providers: [UploadService],
   exports: [UploadService],
 })
 export class UploadModule {}
+

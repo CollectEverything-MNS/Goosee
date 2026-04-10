@@ -7,10 +7,11 @@ import { MenusModule } from './services/menus/menus.module';
 import { SettingsModule } from './services/settings/settings.module';
 import { UploadModule } from './services/upload/upload.module';
 import { RolesModule } from './services/roles/roles.module';
-import { LogsModule } from './services/logs/logs.module';
+import { SharedSecurityModule } from './shared/shared-security.module';
 
 @Module({
   imports: [
+    SharedSecurityModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -21,7 +22,6 @@ import { LogsModule } from './services/logs/logs.module';
     SettingsModule,
     UploadModule,
     RolesModule,
-    LogsModule,
   ],
   controllers: [],
   providers: [],

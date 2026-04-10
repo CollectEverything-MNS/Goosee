@@ -26,6 +26,13 @@ import { VerifyEmailController } from './usecases/verify-email/verify-email.cont
 import { VerifyEmailUseCase } from './usecases/verify-email/verify-email.usecase';
 import { ResendVerificationEmailController } from './usecases/resend-verification-email/resend-verification-email.controller';
 import { ResendVerificationEmailUseCase } from './usecases/resend-verification-email/resend-verification-email.usecase';
+import { SoftDeleteEventsListener } from './usecases/soft-delete/soft-delete.events';
+import { SoftDeleteUseCase } from './usecases/soft-delete/soft-delete.usecase';
+import { UpdateEmailEventsListener } from './usecases/update-email/update-email.events';
+import { UpdateEmailUseCase } from './usecases/update-email/update-email.usecase';
+import { JwtTokenService } from './shared/services/jwt-token.service';
+import { GetTokenVersionController } from './usecases/get-token-version/get-token-version.controller';
+import { GetTokenVersionUseCase } from './usecases/get-token-version/get-token-version.usecase';
 
 @Module({
   imports: [
@@ -84,6 +91,9 @@ import { ResendVerificationEmailUseCase } from './usecases/resend-verification-e
     ForgetPasswordConfirmController,
     VerifyEmailController,
     ResendVerificationEmailController,
+    GetTokenVersionController,
+    UpdateEmailEventsListener,
+    SoftDeleteEventsListener,
   ],
   providers: [
     {
@@ -103,6 +113,10 @@ import { ResendVerificationEmailUseCase } from './usecases/resend-verification-e
     ForgetPasswordConfirmUseCase,
     VerifyEmailUseCase,
     ResendVerificationEmailUseCase,
+    GetTokenVersionUseCase,
+    UpdateEmailUseCase,
+    SoftDeleteUseCase,
+    JwtTokenService,
   ],
 })
 export class AppModule {}

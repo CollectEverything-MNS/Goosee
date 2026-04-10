@@ -1,17 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  NotFoundException,
-  UnauthorizedException,
-  BadRequestException,
-} from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+jest.mock(
+  'jsonwebtoken',
+  () => ({
+    sign: jest.fn(),
+    verify: jest.fn(),
+    decode: jest.fn(),
+    JsonWebTokenError: class JsonWebTokenError extends Error {},
+    TokenExpiredError: class TokenExpiredError extends Error {},
+  }),
+  { virtual: true },
+);
 import { RefreshTokenUseCase } from './refresh-token.usecase';
+import { IAuthRepository } from '../../repositories/auth.repository';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
+import { JwtTokenService } from '../../shared/services/jwt-token.service';
 import { RefreshTokenDto } from './refresh-token.dto';
+import { Auth } from '../../entities/auth.entity';
 import { AuthToken, AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
 
 describe('RefreshTokenUseCase', () => {
   let usecase: RefreshTokenUseCase;
+  let authRepo: jest.Mocked<IAuthRepository>;
   let authTokenRepo: jest.Mocked<IAuthTokenRepository>;
+  let jwtTokenService: jest.Mocked<JwtTokenService>;
+
+  const mockAuthRepo = {
+    findByEmail: jest.fn(),
+    save: jest.fn(),
+    findById: jest.fn(),
+    softDeleteById: jest.fn(),
+  };
 
   const mockAuthTokenRepo = {
     save: jest.fn(),
@@ -20,170 +39,153 @@ describe('RefreshTokenUseCase', () => {
     updateExpiredAt: jest.fn(),
   };
 
+  const mockJwtTokenService = {
+    generateAccessToken: jest.fn(),
+    generateRefreshToken: jest.fn(),
+    verifyRefreshToken: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RefreshTokenUseCase,
         {
+          provide: IAuthRepository,
+          useValue: mockAuthRepo,
+        },
+        {
           provide: IAuthTokenRepository,
           useValue: mockAuthTokenRepo,
+        },
+        {
+          provide: JwtTokenService,
+          useValue: mockJwtTokenService,
         },
       ],
     }).compile();
 
     usecase = module.get<RefreshTokenUseCase>(RefreshTokenUseCase);
+    authRepo = module.get(IAuthRepository);
     authTokenRepo = module.get(IAuthTokenRepository);
+    jwtTokenService = module.get(JwtTokenService);
 
     jest.clearAllMocks();
   });
 
   describe('execute', () => {
     const refreshTokenDto: RefreshTokenDto = {
-      token: 'valid-token-123',
+      token: 'valid-refresh-token',
     };
 
-    it('devrait renouveler un token valide sans problème', async () => {
-      const futureDate = new Date();
-      futureDate.setHours(futureDate.getHours() + 12);
+    const storedToken = {
+      id: 'token-id',
+      authId: 'auth-id',
+      token: refreshTokenDto.token,
+      type: AUTH_TOKEN_TYPES.refresh,
+      expiredAt: new Date(Date.now() + 60 * 60 * 1000),
+      createdAt: new Date(),
+    } as AuthToken;
 
-      const mockAuthToken = {
-        id: 'uuid-token-1',
-        authId: 'uuid-auth-1',
-        token: 'valid-token-123',
-        type: AUTH_TOKEN_TYPES.session,
-        expiredAt: futureDate,
-        createdAt: new Date(),
-      } as AuthToken;
+    const auth = {
+      id: 'auth-id',
+      email: 'test@example.com',
+      password: 'hashed-password',
+      role: ['CUSTOMER'],
+      tokenVersion: 0,
+      isVerified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: undefined,
+      tokens: [],
+    } as Auth;
 
-      const updatedToken = {
-        ...mockAuthToken,
-        expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      } as AuthToken;
+    it('rotates refresh token and returns new token pair', async () => {
+      const accessToken = {
+        token: 'new-access-token',
+        expiredAt: new Date(Date.now() + 15 * 60 * 1000),
+      };
+      const refreshToken = {
+        token: 'new-refresh-token',
+        expiredAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      };
 
-      authTokenRepo.findByToken.mockResolvedValue(mockAuthToken);
-      authTokenRepo.updateExpiredAt.mockResolvedValue(updatedToken);
+      jwtTokenService.verifyRefreshToken.mockReturnValue({
+        sub: auth.id,
+        email: auth.email,
+        roles: auth.role,
+        tokenVersion: auth.tokenVersion,
+        typ: 'refresh',
+      });
+      authTokenRepo.findByToken.mockResolvedValue(storedToken);
+      authRepo.findById.mockResolvedValue(auth);
+      authTokenRepo.save.mockResolvedValue({} as AuthToken);
+      jwtTokenService.generateAccessToken.mockReturnValue(accessToken);
+      jwtTokenService.generateRefreshToken.mockReturnValue(refreshToken);
 
       const result = await usecase.execute(refreshTokenDto);
 
-      expect(authTokenRepo.findByToken).toHaveBeenCalledWith(
-        refreshTokenDto.token,
-      );
-      expect(authTokenRepo.updateExpiredAt).toHaveBeenCalledWith(
-        refreshTokenDto.token,
-        expect.any(Date),
+      expect(jwtTokenService.verifyRefreshToken).toHaveBeenCalledWith(refreshTokenDto.token);
+      expect(authTokenRepo.findByToken).toHaveBeenCalledWith(refreshTokenDto.token);
+      expect(authTokenRepo.deleteByToken).toHaveBeenCalledWith(refreshTokenDto.token);
+      expect(authTokenRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authId: auth.id,
+          token: refreshToken.token,
+          type: AUTH_TOKEN_TYPES.refresh,
+        }),
       );
       expect(result).toEqual({
-        token: updatedToken.token,
-        expiredAt: updatedToken.expiredAt,
+        accessToken: accessToken.token,
+        refreshToken: refreshToken.token,
+        accessTokenExpiredAt: accessToken.expiredAt,
+        refreshTokenExpiredAt: refreshToken.expiredAt,
       });
     });
 
-    it('devrait rejeter si le token existe pas', async () => {
+    it('throws when token is not found in storage', async () => {
+      jwtTokenService.verifyRefreshToken.mockReturnValue({
+        sub: auth.id,
+        email: auth.email,
+        roles: auth.role,
+        tokenVersion: auth.tokenVersion,
+        typ: 'refresh',
+      });
       authTokenRepo.findByToken.mockResolvedValue(null);
 
-      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(
-        'Token not found',
-      );
-      expect(authTokenRepo.findByToken).toHaveBeenCalledWith(
-        refreshTokenDto.token,
-      );
-      expect(authTokenRepo.updateExpiredAt).not.toHaveBeenCalled();
+      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(NotFoundException);
+      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow('Token not found');
+      expect(authTokenRepo.deleteByToken).not.toHaveBeenCalled();
     });
 
-    it('devrait bloquer si le token est expiré', async () => {
-      const pastDate = new Date();
-      pastDate.setHours(pastDate.getHours() - 1);
+    it('throws when token owner does not match', async () => {
+      jwtTokenService.verifyRefreshToken.mockReturnValue({
+        sub: 'another-auth-id',
+        email: auth.email,
+        roles: auth.role,
+        tokenVersion: auth.tokenVersion,
+        typ: 'refresh',
+      });
+      authTokenRepo.findByToken.mockResolvedValue(storedToken);
 
-      const expiredToken = {
-        id: 'uuid-token-expired',
-        authId: 'uuid-auth-1',
-        token: 'expired-token',
-        type: AUTH_TOKEN_TYPES.session,
-        expiredAt: pastDate,
-        createdAt: new Date(),
-      } as AuthToken;
-
-      authTokenRepo.findByToken.mockResolvedValue(expiredToken);
-
-      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(
-        'Token expired',
-      );
-      expect(authTokenRepo.findByToken).toHaveBeenCalledWith(
-        refreshTokenDto.token,
-      );
-      expect(authTokenRepo.updateExpiredAt).not.toHaveBeenCalled();
+      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(UnauthorizedException);
+      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow('Invalid token owner');
     });
 
-    it("devrait renvoyer une erreur si la mise à jour échoue", async () => {
-      const futureDate = new Date();
-      futureDate.setHours(futureDate.getHours() + 12);
+    it('throws when token version does not match', async () => {
+      jwtTokenService.verifyRefreshToken.mockReturnValue({
+        sub: auth.id,
+        email: auth.email,
+        roles: auth.role,
+        tokenVersion: 99,
+        typ: 'refresh',
+      });
+      authTokenRepo.findByToken.mockResolvedValue(storedToken);
+      authRepo.findById.mockResolvedValue(auth);
 
-      const mockAuthToken = {
-        id: 'uuid-token-1',
-        authId: 'uuid-auth-1',
-        token: 'valid-token-123',
-        type: AUTH_TOKEN_TYPES.session,
-        expiredAt: futureDate,
-        createdAt: new Date(),
-      } as AuthToken;
-
-      authTokenRepo.findByToken.mockResolvedValue(mockAuthToken);
-      authTokenRepo.updateExpiredAt.mockResolvedValue(null);
-
-      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(
-        BadRequestException,
-      );
-      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(
-        'Invalid token',
-      );
-    });
-
-    it("devrait prolonger l'expiration du token de 24h", async () => {
-      const futureDate = new Date();
-      futureDate.setHours(futureDate.getHours() + 12);
-
-      const mockAuthToken = {
-        id: 'uuid-token-1',
-        authId: 'uuid-auth-1',
-        token: 'valid-token-123',
-        type: AUTH_TOKEN_TYPES.session,
-        expiredAt: futureDate,
-        createdAt: new Date(),
-      } as AuthToken;
-
-      const updatedToken = {
-        ...mockAuthToken,
-        type: AUTH_TOKEN_TYPES.session,
-        expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      } as AuthToken;
-
-      authTokenRepo.findByToken.mockResolvedValue(mockAuthToken);
-      authTokenRepo.updateExpiredAt.mockResolvedValue(updatedToken);
-
-      const beforeExecution = new Date();
-      await usecase.execute(refreshTokenDto);
-      const afterExecution = new Date();
-
-      const expectedMinExpiration = new Date(beforeExecution);
-      expectedMinExpiration.setHours(expectedMinExpiration.getHours() + 24);
-
-      const expectedMaxExpiration = new Date(afterExecution);
-      expectedMaxExpiration.setHours(expectedMaxExpiration.getHours() + 24);
-
-      const [[, newExpiredAt]] = authTokenRepo.updateExpiredAt.mock.calls;
-
-      expect(newExpiredAt.getTime()).toBeGreaterThanOrEqual(
-        expectedMinExpiration.getTime(),
-      );
-      expect(newExpiredAt.getTime()).toBeLessThanOrEqual(
-        expectedMaxExpiration.getTime(),
-      );
+      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow(UnauthorizedException);
+      await expect(usecase.execute(refreshTokenDto)).rejects.toThrow('Token revoked');
+      expect(authTokenRepo.deleteByToken).not.toHaveBeenCalled();
     });
   });
 });
+

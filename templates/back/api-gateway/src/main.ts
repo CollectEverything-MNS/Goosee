@@ -26,6 +26,7 @@ async function bootstrap() {
       .setTitle(`Projet Goosee Generator - ${nodeEnv}`)
       .setDescription('API Gateway pour le projet Goosee Generator')
       .setVersion('1.0')
+      .addBearerAuth()
       .addTag('User', 'Gestion des utilisateurs')
       .build();
 

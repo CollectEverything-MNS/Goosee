@@ -92,6 +92,7 @@ describe('RegisterUseCase', () => {
       id: 'uuid-456',
       email: 'test@example.com',
       password: 'hashed-password',
+      role: ['CUSTOMER'],
       isVerified: false,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -142,6 +143,7 @@ describe('RegisterUseCase', () => {
         id: 'uuid-existing',
         email: 'test@example.com',
         password: 'hashedpass',
+        role: ['CUSTOMER'],
         isVerified: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -248,3 +250,4 @@ describe('RegisterUseCase', () => {
     });
   });
 });
+

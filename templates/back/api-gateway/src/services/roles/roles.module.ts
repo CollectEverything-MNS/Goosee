@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { ConfigModule } from '@nestjs/config';
-import { HttpProxyService } from '../../shared/services/http-proxy.service';
+import { SharedSecurityModule } from '../../shared/shared-security.module';
 import { CreateRoleController } from './usecases/create-role/create-role.controller';
 import { ListRolesController } from './usecases/list-roles/list-roles.controller';
 import { GetRoleController } from './usecases/get-role/get-role.controller';
@@ -9,7 +7,7 @@ import { UpdateRoleController } from './usecases/update-role/update-role.control
 import { DeleteRoleController } from './usecases/delete-role/delete-role.controller';
 
 @Module({
-  imports: [ConfigModule, HttpModule],
+  imports: [SharedSecurityModule],
   controllers: [
     CreateRoleController,
     ListRolesController,
@@ -17,7 +15,8 @@ import { DeleteRoleController } from './usecases/delete-role/delete-role.control
     UpdateRoleController,
     DeleteRoleController,
   ],
-  providers: [HttpProxyService],
+  providers: [],
   exports: [],
 })
 export class RolesModule {}
+

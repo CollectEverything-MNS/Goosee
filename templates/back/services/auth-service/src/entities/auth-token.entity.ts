@@ -10,7 +10,7 @@ import {
 import { Auth } from './auth.entity';
 
 export const AUTH_TOKEN_TYPES = {
-  session: 'SESSION',
+  refresh: 'REFRESH',
   passwordReset: 'PASSWORD_RESET',
   emailVerification: 'EMAIL_VERIFICATION',
 } as const;
@@ -30,7 +30,7 @@ export class AuthToken {
   @Column()
   token: string;
 
-  @Column({ default: AUTH_TOKEN_TYPES.session })
+  @Column({ default: AUTH_TOKEN_TYPES.refresh })
   type: AuthTokenType;
 
   @CreateDateColumn()

@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { ConfigModule } from '@nestjs/config';
 import { MenusController } from './menus.controller';
 import { MenusService } from './menus.service';
-import { HttpProxyService } from '../../shared/services/http-proxy.service';
+import { SharedSecurityModule } from '../../shared/shared-security.module';
 
 @Module({
-  imports: [ConfigModule, HttpModule],
+  imports: [SharedSecurityModule],
   controllers: [MenusController],
-  providers: [HttpProxyService, MenusService],
+  providers: [MenusService],
   exports: [MenusService],
 })
 export class MenusModule {}
+

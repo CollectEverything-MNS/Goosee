@@ -8,11 +8,15 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PagesService } from './pages.service';
 import { CreatePageDto } from './dto/create-page.dto';
 import { UpdatePageDto } from './dto/update-page.dto';
+import { JwtAuthGuard } from '../../shared/services/jwt-auth.guard';
+import { RolesGuard } from '../../shared/services/roles.guard';
+import { Roles } from '../../shared/services/roles.decorator';
 
 @ApiTags('Pages')
 @Controller('pages')
@@ -43,6 +47,8 @@ export class PagesController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('pages')
   @ApiOperation({ summary: 'Create a new page' })
   @ApiResponse({ status: 201, description: 'Page created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input' })
@@ -51,6 +57,8 @@ export class PagesController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('pages')
   @ApiOperation({ summary: 'Update a page' })
   @ApiResponse({ status: 200, description: 'Page updated successfully' })
   @ApiResponse({ status: 404, description: 'Page not found' })
@@ -59,6 +67,8 @@ export class PagesController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('pages')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a page' })
   @ApiResponse({ status: 204, description: 'Page deleted successfully' })
@@ -68,6 +78,8 @@ export class PagesController {
   }
 
   @Post('seed')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('pages')
   @ApiOperation({ summary: 'Seed default pages' })
   @ApiResponse({ status: 201, description: 'Pages seeded successfully' })
   async seed() {

@@ -1,16 +1,11 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IAuthRepository } from '../../repositories/auth.repository';
 import { ChangePasswordDto } from './change-password.dto';
 import { comparePassword, hashPassword } from '../../shared/utils';
-import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ChangePasswordUseCase {
-  constructor(
-    private readonly authRepo: IAuthRepository,
-    @Inject('RMQ_AUTH_CLIENT') private rmq: ClientProxy
-  ) {}
+  constructor(private readonly authRepo: IAuthRepository) {}
 
   async execute(dto: ChangePasswordDto) {
     const auth = await this.authRepo.findById(dto.authId);
@@ -27,13 +22,6 @@ export class ChangePasswordUseCase {
 
     auth.password = await hashPassword(dto.newPassword);
     await this.authRepo.save(auth);
-
-    await lastValueFrom(
-      this.rmq.emit('password.changed', {
-        authId: auth.id,
-        password: auth.password,
-      })
-    );
 
     return {
       message: 'Password changed successfully',

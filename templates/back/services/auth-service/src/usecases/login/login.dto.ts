@@ -9,6 +9,8 @@ export class LoginDto {
 }
 
 export class LoginResponseDto {
-  token: string;
-  expiredAt: Date;
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiredAt: Date;
+  refreshTokenExpiredAt: Date;
 }
