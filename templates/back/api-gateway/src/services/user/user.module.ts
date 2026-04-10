@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { ConfigModule } from '@nestjs/config';
-import { HttpProxyService } from '../../shared/services/http-proxy.service';
+import { SharedSecurityModule } from '../../shared/shared-security.module';
 import { CreateUserController } from './usecases/create-user/create-user.controller';
 import { GetUserController } from './usecases/get-user/get-user.controller';
 import { ListUsersController } from './usecases/list-users/list-users.controller';
@@ -12,7 +10,7 @@ import { ListAdminsController } from './usecases/list-admins/list-admins.control
 
 
 @Module({
-  imports: [ConfigModule, HttpModule],
+  imports: [SharedSecurityModule],
   controllers: [
     CreateUserController,
     GetUserController,
@@ -22,9 +20,7 @@ import { ListAdminsController } from './usecases/list-admins/list-admins.control
     ListCustomersController,
     ListAdminsController,
   ],
-  providers: [
-    HttpProxyService,
-  ],
+  providers: [],
   exports: [],
 })
 export class UserModule {}

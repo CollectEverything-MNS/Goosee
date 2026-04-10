@@ -5,12 +5,14 @@ import { User } from '../../entities/user.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { LogClient } from '../../shared/log-client.service';
+import { IRoleRepository } from '../../repositories/role.repository';
 
 
 @Injectable()
 export class UpdateUserUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
+    private readonly roleRepo: IRoleRepository,
     @Inject('RMQ_CLIENT') private rmq: ClientProxy,
     private readonly logClient: LogClient,
   ) {}
@@ -25,9 +27,14 @@ export class UpdateUserUseCase {
       throw new NotFoundException('User not found');
     }
 
+    const emailChanged = Boolean(dto.email && dto.email !== user.email);
+    const nextRole = dto.role ? await this.resolveAndValidateRoles(dto.role) : user.role;
+    const roleChanged = Boolean(dto.role);
+
     const userUpdated: User = {
       ...user,
       id: user.id,
+      authId: user.authId,
       firstName: dto.firstName ?? user.firstName,
       lastName: dto.lastName ?? user.lastName,
       phone: dto.phone ?? user.phone,
@@ -35,7 +42,7 @@ export class UpdateUserUseCase {
       postaleCode: dto.postaleCode ?? user.postaleCode,
       city: dto.city ?? user.city,
       country: dto.country ?? user.country,
-      role: dto.role ?? user.role,
+      role: nextRole,
       createdAt: user.createdAt,
       updatedAt: new Date(),
     };
@@ -50,12 +57,15 @@ export class UpdateUserUseCase {
 
     await this.userRepo.save(userUpdated);
 
-    await lastValueFrom(
-      this.rmq.emit('user.updated', {
-      email: userUpdated.email,
-      userId: userUpdated.id
-    }),
-  );
+    if (userUpdated.authId && (emailChanged || roleChanged)) {
+      await lastValueFrom(
+        this.rmq.emit('user.updated', {
+          authId: userUpdated.authId,
+          newEmail: emailChanged ? userUpdated.email : undefined,
+          role: userUpdated.role,
+        }),
+      );
+    }
 
     this.logClient.success({
       message: `Utilisateur mis à jour : ${userUpdated.email}`,
@@ -65,5 +75,24 @@ export class UpdateUserUseCase {
     return {
       message: 'User updated successfully',
     };
+  }
+
+  private async resolveAndValidateRoles(roles: string[]): Promise<string[]> {
+    const normalizedRoles = Array.from(
+      new Set(roles.map((role) => role.trim()).filter(Boolean)),
+    );
+
+    if (!normalizedRoles.length) {
+      throw new BadRequestException('At least one role is required');
+    }
+
+    for (const roleName of normalizedRoles) {
+      const role = await this.roleRepo.findByName(roleName);
+      if (!role) {
+        throw new BadRequestException(`Role does not exist: ${roleName}`);
+      }
+    }
+
+    return normalizedRoles;
   }
 }

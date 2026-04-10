@@ -6,6 +6,8 @@ export class RefreshTokenDto {
 }
 
 export class RefreshTokenResponseDto {
-  token: string;
-  expiredAt: Date;
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiredAt: Date;
+  refreshTokenExpiredAt: Date;
 }

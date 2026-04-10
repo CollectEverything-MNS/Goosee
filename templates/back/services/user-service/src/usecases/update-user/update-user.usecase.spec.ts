@@ -4,6 +4,7 @@ import { UpdateUserUseCase } from './update-user.usecase';
 import { IUserRepository } from '../../repositories/user.repository';
 import { UpdateUserDto } from './update-user.dto';
 import { User } from '../../entities/user.entity';
+import { of } from 'rxjs';
 
 describe('UpdateUserUseCase', () => {
   let usecase: UpdateUserUseCase;
@@ -17,6 +18,10 @@ describe('UpdateUserUseCase', () => {
     deleteById: jest.fn(),
   };
 
+  const mockRmqClient = {
+    emit: jest.fn().mockReturnValue(of({})),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -24,6 +29,10 @@ describe('UpdateUserUseCase', () => {
         {
           provide: IUserRepository,
           useValue: mockUserRepo,
+        },
+        {
+          provide: 'RMQ_CLIENT',
+          useValue: mockRmqClient,
         },
       ],
     }).compile();
@@ -37,6 +46,7 @@ describe('UpdateUserUseCase', () => {
   describe('execute', () => {
     const existingUser = {
       id: 'uuid-123',
+      authId: 'auth-123',
       email: 'old@example.com',
       firstName: 'John',
       lastName: 'Doe',
@@ -233,3 +243,4 @@ describe('UpdateUserUseCase', () => {
     });
   });
 });
+

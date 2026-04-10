@@ -6,7 +6,7 @@ import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { ForgetPasswordConfirmDto } from './forget-password-confirm.dto';
 import { Auth } from '../../entities/auth.entity';
 import { AuthToken, AUTH_TOKEN_TYPES } from '../../entities/auth-token.entity';
-import * as crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 describe('ForgetPasswordConfirmUseCase', () => {
   let usecase: ForgetPasswordConfirmUseCase;
@@ -53,11 +53,6 @@ describe('ForgetPasswordConfirmUseCase', () => {
 
   describe('execute', () => {
     const newPassword = 'newSecurePassword123';
-    const hashedNewPassword = crypto
-      .createHash('sha256')
-      .update(newPassword)
-      .digest('hex');
-
     const confirmDto: ForgetPasswordConfirmDto = {
       email: 'test@example.com',
       otp: '123456',
@@ -68,6 +63,8 @@ describe('ForgetPasswordConfirmUseCase', () => {
       id: 'uuid-confirm-reset',
       email: 'test@example.com',
       password: 'oldHashedPassword',
+      role: ['CUSTOMER'],
+      isVerified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
@@ -91,7 +88,7 @@ describe('ForgetPasswordConfirmUseCase', () => {
       tokenRepo.findByToken.mockResolvedValue(mockToken);
       authRepo.save.mockResolvedValue({
         ...mockAuth,
-        password: hashedNewPassword,
+        password: await bcrypt.hash(newPassword, 12),
       });
       tokenRepo.deleteByToken.mockResolvedValue(undefined);
 
@@ -101,9 +98,15 @@ describe('ForgetPasswordConfirmUseCase', () => {
       expect(tokenRepo.findByToken).toHaveBeenCalledWith('OTP_123456');
       expect(authRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          password: hashedNewPassword,
+          password: expect.any(String),
         }),
       );
+      await expect(
+        bcrypt.compare(
+          newPassword,
+          (authRepo.save.mock.calls[0][0] as Auth).password,
+        ),
+      ).resolves.toBe(true);
       expect(tokenRepo.deleteByToken).toHaveBeenCalledWith('OTP_123456');
       expect(result).toEqual({ message: 'Password reset successfully' });
     });
@@ -173,17 +176,18 @@ describe('ForgetPasswordConfirmUseCase', () => {
       tokenRepo.findByToken.mockResolvedValue(mockToken);
       authRepo.save.mockResolvedValue({
         ...mockAuth,
-        password: hashedNewPassword,
+        password: await bcrypt.hash(newPassword, 12),
       });
       tokenRepo.deleteByToken.mockResolvedValue(undefined);
 
       await usecase.execute(confirmDto);
 
-      expect(authRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          password: hashedNewPassword,
-        }),
-      );
+      await expect(
+        bcrypt.compare(
+          newPassword,
+          (authRepo.save.mock.calls[0][0] as Auth).password,
+        ),
+      ).resolves.toBe(true);
     });
 
     it('devrait supprimer le code OTP après la réinitialisation', async () => {
@@ -191,7 +195,7 @@ describe('ForgetPasswordConfirmUseCase', () => {
       tokenRepo.findByToken.mockResolvedValue(mockToken);
       authRepo.save.mockResolvedValue({
         ...mockAuth,
-        password: hashedNewPassword,
+        password: await bcrypt.hash(newPassword, 12),
       });
       tokenRepo.deleteByToken.mockResolvedValue(undefined);
 
@@ -206,7 +210,7 @@ describe('ForgetPasswordConfirmUseCase', () => {
       tokenRepo.findByToken.mockResolvedValue(mockToken);
       authRepo.save.mockResolvedValue({
         ...mockAuth,
-        password: hashedNewPassword,
+        password: await bcrypt.hash(newPassword, 12),
       });
       tokenRepo.deleteByToken.mockResolvedValue(undefined);
 
@@ -218,3 +222,4 @@ describe('ForgetPasswordConfirmUseCase', () => {
     });
   });
 });
+

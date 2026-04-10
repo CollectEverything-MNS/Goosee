@@ -51,7 +51,7 @@ describe('SoftDeleteUseCase', () => {
 
       await usecase.execute(softDeleteDto);
 
-      expect(authRepo.softDeleteById).toHaveBeenCalledWith(1);
+      expect(authRepo.softDeleteById).toHaveBeenCalledWith('id1');
     });
 
     it('devrait gérer différentes valeurs de authId', async () => {

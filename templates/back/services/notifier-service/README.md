@@ -6,10 +6,15 @@ Service de notifications multi-canaux via RabbitMQ (Email, SMS, Push).
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
+SMTP_SECURE=false
 SMTP_USER=your@gmail.com
 SMTP_PASSWORD=your-password
 SMTP_FROM=noreply@paris-sportif.com
 ```
+
+`SMTP_SECURE` doit correspondre au port:
+- `587` -> `false` (STARTTLS)
+- `465` -> `true` (TLS implicite)
 
 ## Usage
 

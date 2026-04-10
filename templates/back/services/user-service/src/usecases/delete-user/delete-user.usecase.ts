@@ -25,11 +25,13 @@ export class DeleteUserUseCase {
 
     await this.userRepo.deleteById(id);
 
-    await lastValueFrom(
-      this.rmq.emit('user.deleted', {
-      userId: id,
-    }),
-  );
+    if (user.authId) {
+      await lastValueFrom(
+        this.rmq.emit('user.deleted', {
+          authId: user.authId,
+        }),
+      );
+    }
 
     this.logClient.success({
       message: `Utilisateur supprimé : ${user.email}`,

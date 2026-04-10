@@ -20,6 +20,7 @@ export class CreateUserEventsListener {
     }
 
     const user = new User();
+    user.authId = data.authId;
     user.email = data.email;
     user.firstName = '';
     user.lastName = '';

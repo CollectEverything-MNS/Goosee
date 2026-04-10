@@ -25,8 +25,8 @@ export class RoleSeederService implements OnApplicationBootstrap {
   constructor(private readonly roleRepo: IRoleRepository) {}
 
   async onApplicationBootstrap(): Promise<void> {
-    await this.seedRole('OWNER', 'Propriétaire du site avec accès total', ALL_PAGE_KEYS);
-    await this.seedRole('CUSTOMER', 'Client final, aucun accès admin', []);
+    await this.seedRole('OWNER', 'Owner with full access', ALL_PAGE_KEYS);
+    await this.seedRole('CUSTOMER', 'End user with no back-office access', []);
   }
 
   private async seedRole(
@@ -36,7 +36,7 @@ export class RoleSeederService implements OnApplicationBootstrap {
   ): Promise<void> {
     const existing = await this.roleRepo.findByName(name);
     if (existing) {
-      this.logger.log(`Rôle ${name} déjà présent, seed ignoré`);
+      this.logger.log(`Role ${name} already present, skipping seed`);
       return;
     }
 
@@ -47,6 +47,6 @@ export class RoleSeederService implements OnApplicationBootstrap {
     role.pageKeys = pageKeys;
 
     await this.roleRepo.save(role);
-    this.logger.log(`Rôle ${name} seedé`);
+    this.logger.log(`Role ${name} seeded`);
   }
 }

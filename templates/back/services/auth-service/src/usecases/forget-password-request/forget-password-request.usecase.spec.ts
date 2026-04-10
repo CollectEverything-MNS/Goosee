@@ -5,11 +5,13 @@ import { IAuthRepository } from '../../repositories/auth.repository';
 import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 import { Auth } from '../../entities/auth.entity';
 import { AuthToken } from '../../entities/auth-token.entity';
+import { of } from 'rxjs';
 
 describe('ForgetPasswordRequestUseCase', () => {
   let usecase: ForgetPasswordRequestUseCase;
   let authRepo: jest.Mocked<IAuthRepository>;
   let tokenRepo: jest.Mocked<IAuthTokenRepository>;
+  let rmqNotifClient: { emit: jest.Mock };
 
   const mockAuthRepo = {
     findByEmail: jest.fn(),
@@ -25,6 +27,10 @@ describe('ForgetPasswordRequestUseCase', () => {
     updateExpiredAt: jest.fn(),
   };
 
+  const mockRmqNotifClient = {
+    emit: jest.fn().mockReturnValue(of({})),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -37,19 +43,19 @@ describe('ForgetPasswordRequestUseCase', () => {
           provide: IAuthTokenRepository,
           useValue: mockTokenRepo,
         },
+        {
+          provide: 'RMQ_NOTIF_CLIENT',
+          useValue: mockRmqNotifClient,
+        },
       ],
     }).compile();
 
     usecase = module.get<ForgetPasswordRequestUseCase>(ForgetPasswordRequestUseCase);
     authRepo = module.get(IAuthRepository);
     tokenRepo = module.get(IAuthTokenRepository);
+    rmqNotifClient = module.get('RMQ_NOTIF_CLIENT');
 
     jest.clearAllMocks();
-    jest.spyOn(console, 'log').mockImplementation();
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   describe('execute', () => {
@@ -59,6 +65,8 @@ describe('ForgetPasswordRequestUseCase', () => {
       id: 'uuid-password-reset',
       email: 'test@example.com',
       password: 'hashedPassword',
+      role: ['CUSTOMER'],
+      isVerified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
@@ -138,15 +146,20 @@ describe('ForgetPasswordRequestUseCase', () => {
       );
     });
 
-    it('devrait afficher le code OTP dans la console', async () => {
+    it("devrait publier l'envoi de notification email", async () => {
       authRepo.findByEmail.mockResolvedValue(mockAuth);
       tokenRepo.save.mockResolvedValue({} as AuthToken);
-      const consoleLogSpy = jest.spyOn(console, 'log');
 
       await usecase.execute(email);
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/OTP \d{6} - email test@example\.com/)
+      expect(rmqNotifClient.emit).toHaveBeenCalledWith(
+        'send_notification',
+        expect.objectContaining({
+          type: 'EMAIL',
+          data: expect.objectContaining({
+            to: email,
+          }),
+        }),
       );
     });
 
@@ -167,3 +180,4 @@ describe('ForgetPasswordRequestUseCase', () => {
     });
   });
 });
+

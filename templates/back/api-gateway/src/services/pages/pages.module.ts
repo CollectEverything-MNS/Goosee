@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { ConfigModule } from '@nestjs/config';
 import { PagesController } from './pages.controller';
 import { PagesService } from './pages.service';
-import { HttpProxyService } from '../../shared/services/http-proxy.service';
+import { SharedSecurityModule } from '../../shared/shared-security.module';
 
 @Module({
-  imports: [ConfigModule, HttpModule],
+  imports: [SharedSecurityModule],
   controllers: [PagesController],
-  providers: [HttpProxyService, PagesService],
+  providers: [PagesService],
   exports: [PagesService],
 })
 export class PagesModule {}
+
