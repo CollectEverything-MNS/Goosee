@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: goosee-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: dev-goosee-auth-service-dev:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3003
+          envFrom:
+            - configMapRef:
+                name: goosee-config
+            - secretRef:
+                name: goosee-secrets
+          readinessProbe:
+            tcpSocket:
+              port: 3003
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 12

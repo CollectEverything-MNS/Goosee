@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: SERVICE_NAME
+  namespace: goosee-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: SERVICE_NAME
+  template:
+    metadata:
+      labels:
+        app: SERVICE_NAME
+    spec:
+      containers:
+        - name: SERVICE_NAME
+          image: IMAGE_NAME        # dev: dev-goosee-SERVICE_NAME-dev:latest — prod: registry/SERVICE_NAME:tag
+          imagePullPolicy: Never   # passer à IfNotPresent en prod (image depuis registry)
+          ports:
+            - containerPort: SERVICE_PORT
+          envFrom:
+            - configMapRef:
+                name: goosee-config
+            - secretRef:
+                name: goosee-secrets
+          readinessProbe:
+            tcpSocket:
+              port: SERVICE_PORT
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 12

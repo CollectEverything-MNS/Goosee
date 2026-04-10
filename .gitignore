@@ -21,6 +21,9 @@ Thumbs.db
 .env.local
 .env.*.local
 .env.prod
+
+# Kubernetes secrets (valeurs réelles — ne jamais commiter)
+templates/back/k8s/secrets.yaml
 .claude/
 CLAUDE.md
 # Build files

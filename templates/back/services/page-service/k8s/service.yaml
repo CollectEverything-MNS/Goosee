@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: page-service
+  namespace: goosee-dev
+spec:
+  selector:
+    app: page-service
+  ports:
+    - port: 3004
+      targetPort: 3004
+  type: ClusterIP

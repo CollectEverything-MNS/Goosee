@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: page-service
+  namespace: goosee-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: page-service
+  template:
+    metadata:
+      labels:
+        app: page-service
+    spec:
+      containers:
+        - name: page-service
+          image: dev-goosee-page-service-dev:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3004
+          envFrom:
+            - configMapRef:
+                name: goosee-config
+            - secretRef:
+                name: goosee-secrets
+          readinessProbe:
+            tcpSocket:
+              port: 3004
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 12

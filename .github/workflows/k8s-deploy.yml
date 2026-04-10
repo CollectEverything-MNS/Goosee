@@ -1,0 +1,117 @@
+name: Deploy to Kubernetes (prod)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ─── Connexion au cluster ────────────────────────────────────────────────
+      # KUBECONFIG doit être défini dans GitHub → Settings → Secrets and variables
+      # → Actions. Sa valeur est le contenu du kubeconfig encodé en base64 :
+      #   cat ~/.kube/config | base64
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+
+      # ─── Build & push des images ─────────────────────────────────────────────
+      # Adapter REGISTRY et les noms d'images selon ton infrastructure
+      - name: Build and push images
+        env:
+          REGISTRY: ${{ secrets.REGISTRY_URL }}   # ex: ghcr.io/mon-org ou hub.docker.com/mon-user
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login $REGISTRY -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+
+          docker build -t $REGISTRY/goosee-api-gateway:$IMAGE_TAG ./templates/back/api-gateway
+          docker build -t $REGISTRY/goosee-user-service:$IMAGE_TAG ./templates/back/services/user-service
+          docker build -t $REGISTRY/goosee-auth-service:$IMAGE_TAG ./templates/back/services/auth-service
+          docker build -t $REGISTRY/goosee-page-service:$IMAGE_TAG ./templates/back/services/page-service
+          docker build -t $REGISTRY/goosee-notifier-service:$IMAGE_TAG ./templates/back/services/notifier-service
+
+          docker push $REGISTRY/goosee-api-gateway:$IMAGE_TAG
+          docker push $REGISTRY/goosee-user-service:$IMAGE_TAG
+          docker push $REGISTRY/goosee-auth-service:$IMAGE_TAG
+          docker push $REGISTRY/goosee-page-service:$IMAGE_TAG
+          docker push $REGISTRY/goosee-notifier-service:$IMAGE_TAG
+
+      # ─── Namespace & ConfigMap ───────────────────────────────────────────────
+      - name: Apply namespace and configmap
+        run: |
+          kubectl apply -f templates/back/k8s/namespace.yaml
+          kubectl apply -f templates/back/k8s/configmap.yaml
+
+      # ─── Secrets depuis GitHub Secrets ──────────────────────────────────────
+      # Les valeurs viennent des secrets GitHub (jamais de fichiers committés).
+      # Ajouter chaque clé dans GitHub → Settings → Secrets and variables → Actions.
+      - name: Create K8s secrets from GitHub secrets
+        run: |
+          kubectl create secret generic goosee-secrets \
+            --namespace=goosee-dev \
+            --from-literal=USER_DB_USER="${{ secrets.USER_DB_USER }}" \
+            --from-literal=USER_DB_PASSWORD="${{ secrets.USER_DB_PASSWORD }}" \
+            --from-literal=USER_DB_NAME="${{ secrets.USER_DB_NAME }}" \
+            --from-literal=AUTH_DB_USER="${{ secrets.AUTH_DB_USER }}" \
+            --from-literal=AUTH_DB_PASSWORD="${{ secrets.AUTH_DB_PASSWORD }}" \
+            --from-literal=AUTH_DB_NAME="${{ secrets.AUTH_DB_NAME }}" \
+            --from-literal=PAGE_DB_USER="${{ secrets.PAGE_DB_USER }}" \
+            --from-literal=PAGE_DB_PASSWORD="${{ secrets.PAGE_DB_PASSWORD }}" \
+            --from-literal=PAGE_DB_NAME="${{ secrets.PAGE_DB_NAME }}" \
+            --from-literal=RABBITMQ_URL="${{ secrets.RABBITMQ_URL }}" \
+            --from-literal=RABBITMQ_ERLANG_COOKIE="${{ secrets.RABBITMQ_ERLANG_COOKIE }}" \
+            --from-literal=MINIO_ROOT_USER="${{ secrets.MINIO_ROOT_USER }}" \
+            --from-literal=MINIO_ROOT_PASSWORD="${{ secrets.MINIO_ROOT_PASSWORD }}" \
+            --from-literal=SMTP_USER="${{ secrets.SMTP_USER }}" \
+            --from-literal=SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      # ─── Déploiement des services ────────────────────────────────────────────
+      - name: Deploy services
+        env:
+          REGISTRY: ${{ secrets.REGISTRY_URL }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Mettre à jour l'image dans chaque deployment avec le tag du commit
+          kubectl set image deployment/api-gateway \
+            api-gateway=$REGISTRY/goosee-api-gateway:$IMAGE_TAG \
+            --namespace=goosee-dev
+
+          kubectl set image deployment/user-service \
+            user-service=$REGISTRY/goosee-user-service:$IMAGE_TAG \
+            --namespace=goosee-dev
+
+          kubectl set image deployment/auth-service \
+            auth-service=$REGISTRY/goosee-auth-service:$IMAGE_TAG \
+            --namespace=goosee-dev
+
+          kubectl set image deployment/page-service \
+            page-service=$REGISTRY/goosee-page-service:$IMAGE_TAG \
+            --namespace=goosee-dev
+
+          kubectl set image deployment/notifier-service \
+            notifier-service=$REGISTRY/goosee-notifier-service:$IMAGE_TAG \
+            --namespace=goosee-dev
+
+          # Appliquer les manifests (crée les deployments s'ils n'existent pas encore)
+          kubectl apply -f templates/back/api-gateway/k8s/
+          kubectl apply -f templates/back/services/user-service/k8s/
+          kubectl apply -f templates/back/services/auth-service/k8s/
+          kubectl apply -f templates/back/services/page-service/k8s/
+          kubectl apply -f templates/back/services/notifier-service/k8s/
+
+      # ─── Vérification du rollout ─────────────────────────────────────────────
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/api-gateway --namespace=goosee-dev --timeout=120s
+          kubectl rollout status deployment/user-service --namespace=goosee-dev --timeout=120s
+          kubectl rollout status deployment/auth-service --namespace=goosee-dev --timeout=120s
+          kubectl rollout status deployment/page-service --namespace=goosee-dev --timeout=120s
+          kubectl rollout status deployment/notifier-service --namespace=goosee-dev --timeout=120s

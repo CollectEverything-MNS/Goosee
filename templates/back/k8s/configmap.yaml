@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: goosee-config
+  namespace: goosee-dev
+data:
+  # Global
+  NODE_ENV: "development"
+
+  # API Gateway
+  API_GATEWAY_PORT: "3001"
+  NEXT_PUBLIC_WEB_URL: "http://localhost:3000"
+  NEXT_PUBLIC_API_URL: "http://localhost:30001"
+
+  # Service hosts (noms DNS K8s internes au namespace)
+  USER_SERVICE_HOST: "user-service"
+  AUTH_SERVICE_HOST: "auth-service"
+  PAGE_SERVICE_HOST: "page-service"
+
+  # Service ports
+  USER_SERVICE_PORT: "3002"
+  AUTH_SERVICE_PORT: "3003"
+  PAGE_SERVICE_PORT: "3004"
+
+  # Databases hosts
+  USER_DB_HOST: "user-db"
+  AUTH_DB_HOST: "auth-db"
+  PAGE_DB_HOST: "page-db"
+  USER_DB_PORT: "5432"
+  AUTH_DB_PORT: "5432"
+  PAGE_DB_PORT: "5432"
+
+  # MinIO (non sensible)
+  MINIO_ENDPOINT: "minio"
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  MINIO_BUCKET: "goosee-uploads"
+  MINIO_PUBLIC_URL: "http://localhost:30900"
+
+  # SMTP → Mailhog en dev
+  SMTP_HOST: "mailhog"
+  SMTP_PORT: "1025"
+  SMTP_SECURE: "false"
+  SMTP_FROM: "no-reply@goosee.dev"

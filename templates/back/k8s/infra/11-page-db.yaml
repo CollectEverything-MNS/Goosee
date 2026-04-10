@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: page-db
+  namespace: goosee-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: page-db
+  template:
+    metadata:
+      labels:
+        app: page-db
+    spec:
+      containers:
+        - name: page-db
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: goosee-secrets
+                  key: PAGE_DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: goosee-secrets
+                  key: PAGE_DB_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: goosee-secrets
+                  key: PAGE_DB_NAME
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-d", "page_db"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          volumeMounts:
+            - name: page-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: page-db-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: page-db
+  namespace: goosee-dev
+spec:
+  selector:
+    app: page-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
