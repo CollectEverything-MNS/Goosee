@@ -10,20 +10,26 @@ export class CreateUserEventsListener {
   constructor(private readonly userRepo: IUserRepository) {}
 
   @EventPattern('auth.registered')
-  async handleUserRegistered(@Payload() data: { authId: string; email: string }) {
+  async handleUserRegistered(@Payload() data: { authId: string; email: string; firstName?: string; lastName?: string }) {
     this.logger.log(`Événement auth.registered reçu pour : ${data.email}`);
 
     const existing = await this.userRepo.findByEmail(data.email);
     if (existing) {
-      this.logger.warn(`Utilisateur déjà existant pour : ${data.email}`);
+      if (!existing.authId) {
+        existing.authId = data.authId;
+        await this.userRepo.save(existing);
+        this.logger.log(`authId mis à jour pour : ${data.email}`);
+      } else {
+        this.logger.warn(`Utilisateur déjà existant pour : ${data.email}`);
+      }
       return;
     }
 
     const user = new User();
     user.authId = data.authId;
     user.email = data.email;
-    user.firstName = '';
-    user.lastName = '';
+    user.firstName = data.firstName || '';
+    user.lastName = data.lastName || '';
     user.role = [DEFAULT_CUSTOMER_ROLE];
 
     await this.userRepo.save(user);

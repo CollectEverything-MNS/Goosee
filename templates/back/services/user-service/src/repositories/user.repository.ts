@@ -7,5 +7,6 @@ export abstract class IUserRepository {
   abstract list(): Promise<User[]>;
   abstract listCustomers(): Promise<User[]>;
   abstract listAdmins(): Promise<User[]>;
+  abstract findByAuthId(authId: string): Promise<User | null>;
   abstract deleteById(id: string): Promise<void>;
 }

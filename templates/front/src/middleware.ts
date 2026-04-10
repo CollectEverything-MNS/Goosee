@@ -28,19 +28,22 @@ export default async function middleware(req: NextRequest) {
     routes.gooseeAdmin.products.getHref(locale),
     routes.gooseeAdmin.orders.getHref(locale),
     routes.gooseeAdmin.categories.getHref(locale),
+    routes.gooseeAdmin.menu.getHref(locale),
+    routes.gooseeAdmin.settings.getHref(locale),
+    routes.gooseeAdmin.logs.getHref(locale),
   ]
 
-  // const isProtected = protectedRoutes.some((route) => pathname.startsWith(route))
+  const isProtected = protectedRoutes.some((route) => pathname.startsWith(route))
 
-  // if (isProtected) {
-  //   const token = req.cookies.get('token')?.value
-  //
-  //   if (!token) {
-  //     const url = req.nextUrl.clone()
-  //     url.pathname = routes.gooseeAdmin.login.getHref(locale)
-  //     return NextResponse.redirect(url)
-  //   }
-  // }
+  if (isProtected) {
+    const token = req.cookies.get('access_token')?.value
+
+    if (!token) {
+      const url = req.nextUrl.clone()
+      url.pathname = routes.gooseeAdmin.login.getHref(locale)
+      return NextResponse.redirect(url)
+    }
+  }
 
   return res
 }

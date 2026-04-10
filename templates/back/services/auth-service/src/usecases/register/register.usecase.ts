@@ -64,6 +64,8 @@ export class RegisterUseCase {
       this.rmqAuth.emit('auth.registered', {
         authId: savedAuth.id,
         email: savedAuth.email,
+        firstName: dto.firstName || '',
+        lastName: dto.lastName || '',
       })
     );
 
