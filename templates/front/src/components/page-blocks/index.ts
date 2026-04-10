@@ -11,3 +11,7 @@ export * from './quote-block';
 export * from './list-block';
 export * from './video-block';
 export * from './grid-block';
+export * from './featured-products-block';
+export * from './testimonials-block';
+export * from './banner-block';
+export * from './features-block';

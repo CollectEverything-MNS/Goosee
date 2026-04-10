@@ -204,7 +204,7 @@ export function PageEditor({ page }: PageEditorProps) {
               asChild
             >
               <a
-                href={`/${locale}/p/${slug}`}
+                href={`/${locale}/${slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

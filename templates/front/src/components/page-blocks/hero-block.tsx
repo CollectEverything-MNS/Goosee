@@ -43,6 +43,14 @@ export function HeroBlock({
 
   // Déterminer le style de fond
   const getBackgroundStyle = () => {
+    if (hasBackgroundImage) {
+      return {
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      };
+    }
     if (backgroundType === 'color' && backgroundColor) {
       return {
         backgroundColor,
@@ -56,7 +64,7 @@ export function HeroBlock({
   return (
     <section
       className={cn(
-        'relative flex w-full flex-col justify-center px-6 py-12',
+        'relative flex w-full flex-col justify-center px-6 py-12 md:px-12 lg:px-20',
         HEIGHT_CLASSES[height],
         ALIGNMENT_CLASSES[alignment],
         !hasCustomBackground && 'bg-gradient-to-br from-primary/10 via-primary/5 to-background',

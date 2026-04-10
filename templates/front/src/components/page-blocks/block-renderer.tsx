@@ -15,6 +15,10 @@ import { ListBlock } from './list-block';
 import { VideoBlock } from './video-block';
 import { GridBlock } from './grid-block';
 import { HeaderBlock } from './header-block';
+import { FeaturedProductsBlock } from './featured-products-block';
+import { TestimonialsBlock } from './testimonials-block';
+import { BannerBlock } from './banner-block';
+import { FeaturesBlock } from './features-block';
 
 const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   hero: HeroBlock,
@@ -29,6 +33,10 @@ const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   video: VideoBlock,
   grid: GridBlock,
   header: HeaderBlock,
+  'featured-products': FeaturedProductsBlock,
+  testimonials: TestimonialsBlock,
+  banner: BannerBlock,
+  features: FeaturesBlock,
 };
 
 interface BlockRendererProps {

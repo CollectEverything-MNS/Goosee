@@ -46,6 +46,6 @@ export class TypeOrmPageRepository extends IPageRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.pageRepository.softDelete(id);
+    await this.pageRepository.delete(id);
   }
 }

@@ -1,99 +1,132 @@
-
 export interface BlockContext {
-  mode: 'preview' | 'front';
-  isSelected?: boolean;
-  onSelect?: () => void;
-  onSelectComponent?: (id: string) => void;
-  selectedComponentId?: string | null;
+  mode: 'preview' | 'front'
+  isSelected?: boolean
+  onSelect?: () => void
+  onSelectComponent?: (id: string) => void
+  selectedComponentId?: string | null
 }
 
 export interface HeroBlockProps {
-  title: string;
-  subtitle?: string;
-  buttonText?: string;
-  buttonLink?: string;
-  backgroundImage?: string;
-  alignment: 'left' | 'center' | 'right';
-  overlay?: boolean;
-  height?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  title: string
+  subtitle?: string
+  buttonText?: string
+  buttonLink?: string
+  backgroundImage?: string
+  alignment: 'left' | 'center' | 'right'
+  overlay?: boolean
+  height?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
 }
 
 export interface HeadingBlockProps {
-  content: string;
-  level: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  alignment: 'left' | 'center' | 'right';
+  content: string
+  level: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  alignment: 'left' | 'center' | 'right'
 }
 
 export interface TextBlockProps {
-  content: string;
-  alignment: 'left' | 'center' | 'right';
+  content: string
+  alignment: 'left' | 'center' | 'right'
 }
 
 export interface ImageBlockProps {
-  src: string;
-  alt: string;
-  caption?: string;
-  width?: 'sm' | 'md' | 'lg' | 'full';
-  alignment: 'left' | 'center' | 'right';
-  rounded?: boolean;
+  src: string
+  alt: string
+  caption?: string
+  width?: 'sm' | 'md' | 'lg' | 'full'
+  alignment: 'left' | 'center' | 'right'
+  rounded?: boolean
 }
 
 export interface SpacerBlockProps {
-  height: 'sm' | 'md' | 'lg' | 'xl';
+  height: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 export interface ButtonBlockProps {
-  text: string;
-  link: string;
-  variant: 'primary' | 'secondary' | 'outline';
-  size: 'sm' | 'md' | 'lg';
-  alignment: 'left' | 'center' | 'right';
+  text: string
+  link: string
+  variant: 'primary' | 'secondary' | 'outline'
+  size: 'sm' | 'md' | 'lg'
+  alignment: 'left' | 'center' | 'right'
 }
 
 export interface DividerBlockProps {
-  style: 'solid' | 'dashed' | 'dotted';
-  color?: string;
-  width: 'sm' | 'md' | 'lg' | 'full';
+  style: 'solid' | 'dashed' | 'dotted'
+  color?: string
+  width: 'sm' | 'md' | 'lg' | 'full'
 }
 
 export interface QuoteBlockProps {
-  content: string;
-  author?: string;
-  alignment: 'left' | 'center' | 'right';
-  color?: string;
+  content: string
+  author?: string
+  alignment: 'left' | 'center' | 'right'
+  color?: string
 }
 
 export interface ListBlockProps {
-  items: string;
-  style: 'bullet' | 'number' | 'check';
-  alignment: 'left' | 'center' | 'right';
-  color?: string;
+  items: string
+  style: 'bullet' | 'number' | 'check'
+  alignment: 'left' | 'center' | 'right'
+  color?: string
 }
 
 export interface VideoBlockProps {
-  url: string;
-  title: string;
-  aspectRatio: '16:9' | '4:3' | '1:1';
-  alignment: 'left' | 'center' | 'right';
+  url: string
+  title: string
+  aspectRatio: '16:9' | '4:3' | '1:1'
+  alignment: 'left' | 'center' | 'right'
 }
 
 export interface GridBlockProps {
-  columns: 1 | 2 | 3 | 4;
-  gap: 'sm' | 'md' | 'lg' | 'xl';
-  backgroundColor?: string;
-  padding: 'none' | 'sm' | 'md' | 'lg';
+  columns: 1 | 2 | 3 | 4
+  gap: 'sm' | 'md' | 'lg' | 'xl'
+  backgroundColor?: string
+  padding: 'none' | 'sm' | 'md' | 'lg'
 }
 
 export interface HeaderBlockProps {
-  logoPosition: 'left' | 'center';
-  showMenu: boolean;
-  menuAlignment: 'left' | 'center' | 'right';
-  backgroundColor?: string;
-  textColor?: string;
-  sticky: boolean;
-  height: 'sm' | 'md' | 'lg';
+  logoPosition: 'left' | 'center' | 'right'
+  showMenu: boolean
+  menuAlignment: 'left' | 'center' | 'right'
+  backgroundColor?: string
+  textColor?: string
+  sticky: boolean
+  height: 'sm' | 'md' | 'lg'
+}
+
+export interface FeaturedProductsBlockProps {
+  title: string
+  subtitle?: string
+  columns: 2 | 3 | 4
+  products: string
+  backgroundColor?: string
+  textColor?: string
+}
+
+export interface TestimonialsBlockProps {
+  title: string
+  testimonials: string
+  backgroundColor?: string
+  textColor?: string
+}
+
+export interface BannerBlockProps {
+  title: string
+  subtitle?: string
+  buttonText?: string
+  buttonLink?: string
+  backgroundColor?: string
+  textColor?: string
+  alignment: 'left' | 'center' | 'right'
+}
+
+export interface FeaturesBlockProps {
+  title?: string
+  features: string
+  columns: 2 | 3 | 4
+  backgroundColor?: string
+  textColor?: string
 }
 
 export type BlockPropsWithContext<T> = T & {
-  context?: BlockContext;
-};
+  context?: BlockContext
+}

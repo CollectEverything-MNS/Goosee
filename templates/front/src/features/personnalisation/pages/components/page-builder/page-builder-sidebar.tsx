@@ -18,6 +18,10 @@ import {
   MoveVertical,
   Play,
   ShoppingBag,
+  Navigation,
+  Package,
+  ShieldCheck,
+  ShoppingCart,
   Sparkles,
   Type,
 } from 'lucide-react';
@@ -41,14 +45,20 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   minus: Minus,
   list: List,
   play: Play,
+  navigation: Navigation,
+  package: Package,
+  'message-square': MessageSquareQuote,
+  'shield-check': ShieldCheck,
+  'shopping-cart': ShoppingCart,
 };
 
 const CATEGORY_ICONS: Record<ComponentCategory, React.ComponentType<{ className?: string }>> = {
   basic: Type,
   layout: Layout,
+  ecommerce: ShoppingCart,
 };
 
-const CATEGORY_ORDER: ComponentCategory[] = ['layout', 'basic'];
+const CATEGORY_ORDER: ComponentCategory[] = ['layout', 'basic', 'ecommerce'];
 
 export function PageBuilderSidebar() {
   const t = useTranslations('admin.pageBuilder');
@@ -71,7 +81,7 @@ export function PageBuilderSidebar() {
       </div>
 
       <ScrollArea className="flex-1">
-        <Accordion type="multiple" defaultValue={['layout', 'basic']} className="px-2">
+        <Accordion type="multiple" defaultValue={['layout', 'basic', 'ecommerce']} className="px-2">
           {CATEGORY_ORDER.map((categoryKey) => {
             const components = componentsByCategory[categoryKey];
             if (!components || components.length === 0) return null;

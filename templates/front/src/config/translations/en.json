@@ -446,7 +446,8 @@
       },
       "categories": {
         "basic": "Basic",
-        "layout": "Layout"
+        "layout": "Layout",
+        "ecommerce": "E-commerce"
       },
       "components": {
         "hero": "Hero",
@@ -460,7 +461,11 @@
         "spacer": "Spacer",
         "video": "Video",
         "grid": "Grid",
-        "header": "Header"
+        "header": "Header",
+        "featured-products": "Featured Products",
+        "testimonials": "Testimonials",
+        "banner": "Promo Banner",
+        "features": "Features"
       },
       "defaults": {
         "title": "Your title",
@@ -562,23 +567,6 @@
         "ERROR": "Error",
         "CRITICAL": "Critical",
         "DEBUG": "Debug"
-      }
-    },
-    "dashboard": {
-      "stats": {
-        "admins": "Administrators",
-        "customers": "Customers",
-        "roles": "Roles",
-        "logs": "Log entries"
-      },
-      "recentLogs": "Recent activity",
-      "noLogs": "No logs yet",
-      "quickLinks": {
-        "title": "Quick links",
-        "users": "Users",
-        "roles": "Roles",
-        "logs": "Logs",
-        "pages": "Pages"
       }
     }
   }

@@ -40,7 +40,7 @@ export function usePagesColumns(): ColumnDef<Page>[] {
         const page = row.original;
         return (
           <Link
-            href={`/${locale}/p/${page.slug}`}
+            href={`/${locale}/${page.slug}`}
             className="font-medium hover:underline hover:text-primary transition-colors"
           >
             {page.title}

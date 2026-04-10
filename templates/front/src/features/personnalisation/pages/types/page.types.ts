@@ -1,5 +1,6 @@
 import { CATEGORY_BASIC_COMPONENTS } from '@/features/personnalisation/pages/types/categories/page-basic.types';
 import { CATEGORY_LAYOUT_COMPONENTS } from '@/features/personnalisation/pages/types/categories/page-layout.types';
+import { CATEGORY_ECOMMERCE_COMPONENTS } from '@/features/personnalisation/pages/types/categories/page-ecommerce.types';
 
 export enum PageStatus {
   DRAFT = 'draft',
@@ -46,9 +47,13 @@ export type ComponentType =
   | 'list'
   | 'video'
   | 'grid'
-  | 'header';
+  | 'header'
+  | 'featured-products'
+  | 'testimonials'
+  | 'banner'
+  | 'features';
 
-export type ComponentCategory = 'basic' | 'layout';
+export type ComponentCategory = 'basic' | 'layout' | 'ecommerce';
 
 export interface ComponentDefinition {
   type: ComponentType;
@@ -61,9 +66,11 @@ export interface ComponentDefinition {
 export const COMPONENT_CATEGORIES: Record<ComponentCategory, { label: string; icon: string }> = {
   basic: { label: 'Basique', icon: 'type' },
   layout: { label: 'Mise en page', icon: 'layout' },
+  ecommerce: { label: 'E-commerce', icon: 'shopping-cart' },
 };
 
 export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
   ...CATEGORY_BASIC_COMPONENTS,
-  ...CATEGORY_LAYOUT_COMPONENTS
+  ...CATEGORY_LAYOUT_COMPONENTS,
+  ...CATEGORY_ECOMMERCE_COMPONENTS,
 ];

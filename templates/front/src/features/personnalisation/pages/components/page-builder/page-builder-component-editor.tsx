@@ -20,9 +20,47 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { FileUpload } from '@/components/ui/file-upload'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUploadFile } from '@/features/personnalisation/settings/usecases/use-upload-file'
-import { Palette, Settings, Type, X } from 'lucide-react'
+import { Link2, Palette, Settings, Type, Upload, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+
+function ImageField({
+  label,
+  value,
+  onChange,
+  onUpload,
+  uploadPlaceholder,
+}: {
+  label: string
+  value: string
+  onChange: (url: string) => void
+  onUpload: (file: File) => Promise<{ url: string }>
+  uploadPlaceholder: string
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Input
+        type="url"
+        placeholder="https://example.com/image.jpg"
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <FileUpload
+        value={value}
+        onChange={onChange}
+        onUpload={onUpload}
+        accept={{ 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'] }}
+        placeholder={uploadPlaceholder}
+      />
+      {value && (
+        <img src={value} alt="Aperçu" className="rounded-md border max-h-32 w-full object-cover" />
+      )}
+    </div>
+  )
+}
 
 interface PageBuilderComponentEditorProps {
   component: PageComponent
@@ -87,18 +125,14 @@ export function PageBuilderComponentEditor({
 
     if (IMAGE_FIELD_KEYS.includes(key)) {
       return (
-        <div key={key} className="space-y-2">
-          <Label>{formatLabel(key)}</Label>
-          <FileUpload
-            value={value as string}
-            onChange={(url) => handleChange(key, url)}
-            onUpload={(file) => handleUpload(file, 'pages')}
-            accept={{
-              'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'],
-            }}
-            placeholder={tEditor('uploadImage')}
-          />
-        </div>
+        <ImageField
+          key={key}
+          label={formatLabel(key)}
+          value={value as string}
+          onChange={(url) => handleChange(key, url)}
+          onUpload={(file) => handleUpload(file, 'pages')}
+          uploadPlaceholder={tEditor('uploadImage')}
+        />
       )
     }
 
@@ -413,8 +447,18 @@ export function PageBuilderComponentEditor({
   const styleProps: [string, unknown][] = []
   const optionsProps: [string, unknown][] = []
 
-  Object.entries(component.props).forEach(([key, value]) => {
+  const currentBackgroundType = component.props.backgroundType as string | undefined;
+  const propsEntries = Object.entries(component.props);
+
+  if (currentBackgroundType === 'image' && !('backgroundImage' in component.props)) {
+    propsEntries.push(['backgroundImage', '']);
+  }
+
+  propsEntries.forEach(([key, value]) => {
     if (Array.isArray(value) || (typeof value === 'object' && value !== null)) return
+
+    if (key === 'backgroundColor' && currentBackgroundType === 'image') return
+    if (key === 'backgroundImage' && currentBackgroundType !== 'image') return
 
     // Style props: colors, alignment, background
     if (

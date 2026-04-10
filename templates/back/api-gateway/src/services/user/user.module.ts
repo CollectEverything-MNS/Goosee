@@ -8,7 +8,6 @@ import { DeleteUserController } from './usecases/delete-user/delete-user.control
 import { ListCustomersController } from './usecases/list-customers/list-customers.controller';
 import { ListAdminsController } from './usecases/list-admins/list-admins.controller';
 
-
 @Module({
   imports: [SharedSecurityModule],
   controllers: [

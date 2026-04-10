@@ -34,14 +34,14 @@ export function PageBuilderSidebarDraggableItem({
       style={style}
       variant="outline"
       className={cn(
-        'flex h-20 min-w-[70px] flex-1 basis-[calc(50%-4px)] flex-col items-center justify-center gap-2',
+        'flex h-16 min-w-[70px] flex-1 basis-[calc(50%-4px)] flex-col items-center justify-center gap-1 px-1',
         isDragging && 'opacity-50'
       )}
       {...listeners}
       {...attributes}
     >
       <Icon className="h-5 w-5" />
-      <span className="text-xs">{definition.label}</span>
+      <span className="text-[10px] leading-tight text-center truncate w-full">{definition.label}</span>
     </Button>
   );
 }
