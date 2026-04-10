@@ -40,6 +40,8 @@ import { UpdateRoleController } from './usecases/update-role/update-role.control
 import { UpdateRoleUseCase } from './usecases/update-role/update-role.usecase';
 import { DeleteRoleController } from './usecases/delete-role/delete-role.controller';
 import { DeleteRoleUseCase } from './usecases/delete-role/delete-role.usecase';
+import { GetUserByAuthController } from './usecases/get-user-by-auth/get-user-by-auth.controller';
+import { GetUserByAuthUseCase } from './usecases/get-user-by-auth/get-user-by-auth.usecase';
 
 @Module({
   imports: [
@@ -106,6 +108,7 @@ import { DeleteRoleUseCase } from './usecases/delete-role/delete-role.usecase';
     GetRoleController,
     UpdateRoleController,
     DeleteRoleController,
+    GetUserByAuthController,
   ],
 
   providers: [
@@ -132,6 +135,7 @@ import { DeleteRoleUseCase } from './usecases/delete-role/delete-role.usecase';
     GetRoleUseCase,
     UpdateRoleUseCase,
     DeleteRoleUseCase,
+    GetUserByAuthUseCase,
   ],
 })
 export class AppModule {}

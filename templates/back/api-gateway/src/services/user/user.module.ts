@@ -7,10 +7,12 @@ import { UpdateUserController } from './usecases/update-user/update-user.control
 import { DeleteUserController } from './usecases/delete-user/delete-user.controller';
 import { ListCustomersController } from './usecases/list-customers/list-customers.controller';
 import { ListAdminsController } from './usecases/list-admins/list-admins.controller';
+import { GetMeController } from './usecases/get-me/get-me.controller';
 
 @Module({
   imports: [SharedSecurityModule],
   controllers: [
+    GetMeController,
     CreateUserController,
     GetUserController,
     ListUsersController,

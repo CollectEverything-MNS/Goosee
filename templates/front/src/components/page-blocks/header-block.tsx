@@ -6,10 +6,12 @@ import { useSettings } from '@/features/personnalisation/settings/usecases/use-g
 import { useMenus } from '@/features/personnalisation/menu/usecases/use-list-menus';
 import { usePages } from '@/features/personnalisation/pages/usecases/list-pages/use-list-pages';
 import { useMemo } from 'react';
+import { ShoppingCart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { HEIGHT_CLASSES, MENU_ALIGNMENT_CLASSES } from './header/header-utils';
 import { MenuItem } from './header/header-menu-item';
 import { MobileMenu } from './header/header-mobile-menu';
-import { LoginModal } from './header/header-login-modal';
+import { HeaderUserMenu } from './header/header-user-menu';
 import { HeaderLogo } from './header/header-logo';
 
 export function HeaderBlock({
@@ -71,8 +73,13 @@ export function HeaderBlock({
         )}
 
         {!isPreview && (
-          <div className="hidden md:flex shrink-0 items-center ml-4">
-            <LoginModal textColor={textColor} />
+          <div className="flex shrink-0 items-center gap-1 ml-4">
+            <Button variant="ghost" size="icon">
+              <ShoppingCart className="h-5 w-5" style={{ color: textColor }} />
+            </Button>
+            <div className="hidden md:flex">
+              <HeaderUserMenu textColor={textColor} />
+            </div>
           </div>
         )}
 

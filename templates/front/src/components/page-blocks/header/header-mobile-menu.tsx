@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu as MenuType } from '@/features/personnalisation/menu/types/menu.types';
 import { resolveHref } from './header-utils';
-import { LoginModal } from './header-login-modal';
+import { MobileUserMenu } from './header-user-menu';
 
 interface MobileMenuProps {
   menus: MenuType[];
@@ -66,7 +66,7 @@ export function MobileMenu({ menus, textColor, isPreview, slugMap }: MobileMenuP
 
           {!isPreview && (
             <div className="border-t pt-4 mt-4 px-3">
-              <LoginModal />
+              <MobileUserMenu />
             </div>
           )}
         </nav>

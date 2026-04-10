@@ -43,6 +43,10 @@ export class TypeOrmUserRepository implements IUserRepository {
       .getMany();
   }
 
+  async findByAuthId(authId: string): Promise<User | null> {
+    return this.repository.findOne({ where: { authId } });
+  }
+
   async deleteById(id: string): Promise<void> {
     await this.repository.delete({ id });
   }

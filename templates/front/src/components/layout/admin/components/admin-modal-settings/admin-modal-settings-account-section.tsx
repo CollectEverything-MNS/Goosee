@@ -11,11 +11,17 @@ import {
 import {
   AdminModalSettingsAccountChangeEmailModal,
 } from '@/components/layout/admin/components/admin-modal-settings/admin-modal-settings-account-email-modal';
+import { useAuth } from '@/providers/auth-provider';
 
 export function AdminModalSettingsAccountSection() {
   const t = useTranslations('admin.settings.account');
+  const { user } = useAuth();
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isEmailOpen, setIsEmailOpen] = useState(false);
+
+  const initials = user
+    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || user.email[0].toUpperCase()
+    : '?';
 
   return (
     <div className="space-y-8">
@@ -25,7 +31,9 @@ export function AdminModalSettingsAccountSection() {
         <h3 className="text-sm font-medium">{t('profile')}</h3>
 
         <div className="flex items-center gap-4">
-          <div className="h-16 w-16 rounded-full bg-muted" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted text-lg font-semibold">
+            {initials}
+          </div>
           <button className="text-sm text-primary hover:underline">
             {t('createPortrait')}
           </button>
@@ -33,7 +41,7 @@ export function AdminModalSettingsAccountSection() {
 
         <div className="max-w-sm">
           <Label>{t('name')}</Label>
-          <Input className="mt-1" defaultValue="Romain" />
+          <Input className="mt-1" defaultValue={user ? `${user.firstName} ${user.lastName}`.trim() : ''} readOnly />
         </div>
       </section>
 
@@ -42,10 +50,9 @@ export function AdminModalSettingsAccountSection() {
 
         <AdminModalSettingsRaw
           title={t('email')}
-          description="romain@lesentrecodeurs.com"
+          description={user?.email ?? ''}
           action={t('change')}
           onClick={() => setIsEmailOpen(true)}
-
         />
 
         <AdminModalSettingsRaw

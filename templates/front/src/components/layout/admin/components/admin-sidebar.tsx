@@ -25,11 +25,13 @@ import { getAdminMenu } from '@/config/menu-admin.config'
 import { useLocale, useTranslations } from 'next-intl'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useSettings } from '@/features/personnalisation/settings/usecases/use-get-settings'
+import { useAuth } from '@/providers/auth-provider'
 
 type TItem = {
   name: string
   path?: string
   icon?: LucideIcon
+  pageKey?: string
 }
 
 export function AdminSidebar() {
@@ -38,9 +40,25 @@ export function AdminSidebar() {
   const pathname = usePathname()
   const menu = getAdminMenu()
   const { data: settings, isLoading, dataUpdatedAt } = useSettings()
+  const { canAccess, logout } = useAuth()
   const logoSrc = settings?.logoUrl
     ? `${settings.logoUrl}${settings.logoUrl.includes('?') ? '&' : '?'}v=${dataUpdatedAt}`
     : undefined
+
+  const filteredMenu = menu
+    .map((group) => {
+      if (group.items) {
+        const filteredItems = group.items.filter(
+          (item: TItem) => !item.pageKey || canAccess(item.pageKey)
+        )
+        if (filteredItems.length === 0) return null
+        return { ...group, items: filteredItems }
+      }
+      if (group.pageKey && !canAccess(group.pageKey)) return null
+      return group
+    })
+    .filter(Boolean)
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -77,7 +95,7 @@ export function AdminSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {menu.map((group) => {
+            {filteredMenu.map((group: any) => {
               const hasChildren = Array.isArray(group.items) && group.items.length > 0
               const isGroupActive =
                 hasChildren &&
@@ -144,12 +162,12 @@ export function AdminSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="bg-sidebar-accent p-2">
-        <Link
-          href={routes.gooseeAdmin.login.getHref(locale)}
+        <button
+          onClick={() => logout()}
           className="flex w-full items-center justify-center gap-2 rounded-md p-4 text-sm font-medium hover:bg-sidebar-accent"
         >
           <LogOut size={20} /> {t('admin.sidebar.logout')}
-        </Link>
+        </button>
       </SidebarFooter>
 
       <SidebarRail />
