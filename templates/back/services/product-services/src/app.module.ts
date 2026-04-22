@@ -3,13 +3,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
+import { LogClient } from './shared/log-client.service';
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
 import { Tag } from './entities/tag.entity';
 import { ProductTag } from './entities/product-tag.entity';
 import { ProductAttribute } from './entities/product-attribute.entity';
-import { LogClient } from './shared/log-client.service';
+
+const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute];
 
 @Module({
   imports: [
@@ -25,19 +27,12 @@ import { LogClient } from './shared/log-client.service';
         username: cfg.get<string>('PRODUCT_DB_USER'),
         password: cfg.get<string>('PRODUCT_DB_PASSWORD'),
         database: cfg.get<string>('PRODUCT_DB_NAME'),
-        entities: [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute],
+        entities: ENTITIES,
         synchronize: cfg.get<string>('NODE_ENV') === 'development',
       }),
     }),
 
-    TypeOrmModule.forFeature([
-      Category,
-      Product,
-      ProductImage,
-      Tag,
-      ProductTag,
-      ProductAttribute,
-    ]),
+    TypeOrmModule.forFeature(ENTITIES),
 
     ClientsModule.registerAsync([
       {
