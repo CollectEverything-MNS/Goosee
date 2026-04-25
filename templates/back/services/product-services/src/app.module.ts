@@ -10,6 +10,18 @@ import { ProductImage } from './entities/product-image.entity';
 import { Tag } from './entities/tag.entity';
 import { ProductTag } from './entities/product-tag.entity';
 import { ProductAttribute } from './entities/product-attribute.entity';
+import { ICategoryRepository } from './repositories/category.repository';
+import { TypeOrmCategoryRepository } from './repositories/implements/category.impl.repository';
+import { TypeOrmProductAttributeRepository } from './repositories/implements/product-attribute.impl.repository';
+import { TypeOrmProductImageRepository } from './repositories/implements/product-image.impl.repository';
+import { TypeOrmProductTagRepository } from './repositories/implements/product-tag.impl.repository';
+import { TypeOrmProductRepository } from './repositories/implements/product.impl.repository';
+import { TypeOrmTagRepository } from './repositories/implements/tag.impl.repository';
+import { IProductAttributeRepository } from './repositories/product-attribute.repository';
+import { IProductImageRepository } from './repositories/product-image.repository';
+import { IProductTagRepository } from './repositories/product-tag.repository';
+import { IProductRepository } from './repositories/product.repository';
+import { ITagRepository } from './repositories/tag.repository';
 
 const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute];
 
@@ -50,6 +62,14 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     ]),
   ],
   controllers: [],
-  providers: [LogClient],
+    providers: [
+    { provide: ICategoryRepository, useClass: TypeOrmCategoryRepository },
+    { provide: IProductRepository, useClass: TypeOrmProductRepository },
+    { provide: IProductImageRepository, useClass: TypeOrmProductImageRepository },
+    { provide: ITagRepository, useClass: TypeOrmTagRepository },
+    { provide: IProductTagRepository, useClass: TypeOrmProductTagRepository },
+    { provide: IProductAttributeRepository, useClass: TypeOrmProductAttributeRepository },
+    LogClient,
+    ],
 })
 export class AppModule {}
