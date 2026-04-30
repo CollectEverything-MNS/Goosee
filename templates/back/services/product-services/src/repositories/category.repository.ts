@@ -1,4 +1,4 @@
-import { Category } from "src/entities/category.entity";
+import { Category } from 'src/entities/category.entity';
 
 export abstract class ICategoryRepository {
   abstract save(category: Category): Promise<Category>;

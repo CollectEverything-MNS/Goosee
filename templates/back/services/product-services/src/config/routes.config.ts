@@ -1,21 +1,54 @@
-export const ROUTES = {
-  CATEGORIES: '/categories',
-  CATEGORY_BY_ID: '/categories/:id',
+export const categoriesRoutes = {
+  root: '/categories',
+  category: {
+    create: '/',
+    getOne: '/:id',
+    update: '/:id',
+    delete: '/:id',
+    products: '/:id/products',
+  },
+};
 
-  PRODUCTS: '/products',
-  PRODUCT_BY_ID: '/products/:id',
-  PRODUCT_STOCK: '/products/:id/stock',
-  PRODUCTS_BY_CATEGORY: '/categories/:id/products',
+export const productsRoutes = {
+  root: '/products',
+  product: {
+    create: '/',
+    getOne: '/:id',
+    update: '/:id',
+    delete: '/:id',
+    updateStock: '/:id/stock',
+  },
+};
 
-  PRODUCT_IMAGES: '/products/:id/images',
-  PRODUCT_IMAGE_BY_ID: '/products/:id/images/:imageId',
-  PRODUCT_IMAGE_MAIN: '/products/:id/images/:imageId/main',
+export const tagsRoutes = {
+  root: '/tags',
+  tag: {
+    create: '/',
+    delete: '/:id',
+  },
+};
 
-  TAGS: '/tags',
-  TAG_BY_ID: '/tags/:id',
-  PRODUCT_TAGS: '/products/:id/tags',
-  PRODUCT_TAG_BY_ID: '/products/:id/tags/:tagId',
+export const productImagesRoutes = {
+  root: '/products',
+  image: {
+    add: '/:id/images',
+    delete: '/:id/images/:imageId',
+    setMain: '/:id/images/:imageId/main',
+  },
+};
 
-  PRODUCT_ATTRIBUTES: '/products/:id/attributes',
-  PRODUCT_ATTRIBUTE_BY_ID: '/products/:id/attributes/:attributeId',
+export const productTagsRoutes = {
+  root: '/products',
+  productTag: {
+    add: '/:id/tags',
+    remove: '/:id/tags/:tagId',
+  },
+};
+
+export const productAttributesRoutes = {
+  root: '/products',
+  attribute: {
+    add: '/:id/attributes',
+    remove: '/:id/attributes/:attributeId',
+  },
 };

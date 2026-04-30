@@ -22,6 +22,16 @@ import { IProductImageRepository } from './repositories/product-image.repository
 import { IProductTagRepository } from './repositories/product-tag.repository';
 import { IProductRepository } from './repositories/product.repository';
 import { ITagRepository } from './repositories/tag.repository';
+import { CreateCategoryController } from './usecases/create-category/create-category.controller';
+import { CreateCategoryUseCase } from './usecases/create-category/create-category.usecase';
+import { DeleteCategoryController } from './usecases/delete-category/delete-category.controller';
+import { DeleteCategoryUseCase } from './usecases/delete-category/delete-category.usecase';
+import { GetCategoryController } from './usecases/get-category/get-category.controller';
+import { GetCategoryUseCase } from './usecases/get-category/get-category.usecase';
+import { ListCategoriesController } from './usecases/list-categories/list-categories.controller';
+import { ListCategoriesUseCase } from './usecases/list-categories/list-categories.usecase';
+import { UpdateCategoryController } from './usecases/update-category/update-category.controller';
+import { UpdateCategoryUseCase } from './usecases/update-category/update-category.usecase';
 
 const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute];
 
@@ -61,15 +71,26 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
       },
     ]),
   ],
-  controllers: [],
-    providers: [
+  controllers: [
+    CreateCategoryController,
+    UpdateCategoryController,
+    DeleteCategoryController,
+    GetCategoryController,
+    ListCategoriesController,
+  ],
+  providers: [
     { provide: ICategoryRepository, useClass: TypeOrmCategoryRepository },
     { provide: IProductRepository, useClass: TypeOrmProductRepository },
     { provide: IProductImageRepository, useClass: TypeOrmProductImageRepository },
     { provide: ITagRepository, useClass: TypeOrmTagRepository },
     { provide: IProductTagRepository, useClass: TypeOrmProductTagRepository },
     { provide: IProductAttributeRepository, useClass: TypeOrmProductAttributeRepository },
+    CreateCategoryUseCase,
+    UpdateCategoryUseCase,
+    DeleteCategoryUseCase,
+    GetCategoryUseCase,
+    ListCategoriesUseCase,
     LogClient,
-    ],
+  ],
 })
 export class AppModule {}

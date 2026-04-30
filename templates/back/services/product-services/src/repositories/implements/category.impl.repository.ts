@@ -34,7 +34,7 @@ export class TypeOrmCategoryRepository implements ICategoryRepository {
   }
 
   async hasProducts(categoryId: string): Promise<boolean> {
-    return false; 
+    return false;
   }
 
   async softDelete(id: string): Promise<void> {

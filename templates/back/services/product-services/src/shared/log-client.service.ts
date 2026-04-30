@@ -23,12 +23,24 @@ export class LogClient {
 
   constructor(@Inject('LOG_CLIENT') private readonly client: ClientProxy) {}
 
-  info(payload: EmitLogPayload) { this.emit(LogLevel.INFO, payload); }
-  success(payload: EmitLogPayload) { this.emit(LogLevel.SUCCESS, payload); }
-  warning(payload: EmitLogPayload) { this.emit(LogLevel.WARNING, payload); }
-  error(payload: EmitLogPayload) { this.emit(LogLevel.ERROR, payload); }
-  critical(payload: EmitLogPayload) { this.emit(LogLevel.CRITICAL, payload); }
-  debug(payload: EmitLogPayload) { this.emit(LogLevel.DEBUG, payload); }
+  info(payload: EmitLogPayload) {
+    this.emit(LogLevel.INFO, payload);
+  }
+  success(payload: EmitLogPayload) {
+    this.emit(LogLevel.SUCCESS, payload);
+  }
+  warning(payload: EmitLogPayload) {
+    this.emit(LogLevel.WARNING, payload);
+  }
+  error(payload: EmitLogPayload) {
+    this.emit(LogLevel.ERROR, payload);
+  }
+  critical(payload: EmitLogPayload) {
+    this.emit(LogLevel.CRITICAL, payload);
+  }
+  debug(payload: EmitLogPayload) {
+    this.emit(LogLevel.DEBUG, payload);
+  }
 
   private emit(level: LogLevel, payload: EmitLogPayload) {
     try {
@@ -39,9 +51,7 @@ export class LogClient {
         userId: payload.userId,
       });
     } catch (err) {
-      this.logger.error(
-        `Échec de l'émission du log : ${(err as Error).message}`
-      );
+      this.logger.error(`Échec de l'émission du log : ${(err as Error).message}`);
     }
   }
 }
