@@ -5,5 +5,6 @@ export abstract class ITagRepository {
   abstract findById(id: string): Promise<Tag | null>;
   abstract findBySlug(slug: string): Promise<Tag | null>;
   abstract list(): Promise<Tag[]>;
+  abstract findByProductId(productId: string): Promise<Tag[]>;
   abstract deleteById(id: string): Promise<void>;
 }

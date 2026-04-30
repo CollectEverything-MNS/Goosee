@@ -28,6 +28,15 @@ export class TypeOrmTagRepository implements ITagRepository {
     return this.repository.find({ order: { name: 'ASC' } });
   }
 
+  async findByProductId(productId: string): Promise<Tag[]> {
+    return this.repository
+      .createQueryBuilder('tag')
+      .innerJoin('product_tag', 'pt', 'pt.tagId = tag.id')
+      .where('pt.productId = :productId', { productId })
+      .orderBy('tag.name', 'ASC')
+      .getMany();
+  }
+
   async deleteById(id: string): Promise<void> {
     await this.repository.delete({ id });
   }

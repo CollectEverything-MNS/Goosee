@@ -32,6 +32,20 @@ import { ListCategoriesController } from './usecases/list-categories/list-catego
 import { ListCategoriesUseCase } from './usecases/list-categories/list-categories.usecase';
 import { UpdateCategoryController } from './usecases/update-category/update-category.controller';
 import { UpdateCategoryUseCase } from './usecases/update-category/update-category.usecase';
+import { CreateProductController } from './usecases/create-product/create-product.controller';
+import { CreateProductUseCase } from './usecases/create-product/create-product.usecase';
+import { DeleteProductController } from './usecases/delete-product/delete-product.controller';
+import { DeleteProductUseCase } from './usecases/delete-product/delete-product.usecase';
+import { GetProductController } from './usecases/get-product/get-product.controller';
+import { GetProductUseCase } from './usecases/get-product/get-product.usecase';
+import { ListProductsByCategoryController } from './usecases/list-products-by-category/list-products-by-category.controller';
+import { ListProductsByCategoryUseCase } from './usecases/list-products-by-category/list-products-by-category.usecase';
+import { ListProductsController } from './usecases/list-products/list-products.controller';
+import { ListProductsUseCase } from './usecases/list-products/list-products.usecase';
+import { UpdateProductStockController } from './usecases/update-product-stock/update-product-stock.controller';
+import { UpdateProductStockUseCase } from './usecases/update-product-stock/update-product-stock.usecase';
+import { UpdateProductController } from './usecases/update-product/update-product.controller';
+import { UpdateProductUseCase } from './usecases/update-product/update-product.usecase';
 
 const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute];
 
@@ -77,6 +91,13 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     DeleteCategoryController,
     GetCategoryController,
     ListCategoriesController,
+    CreateProductController,
+    UpdateProductController,
+    DeleteProductController,
+    GetProductController,
+    ListProductsController,
+    ListProductsByCategoryController,
+    UpdateProductStockController,
   ],
   providers: [
     { provide: ICategoryRepository, useClass: TypeOrmCategoryRepository },
@@ -91,6 +112,13 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     GetCategoryUseCase,
     ListCategoriesUseCase,
     LogClient,
+    CreateProductUseCase,
+    UpdateProductUseCase,
+    DeleteProductUseCase,
+    GetProductUseCase,
+    ListProductsUseCase,
+    ListProductsByCategoryUseCase,
+    UpdateProductStockUseCase,
   ],
 })
 export class AppModule {}
