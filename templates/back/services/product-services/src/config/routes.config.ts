@@ -31,6 +31,7 @@ export const tagsRoutes = {
 export const productImagesRoutes = {
   root: '/products',
   image: {
+    list: '/:id/images',
     add: '/:id/images',
     delete: '/:id/images/:imageId',
     setMain: '/:id/images/:imageId/main',
