@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MulterModule } from '@nestjs/platform-express';
 
 import { LogClient } from './shared/log-client.service';
 import { Category } from './entities/category.entity';
@@ -46,6 +47,15 @@ import { UpdateProductStockController } from './usecases/update-product-stock/up
 import { UpdateProductStockUseCase } from './usecases/update-product-stock/update-product-stock.usecase';
 import { UpdateProductController } from './usecases/update-product/update-product.controller';
 import { UpdateProductUseCase } from './usecases/update-product/update-product.usecase';
+import { StorageService } from './services/storage.service';
+import { AddProductImageController } from './usecases/add-product-image/add-product-image.controller';
+import { AddProductImageUseCase } from './usecases/add-product-image/add-product-image.usecase';
+import { DeleteProductImageController } from './usecases/delete-product-image/delete-product-image.controller';
+import { DeleteProductImageUseCase } from './usecases/delete-product-image/delete-product-image.usecase';
+import { GetProductImagesController } from './usecases/get-product-images/get-product-images.controller';
+import { GetProductImagesUseCase } from './usecases/get-product-images/get-product-images.usecase';
+import { SetMainProductImageController } from './usecases/set-main-product-image/set-main-product-image.controller';
+import { SetMainProductImageUseCase } from './usecases/set-main-product-image/set-main-product-image.usecase';
 
 const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute];
 
@@ -84,6 +94,7 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
         }),
       },
     ]),
+    MulterModule.register({ storage: undefined }),
   ],
   controllers: [
     CreateCategoryController,
@@ -98,6 +109,10 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     ListProductsController,
     ListProductsByCategoryController,
     UpdateProductStockController,
+    GetProductImagesController,
+    AddProductImageController,
+    DeleteProductImageController,
+    SetMainProductImageController,
   ],
   providers: [
     { provide: ICategoryRepository, useClass: TypeOrmCategoryRepository },
@@ -119,6 +134,11 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     ListProductsUseCase,
     ListProductsByCategoryUseCase,
     UpdateProductStockUseCase,
+    StorageService,
+    GetProductImagesUseCase,
+    AddProductImageUseCase,
+    DeleteProductImageUseCase,
+    SetMainProductImageUseCase,
   ],
 })
 export class AppModule {}

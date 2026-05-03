@@ -7,7 +7,7 @@ import { productImagesRoutes } from '../../config/routes.config';
 export class GetProductImagesController {
   constructor(private readonly getProductImagesUseCase: GetProductImagesUseCase) {}
 
-  @Get(productImagesRoutes.image.add)
+@Get(productImagesRoutes.image.list)
   @ApiOperation({ summary: "Liste des images d'un produit" })
   async getImages(@Param('id') productId: string) {
     return this.getProductImagesUseCase.execute(productId);
