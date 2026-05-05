@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 
 import { ICategoryRepository } from '../../repositories/category.repository';
 import { IProductRepository } from '../../repositories/product.repository';
-import { LogClient } from '../../shared/log-client.service';
+import { LogClient } from '../../services/log-client.service';
 
 @Injectable()
 export class DeleteCategoryUseCase {

@@ -20,14 +20,6 @@ export const productsRoutes = {
   },
 };
 
-export const tagsRoutes = {
-  root: '/tags',
-  tag: {
-    create: '/',
-    delete: '/:id',
-  },
-};
-
 export const productImagesRoutes = {
   root: '/products',
   image: {
@@ -38,18 +30,30 @@ export const productImagesRoutes = {
   },
 };
 
+export const tagsRoutes = {
+  root: '/tags',
+  tag: {
+    create: '/',
+    getOne: '/:id',
+    delete: '/:id',
+  },
+};
+
 export const productTagsRoutes = {
   root: '/products',
   productTag: {
+    list: '/:id/tags',
     add: '/:id/tags',
-    remove: '/:id/tags/:tagId',
+    delete: '/:id/tags/:tagId',
   },
 };
 
 export const productAttributesRoutes = {
   root: '/products',
   attribute: {
+    list: '/:id/attributes',
     add: '/:id/attributes',
-    remove: '/:id/attributes/:attributeId',
+    getOne: '/:id/attributes/:attributeId',
+    delete: '/:id/attributes/:attributeId',
   },
 };

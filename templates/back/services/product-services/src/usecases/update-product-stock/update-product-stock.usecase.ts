@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IProductRepository } from '../../repositories/product.repository';
 import { UpdateProductStockDto } from './update-product-stock.dto';
-import { LogClient } from '../../shared/log-client.service';
+import { LogClient } from '../../services/log-client.service';
 
 @Injectable()
 export class UpdateProductStockUseCase {

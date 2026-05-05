@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MulterModule } from '@nestjs/platform-express';
 
-import { LogClient } from './shared/log-client.service';
+import { LogClient } from './services/log-client.service';
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
@@ -56,6 +56,28 @@ import { GetProductImagesController } from './usecases/get-product-images/get-pr
 import { GetProductImagesUseCase } from './usecases/get-product-images/get-product-images.usecase';
 import { SetMainProductImageController } from './usecases/set-main-product-image/set-main-product-image.controller';
 import { SetMainProductImageUseCase } from './usecases/set-main-product-image/set-main-product-image.usecase';
+import { AddProductAttributeController } from './usecases/add-product-attribute/add-product-attribute.controller';
+import { AddProductAttributeUseCase } from './usecases/add-product-attribute/add-product-attribute.usecase';
+import { AddProductTagController } from './usecases/add-product-tag/add-product-tag.controller';
+import { AddProductTagUseCase } from './usecases/add-product-tag/add-product-tag.usecase';
+import { CreateTagController } from './usecases/create-tag/create-tag.controller';
+import { CreateTagUseCase } from './usecases/create-tag/create-tag.usecase';
+import { deleteProductAttributeController } from './usecases/delete-product-attribute/delete-product-attribute.controller';
+import { deleteProductAttributeUseCase } from './usecases/delete-product-attribute/delete-product-attribute.usecase';
+import { deleteProductTagController } from './usecases/delete-product-tag/delete-product-tag.controller';
+import { deleteProductTagUseCase } from './usecases/delete-product-tag/delete-product-tag.usecase';
+import { DeleteTagController } from './usecases/delete-tag/delete-tag.controller';
+import { DeleteTagUseCase } from './usecases/delete-tag/delete-tag.usecase';
+import { ListProductAttributesController } from './usecases/list-product-attributes/list-product-attributes.controller';
+import { ListProductAttributesUseCase } from './usecases/list-product-attributes/list-product-attributes.usecase';
+import { ListProductTagsController } from './usecases/list-product-tags/list-product-tags.controller';
+import { ListProductTagsUseCase } from './usecases/list-product-tags/list-product-tags.usecase';
+import { ListTagsController } from './usecases/list-tags/list-tags.controller';
+import { ListTagsUseCase } from './usecases/list-tags/list-tags.usecase';
+import { GetProductAttributeController } from './usecases/get-product-attribute/get-product-attribute.controller';
+import { GetProductAttributeUseCase } from './usecases/get-product-attribute/get-product-attribute.usecase';
+import { GetTagController } from './usecases/get-tag/get-tag.controller';
+import { GetTagUseCase } from './usecases/get-tag/get-tag.usecase';
 
 const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute];
 
@@ -113,6 +135,17 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     AddProductImageController,
     DeleteProductImageController,
     SetMainProductImageController,
+    CreateTagController,
+    ListTagsController,
+    DeleteTagController,
+    AddProductTagController,
+    ListProductTagsController,
+    deleteProductTagController,
+    AddProductAttributeController,
+    ListProductAttributesController,
+    deleteProductAttributeController,
+    GetTagController,
+    GetProductAttributeController,
   ],
   providers: [
     { provide: ICategoryRepository, useClass: TypeOrmCategoryRepository },
@@ -139,6 +172,17 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     AddProductImageUseCase,
     DeleteProductImageUseCase,
     SetMainProductImageUseCase,
+    CreateTagUseCase,
+    ListTagsUseCase,
+    DeleteTagUseCase,
+    AddProductTagUseCase,
+    ListProductTagsUseCase,
+    deleteProductTagUseCase,
+    AddProductAttributeUseCase,
+    ListProductAttributesUseCase,
+    deleteProductAttributeUseCase,
+    GetTagUseCase,
+    GetProductAttributeUseCase,
   ],
 })
 export class AppModule {}

@@ -3,7 +3,7 @@ import { IProductRepository } from '../../repositories/product.repository';
 import { ICategoryRepository } from '../../repositories/category.repository';
 import { CreateProductDto } from './create-product.dto';
 import { Product } from '../../entities/product.entity';
-import { LogClient } from '../../shared/log-client.service';
+import { LogClient } from '../../services/log-client.service';
 
 @Injectable()
 export class CreateProductUseCase {

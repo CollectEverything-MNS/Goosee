@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IProductImageRepository } from '../../repositories/product-image.repository';
-import { LogClient } from '../../shared/log-client.service';
+import { LogClient } from '../../services/log-client.service';
 
 @Injectable()
 export class SetMainProductImageUseCase {

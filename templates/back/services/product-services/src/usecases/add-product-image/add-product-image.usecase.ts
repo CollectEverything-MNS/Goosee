@@ -3,7 +3,7 @@ import { IProductRepository } from '../../repositories/product.repository';
 import { IProductImageRepository } from '../../repositories/product-image.repository';
 import { StorageService } from '../../services/storage.service';
 import { ProductImage } from '../../entities/product-image.entity';
-import { LogClient } from '../../shared/log-client.service';
+import { LogClient } from '../../services/log-client.service';
 
 @Injectable()
 export class AddProductImageUseCase {
