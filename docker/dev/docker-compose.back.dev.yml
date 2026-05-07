@@ -20,6 +20,8 @@ services:
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       LOG_SERVICE_HOST: ${LOG_SERVICE_HOST}
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
+      PRODUCT_SERVICE_HOST: ${PRODUCT_SERVICE_HOST}
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -93,7 +95,7 @@ services:
       goosee-rabbitmq-dev:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}" ]
+      test: ["CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -180,6 +182,44 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${LOG_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-product-service-dev:
+    container_name: goosee-product-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/product-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      PRODUCT_DB_HOST: goosee-product-db-dev
+      PRODUCT_DB_PORT: 5432
+      PRODUCT_DB_USER: ${PRODUCT_DB_USER}
+      PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}
+      PRODUCT_DB_NAME: ${PRODUCT_DB_NAME}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
+    expose:
+      - "${PRODUCT_SERVICE_PORT}"
+    depends_on:
+      goosee-product-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${PRODUCT_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10

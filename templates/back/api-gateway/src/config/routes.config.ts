@@ -3,7 +3,9 @@ const usersBasePath = '/users';
 const rolesBasePath = '/roles';
 const logsBasePath = '/logs';
 const uploadBasePath = '/upload';
-
+const productsBasePath = '/products';
+const categoriesBasePath = '/categories';
+const tagsBasePath = '/tags';
 
 export const routesConfig = {
   upload: {
@@ -119,6 +121,130 @@ export const routesConfig = {
     listLogs: {
       path: `${logsBasePath}`,
       link: (serviceUrl: string) => `${serviceUrl}${logsBasePath}`,
+    },
+  },
+  product: {
+    listProducts: {
+      path: productsBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${productsBasePath}`,
+    },
+    getProduct: {
+      path: `${productsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}`,
+    },
+    createProduct: {
+      path: productsBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${productsBasePath}`,
+    },
+    updateProduct: {
+      path: `${productsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}`,
+    },
+    deleteProduct: {
+      path: `${productsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}`,
+    },
+    updateStock: {
+      path: `${productsBasePath}/:id/stock`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/stock`,
+    },
+    // Images
+    getImages: {
+      path: `${productsBasePath}/:id/images`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/images`,
+    },
+    addImage: {
+      path: `${productsBasePath}/:id/images`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/images`,
+    },
+    deleteImage: {
+      path: `${productsBasePath}/:id/images/:imageId`,
+      link: (serviceUrl: string, id: string, imageId: string) =>
+        `${serviceUrl}${productsBasePath}/${id}/images/${imageId}`,
+    },
+    setMainImage: {
+      path: `${productsBasePath}/:id/images/:imageId/main`,
+      link: (serviceUrl: string, id: string, imageId: string) =>
+        `${serviceUrl}${productsBasePath}/${id}/images/${imageId}/main`,
+    },
+    // Tags produit
+    listProductTags: {
+      path: `${productsBasePath}/:id/tags`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/tags`,
+    },
+    addProductTag: {
+      path: `${productsBasePath}/:id/tags`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/tags`,
+    },
+    deleteProductTag: {
+      path: `${productsBasePath}/:id/tags/:tagId`,
+      link: (serviceUrl: string, id: string, tagId: string) =>
+        `${serviceUrl}${productsBasePath}/${id}/tags/${tagId}`,
+    },
+    // Attributs produit
+    listProductAttributes: {
+      path: `${productsBasePath}/:id/attributes`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/attributes`,
+    },
+    getProductAttribute: {
+      path: `${productsBasePath}/:id/attributes/:attributeId`,
+      link: (serviceUrl: string, id: string, attributeId: string) =>
+        `${serviceUrl}${productsBasePath}/${id}/attributes/${attributeId}`,
+    },
+    addProductAttribute: {
+      path: `${productsBasePath}/:id/attributes`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/attributes`,
+    },
+    deleteProductAttribute: {
+      path: `${productsBasePath}/:id/attributes/:attributeId`,
+      link: (serviceUrl: string, id: string, attributeId: string) =>
+        `${serviceUrl}${productsBasePath}/${id}/attributes/${attributeId}`,
+    },
+  },
+
+  category: {
+    listCategories: {
+      path: categoriesBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${categoriesBasePath}`,
+    },
+    getCategory: {
+      path: `${categoriesBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${categoriesBasePath}/${id}`,
+    },
+    createCategory: {
+      path: categoriesBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${categoriesBasePath}`,
+    },
+    updateCategory: {
+      path: `${categoriesBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${categoriesBasePath}/${id}`,
+    },
+    deleteCategory: {
+      path: `${categoriesBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${categoriesBasePath}/${id}`,
+    },
+    listProductsByCategory: {
+      path: `${categoriesBasePath}/:id/products`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${categoriesBasePath}/${id}/products`,
+    },
+  },
+
+  tag: {
+    listTags: {
+      path: tagsBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${tagsBasePath}`,
+    },
+    getTag: {
+      path: `${tagsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${tagsBasePath}/${id}`,
+    },
+    createTag: {
+      path: tagsBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${tagsBasePath}`,
+    },
+    deleteTag: {
+      path: `${tagsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${tagsBasePath}/${id}`,
     },
   },
 };

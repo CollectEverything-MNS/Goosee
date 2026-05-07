@@ -5,6 +5,7 @@ export type ServiceUrls = {
   auth: string;
   page: string;
   log: string;
+  product: string;
 };
 
 export const serviceUrl = (config: ConfigService): ServiceUrls => ({
@@ -12,4 +13,5 @@ export const serviceUrl = (config: ConfigService): ServiceUrls => ({
   auth: `http://${config.get('AUTH_SERVICE_HOST')}:${config.get('AUTH_SERVICE_PORT')}`,
   page: `http://${config.get('PAGE_SERVICE_HOST')}:${config.get('PAGE_SERVICE_PORT')}`,
   log: `http://${config.get('LOG_SERVICE_HOST')}:${config.get('LOG_SERVICE_PORT')}`,
+  product: `http://${config.get('PRODUCT_SERVICE_HOST')}:${config.get('PRODUCT_SERVICE_PORT')}`,
 });
