@@ -45,7 +45,7 @@ export class AddProductImageController {
   @ApiOperation({ summary: "Ajout d'une image à un produit" })
   async addImage(
     @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Query('isMain') isMain?: string
   ) {
     if (!file) throw new BadRequestException('No file provided');
