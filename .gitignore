@@ -7,7 +7,7 @@ yarn-error.log*
 yarn.lock
 
 # Logs
-logs/
+/logs/
 *.log
 *.log.*
 
@@ -21,13 +21,13 @@ Thumbs.db
 .env.local
 .env.*.local
 .env.prod
-.claude/
-CLAUDE.md
+
 # Build files
 dist/
 build/
 .next/
 out/
+*.tsbuildinfo
 
 # IDEs and editors
 .vscode/
@@ -37,5 +37,6 @@ out/
 # Dependency directories
 bower_components/
 
-CLAUDE.md
+# Claude
 .claude/
+CLAUDE.md
