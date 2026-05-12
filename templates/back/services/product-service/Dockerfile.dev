@@ -1,0 +1,19 @@
+FROM node:22-alpine
+
+RUN corepack enable && corepack prepare yarn@1.22.22 --activate
+RUN yarn config set network-timeout 600000 -g
+
+WORKDIR /usr/src/app
+
+COPY package.json yarn.lock ./
+COPY templates/back/services/product-service/package.json ./templates/back/services/product-service/package.json
+
+RUN yarn install --frozen-lockfile --network-timeout 600000
+
+COPY templates/back/services/product-service ./templates/back/services/product-service
+
+WORKDIR /usr/src/app/templates/back/services/product-service
+
+EXPOSE 3006
+
+CMD ["yarn", "dev"]

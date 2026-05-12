@@ -9,17 +9,19 @@ services:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
       NODE_ENV: ${NODE_ENV}
-      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_HOST: goosee-auth-service-dev
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       JWT_SECRET: ${JWT_SECRET}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      PAGE_SERVICE_HOST: ${PAGE_SERVICE_HOST}
+      PAGE_SERVICE_HOST: goosee-page-service-dev
       PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
-      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
-      LOG_SERVICE_HOST: ${LOG_SERVICE_HOST}
+      USER_SERVICE_HOST: goosee-user-service-dev
+      LOG_SERVICE_HOST: goosee-log-service-dev
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
+      PRODUCT_SERVICE_HOST: goosee-product-service-dev
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -34,7 +36,7 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
-      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       JWT_SECRET: ${JWT_SECRET}
@@ -42,7 +44,7 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
-      AUTH_DB_HOST: ${AUTH_DB_HOST}
+      AUTH_DB_HOST: goosee-auth-db-dev
       AUTH_DB_PORT: 5432
       AUTH_DB_USER: ${AUTH_DB_USER}
       AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
@@ -71,14 +73,14 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
-      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
       PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
-      PAGE_DB_HOST: ${PAGE_DB_HOST}
+      PAGE_DB_HOST: goosee-page-db-dev
       PAGE_DB_PORT: 5432
       PAGE_DB_USER: ${PAGE_DB_USER}
       PAGE_DB_PASSWORD: ${PAGE_DB_PASSWORD}
       PAGE_DB_NAME: ${PAGE_DB_NAME}
-      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_ENDPOINT: goosee-minio-dev
       MINIO_PORT: ${MINIO_PORT}
       MINIO_USE_SSL: ${MINIO_USE_SSL}
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
@@ -93,7 +95,7 @@ services:
       goosee-rabbitmq-dev:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}" ]
+      test: ["CMD-SHELL", "nc -z localhost ${PAGE_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -109,8 +111,8 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
-      RABBITMQ_URL: ${RABBITMQ_URL}
-      SMTP_HOST: ${SMTP_HOST}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
+      SMTP_HOST: goosee-mailhog-dev
       SMTP_PORT: ${SMTP_PORT}
       SMTP_SECURE: ${SMTP_SECURE}
       SMTP_USER: ${SMTP_USER}
@@ -133,9 +135,9 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
-      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
-      USER_DB_HOST: ${USER_DB_HOST}
+      USER_DB_HOST: goosee-user-db-dev
       USER_DB_PORT: 5432
       USER_DB_USER: ${USER_DB_USER}
       USER_DB_PASSWORD: ${USER_DB_PASSWORD}
@@ -164,9 +166,9 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
-      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
-      LOG_DB_HOST: ${LOG_DB_HOST}
+      LOG_DB_HOST: goosee-log-db-dev
       LOG_DB_PORT: 5432
       LOG_DB_USER: ${LOG_DB_USER}
       LOG_DB_PASSWORD: ${LOG_DB_PASSWORD}
@@ -180,6 +182,44 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${LOG_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-product-service-dev:
+    container_name: goosee-product-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/product-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      PRODUCT_DB_HOST: goosee-product-db-dev
+      PRODUCT_DB_PORT: 5432
+      PRODUCT_DB_USER: ${PRODUCT_DB_USER}
+      PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}
+      PRODUCT_DB_NAME: ${PRODUCT_DB_NAME}
+      MINIO_ENDPOINT: goosee-minio-dev
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
+    expose:
+      - "${PRODUCT_SERVICE_PORT}"
+    depends_on:
+      goosee-product-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${PRODUCT_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10

@@ -39,7 +39,7 @@ export class UploadController {
   @ApiResponse({ status: 201, description: 'File uploaded successfully' })
   @ApiResponse({ status: 400, description: 'Invalid file' })
   @UseInterceptors(FileInterceptor('file'))
-  async upload(@UploadedFile() file: Express.Multer.File, @Query('folder') folder?: string) {
+  async upload(@UploadedFile() file: any, @Query('folder') folder?: string) {
     if (!file) {
       throw new BadRequestException('No file provided');
     }
