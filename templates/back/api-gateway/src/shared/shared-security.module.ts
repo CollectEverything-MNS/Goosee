@@ -8,7 +8,7 @@ import { RoleAccessService } from './services/role-access.service';
 
 @Global()
 @Module({
-  imports: [ConfigModule, HttpModule],
+  imports: [ConfigModule, HttpModule.register({ timeout: 5000, maxRedirects: 5 })],
   providers: [HttpProxyService, JwtAuthGuard, RolesGuard, RoleAccessService],
   exports: [HttpProxyService, JwtAuthGuard, RolesGuard, RoleAccessService],
 })
