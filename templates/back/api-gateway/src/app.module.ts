@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller';
 import { MetricsController } from './metrics/metrics.controller';
+import { InternalModule } from './internal/internal.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './services/auth/auth.module';
 import { UserModule } from './services/user/user.module';
@@ -28,6 +29,7 @@ import { LogsModule } from './services/logs/logs.module';
     CategoriesModule,
     TagsModule,
     LogsModule,
+    InternalModule,
   ],
   controllers: [HealthController, MetricsController],
   providers: [],

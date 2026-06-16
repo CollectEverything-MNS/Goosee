@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller';
 import { MetricsController } from './metrics/metrics.controller';
+import { InternalKpiController } from './internal/internal-kpi.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -126,6 +127,7 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
   controllers: [
     HealthController,
     MetricsController,
+    InternalKpiController,
     CreateCategoryController,
     UpdateCategoryController,
     DeleteCategoryController,

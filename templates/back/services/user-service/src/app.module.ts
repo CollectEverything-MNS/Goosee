@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller';
 import { MetricsController } from './metrics/metrics.controller';
+import { InternalKpiController } from './internal/internal-kpi.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -101,6 +102,7 @@ import { GetUserByAuthUseCase } from './usecases/get-user-by-auth/get-user-by-au
   controllers: [
     HealthController,
     MetricsController,
+    InternalKpiController,
     CreateUserController,
     ListCustomersController,
     ListAdminsController,
