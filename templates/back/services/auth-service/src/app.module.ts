@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller';
+import { MetricsController } from './metrics/metrics.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -86,6 +87,7 @@ import { GetTokenVersionUseCase } from './usecases/get-token-version/get-token-v
   ],
   controllers: [
     HealthController,
+    MetricsController,
     RegisterController,
     LoginController,
     RevokeTokenController,

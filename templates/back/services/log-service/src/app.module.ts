@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller';
+import { MetricsController } from './metrics/metrics.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -36,7 +37,7 @@ import { ListLogsController } from './usecases/list-logs/list-logs.controller';
     }),
     TypeOrmModule.forFeature([Log]),
   ],
-  controllers: [HealthController, CreateLogEventsListener, ListLogsController],
+  controllers: [HealthController, MetricsController, CreateLogEventsListener, ListLogsController],
   providers: [
     {
       provide: ILogRepository,

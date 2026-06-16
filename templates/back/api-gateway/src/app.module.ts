@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller';
+import { MetricsController } from './metrics/metrics.controller';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './services/auth/auth.module';
 import { UserModule } from './services/user/user.module';
@@ -28,7 +29,7 @@ import { LogsModule } from './services/logs/logs.module';
     TagsModule,
     LogsModule,
   ],
-  controllers: [HealthController],
+  controllers: [HealthController, MetricsController],
   providers: [],
 })
 export class AppModule {}
