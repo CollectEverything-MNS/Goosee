@@ -85,7 +85,7 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 | 0.2 | Config 100 % par env + garde-fous (refus `synchronize` hors dev, validation secrets au boot) | 1 j | ✅ |
 | 0.3 | Endpoints `/health` (readiness/liveness) gateway + services | 0.5 j | ✅ |
 | 0.4 | Endpoint `/metrics` Prometheus (gateway + services) | 1 j | ✅ |
-| 0.5 | Endpoint `/internal/kpi` (agrégat business) protégé par secret partagé | 1 j | ⬜ |
+| 0.5 | Endpoint `/internal/kpi` (KPI d'usage pour scalabilité) protégé par secret partagé | 1 j | ✅ |
 | 0.6 | Images de prod (`Dockerfile.prod`) + entrypoint unattended (migrate → `init:user` → callback statut) | 1.5–2 j | ⬜ |
 | 0.7 | Quick wins sécu : `helmet`, `@nestjs/throttler`, timeouts `HttpModule` | 1 j | ⬜ |
 
