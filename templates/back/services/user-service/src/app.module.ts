@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HealthController } from './health/health.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -97,6 +98,7 @@ import { GetUserByAuthUseCase } from './usecases/get-user-by-auth/get-user-by-au
   ],
 
   controllers: [
+    HealthController,
     CreateUserController,
     ListCustomersController,
     ListAdminsController,

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HealthController } from './health/health.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -82,6 +83,7 @@ import { UploadFileController } from './usecases/upload-file/upload-file.control
     ]),
   ],
   controllers: [
+    HealthController,
     CreatePageController,
     UpdatePageController,
     DeletePageController,

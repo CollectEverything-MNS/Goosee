@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HealthController } from './health/health.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -122,6 +123,7 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     MulterModule.register({ storage: undefined }),
   ],
   controllers: [
+    HealthController,
     CreateCategoryController,
     UpdateCategoryController,
     DeleteCategoryController,
