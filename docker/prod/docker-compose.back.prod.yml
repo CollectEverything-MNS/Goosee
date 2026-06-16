@@ -19,12 +19,19 @@ services:
       PAGE_SERVICE_PORT: ${PAGE_SERVICE_PORT}
       LOG_SERVICE_HOST: ${LOG_SERVICE_HOST}
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
+      PRODUCT_SERVICE_HOST: ${PRODUCT_SERVICE_HOST}
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-prod
       - goosee-user-service-prod
       - goosee-page-service-prod
       - goosee-log-service-prod
+      - goosee-product-service-prod
     networks:
       - goosee_net
 
@@ -32,8 +39,8 @@ services:
   goosee-auth-service-prod:
     container_name: goosee-auth-service-prod
     build:
-      context: ../../templates/back/services/auth-service
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: templates/back/services/auth-service/Dockerfile
     command: node dist/main
     restart: unless-stopped
     environment:
@@ -46,6 +53,11 @@ services:
       AUTH_DB_USER: ${AUTH_DB_USER}
       AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
       AUTH_DB_NAME: ${AUTH_DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
     expose:
       - "${AUTH_SERVICE_PORT}"
     depends_on:
@@ -84,8 +96,8 @@ services:
   goosee-user-service-prod:
     container_name: goosee-user-service-prod
     build:
-      context: ../../templates/back/services/user-service
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: templates/back/services/user-service/Dockerfile
     command: node dist/main
     restart: unless-stopped
     environment:
@@ -97,6 +109,7 @@ services:
       USER_DB_USER: ${USER_DB_USER}
       USER_DB_PASSWORD: ${USER_DB_PASSWORD}
       USER_DB_NAME: ${USER_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${USER_SERVICE_PORT}"
     depends_on:
@@ -135,8 +148,8 @@ services:
   goosee-page-service-prod:
     container_name: goosee-page-service-prod
     build:
-      context: ../../templates/back/services/page-service
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: templates/back/services/page-service/Dockerfile
     command: node dist/main
     restart: unless-stopped
     environment:
@@ -193,8 +206,8 @@ services:
   goosee-log-service-prod:
     container_name: goosee-log-service-prod
     build:
-      context: ../../templates/back/services/log-service
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: templates/back/services/log-service/Dockerfile
     command: node dist/main
     restart: unless-stopped
     environment:
@@ -240,12 +253,71 @@ services:
     networks:
       - goosee_net
 
+  # ─────────── PRODUCT ───────────
+  goosee-product-service-prod:
+    container_name: goosee-product-service-prod
+    build:
+      context: ../..
+      dockerfile: templates/back/services/product-service/Dockerfile
+    command: node dist/main
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      PRODUCT_DB_HOST: ${PRODUCT_DB_HOST}
+      PRODUCT_DB_PORT: ${PRODUCT_DB_PORT}
+      PRODUCT_DB_USER: ${PRODUCT_DB_USER}
+      PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}
+      PRODUCT_DB_NAME: ${PRODUCT_DB_NAME}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+    expose:
+      - "${PRODUCT_SERVICE_PORT}"
+    depends_on:
+      goosee-product-db-prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${PRODUCT_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - goosee_net
+
+  goosee-product-db-prod:
+    image: postgres:16-alpine
+    container_name: goosee-product-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PRODUCT_DB_USER}
+      POSTGRES_PASSWORD: ${PRODUCT_DB_PASSWORD}
+      POSTGRES_DB: ${PRODUCT_DB_NAME}
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    expose:
+      - "${PRODUCT_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PRODUCT_DB_USER} -d ${PRODUCT_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
   # ─────────── NOTIFIER ───────────
   goosee-notifier-service-prod:
     container_name: goosee-notifier-service-prod
     build:
-      context: ../../templates/back/services/notifier-service
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: templates/back/services/notifier-service/Dockerfile
     command: node dist/main
     restart: unless-stopped
     environment:
@@ -265,6 +337,7 @@ volumes:
   user_db_data:
   page_db_data:
   log_db_data:
+  product_db_data:
 
 networks:
   goosee_net:
