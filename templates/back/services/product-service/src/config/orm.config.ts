@@ -18,5 +18,5 @@ export const AppDataSource = new DataSource({
   database: configService.get<string>('PRODUCT_DB_NAME'),
   entities: [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute],
   migrations: ['src/migrations/*.ts'],
-  synchronize: configService.get<string>('NODE_ENV') === 'development',
+  synchronize: false,
 });
