@@ -1,4 +1,5 @@
-import { Body, Controller, Put } from '@nestjs/common';
+import { Body, Controller, Put, UseGuards } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ForgetPasswordRequestDto } from './forget-password-request.dto';
@@ -7,6 +8,8 @@ import { HttpProxyService } from '../../../../shared/services/http-proxy.service
 import { serviceUrl, ServiceUrls } from 'src/config/services.config';
 
 @ApiTags('Auth')
+@UseGuards(ThrottlerGuard)
+@Throttle({ default: { limit: 5, ttl: 60000 } })
 @Controller()
 export class ForgetPasswordRequestController {
   private readonly services: ServiceUrls;

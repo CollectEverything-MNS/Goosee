@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { RegisterDto } from './register.dto';
@@ -7,6 +8,8 @@ import { serviceUrl, ServiceUrls } from '../../../../config/services.config';
 import { HttpProxyService } from '../../../../shared/services/http-proxy.service';
 
 @ApiTags('Auth')
+@UseGuards(ThrottlerGuard)
+@Throttle({ default: { limit: 5, ttl: 60000 } })
 @Controller()
 export class RegisterController {
   private readonly services: ServiceUrls;

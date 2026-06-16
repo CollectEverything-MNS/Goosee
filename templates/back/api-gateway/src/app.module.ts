@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { HealthController } from './health/health.controller';
 import { MetricsController } from './metrics/metrics.controller';
 import { InternalModule } from './internal/internal.module';
@@ -16,6 +17,7 @@ import { LogsModule } from './services/logs/logs.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
     SharedSecurityModule,
     ConfigModule.forRoot({
       isGlobal: true,
