@@ -12,6 +12,7 @@
     "infra:clean": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.infra.dev.yml down -v --remove-orphans",
     "infra:logs": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.infra.dev.yml logs -f",
     "infra:status": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.infra.dev.yml ps",
+    "init:user": "dotenv -e env/.env.dev -- node scripts/init-user.js",
     "start:dev:build": "yarn install && docker compose --env-file env/.env.dev -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.back.dev.yml up --build",
     "start:dev": "yarn install && docker compose --env-file env/.env.dev -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.back.dev.yml up",
     "stop:dev": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.back.dev.yml down",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",
     "@commitlint/config-conventional": "^20.3.1",
+    "bcryptjs": "^3.0.3",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "dotenv-cli": "^7.4.4",
@@ -39,6 +41,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "husky": "^9.1.7",
+    "pg": "^8.21.0",
     "prettier": "^3.8.0",
     "turbo": "^2.5.6"
   }

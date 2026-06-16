@@ -36,6 +36,15 @@ yarn stop:dev
 yarn restart:dev
 ```
 
+-   Créer l'utilisateur administrateur par défaut (`admin@goosee.dev` / `goosee`, rôle OWNER)
+
+```
+yarn init:user
+```
+
+> À lancer une fois la stack démarrée. Commande idempotente. Personnalisable via
+> `INIT_USER_EMAIL` / `INIT_USER_PASSWORD`.
+
 ## Documentation
 
 _Cliquez Sur le lien pour voir en détail._
