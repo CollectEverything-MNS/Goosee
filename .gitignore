@@ -37,7 +37,7 @@ out/
 # Dependency directories
 bower_components/
 
-# Claude (CLAUDE.md, workflow.md et .claude/settings.json sont versionnes)
-.claude/settings.local.json
+.claude
 Claude.md
 workflow.md
+audit.md
