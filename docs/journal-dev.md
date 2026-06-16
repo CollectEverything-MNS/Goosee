@@ -256,6 +256,27 @@ puis 1.3 (catalogue de forfaits + option scalable).
 Prochaine étape (ordre de priorité) : Lot 3+4 (orchestrateur + réseau Docker), testés en
 déclenchement manuel, avant de câbler Stripe (Lot 2).
 
+---
+
+## 2026-06-16 — Lot 4.1 : reverse-proxy Traefik central (repo Goosee)
+
+**Fait :**
+- `docker/tenant/docker-compose.traefik.yml` : Traefik v3.3, réseau partagé
+  `goosee_platform`, **provider fichier** (`docker/tenant/dynamic/`).
+- Choix du provider fichier plutôt que le provider Docker : ce dernier **échoue avec
+  Docker Desktop sous Windows** (`Failed to retrieve information of the docker client…
+  Error response from daemon:` — y compris via docker-socket-proxy), alors que le socket
+  fonctionne pourtant (testé `/version` et `/info` OK depuis un conteneur). Le provider
+  fichier confie en plus le routage explicitement au control plane.
+- Testé : whoami + fichier de routage → `http://whoami.127.0.0.1.nip.io/` HTTP 200.
+- Commit `feat(infra): ajoute le reverse-proxy Traefik central (provider fichier)`.
+
+**⚠️ Caveat Windows :** le watch fsnotify de Traefik **ne se propage pas** sur les
+bind-mounts Docker Desktop → après écriture/suppression d'un fichier dans `dynamic/`,
+l'orchestrateur devra **recharger Traefik** (restart ou SIGHUP). À implémenter au Lot 3.
+
+**Reste :** template de tenant (compose isolé + routage Traefik), puis orchestrateur.
+
 
 
 
