@@ -241,6 +241,22 @@ puis 1.3 (catalogue de forfaits + option scalable).
 
 **Reste :** Lot 1.3 — catalogue de forfaits (starter/commerce/enterprise + option scalable).
 
+---
+
+## 2026-06-16 — Lot 1.3 : catalogue de forfaits (goosee-vitrine)
+
+**Fait :**
+- Module `plans` : catalogue statique (starter 19€/docker, commerce 49€/docker,
+  enterprise 99€/k8s) + helper `planInfra` (scalable → k8s, sinon docker).
+- `GET /plans` public pour la consultation des forfaits avant inscription.
+- Testé : `GET /plans` HTTP 200 avec les 3 forfaits.
+- Commit `feat(vitrine): expose le catalogue de forfaits sur /plans`.
+
+**🎉 LOT 1 TERMINÉ** (modèle Project, rôles/guards, catalogue forfaits) côté vitrine.
+Prochaine étape (ordre de priorité) : Lot 3+4 (orchestrateur + réseau Docker), testés en
+déclenchement manuel, avant de câbler Stripe (Lot 2).
+
+
 
 
 
