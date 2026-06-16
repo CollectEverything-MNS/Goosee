@@ -60,6 +60,8 @@ import { GetUserByAuthUseCase } from './usecases/get-user-by-auth/get-user-by-au
         password: configService.get<string>('USER_DB_PASSWORD'),
         database: configService.get<string>('USER_DB_NAME'),
         entities: [User, Role],
+        migrations: ['dist/migrations/*.js'],
+        migrationsRun: configService.get<string>('NODE_ENV') !== 'development',
         synchronize: configService.get<string>('NODE_ENV') === 'development',
       }),
     }),

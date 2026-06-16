@@ -97,6 +97,8 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
         password: cfg.get<string>('PRODUCT_DB_PASSWORD'),
         database: cfg.get<string>('PRODUCT_DB_NAME'),
         entities: ENTITIES,
+        migrations: ['dist/migrations/*.js'],
+        migrationsRun: cfg.get<string>('NODE_ENV') !== 'development',
         synchronize: cfg.get<string>('NODE_ENV') === 'development',
       }),
     }),

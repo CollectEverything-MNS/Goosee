@@ -60,6 +60,8 @@ import { UploadFileController } from './usecases/upload-file/upload-file.control
         password: configService.get<string>('PAGE_DB_PASSWORD'),
         database: configService.get<string>('PAGE_DB_NAME'),
         entities: [Page, Menu, SiteSettings],
+        migrations: ['dist/migrations/*.js'],
+        migrationsRun: configService.get<string>('NODE_ENV') !== 'development',
         synchronize: configService.get<string>('NODE_ENV') === 'development',
       }),
     }),

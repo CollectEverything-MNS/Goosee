@@ -28,6 +28,8 @@ import { ListLogsController } from './usecases/list-logs/list-logs.controller';
         password: configService.get<string>('LOG_DB_PASSWORD'),
         database: configService.get<string>('LOG_DB_NAME'),
         entities: [Log],
+        migrations: ['dist/migrations/*.js'],
+        migrationsRun: configService.get<string>('NODE_ENV') !== 'development',
         synchronize: configService.get<string>('NODE_ENV') === 'development',
       }),
     }),

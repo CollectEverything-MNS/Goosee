@@ -50,6 +50,8 @@ import { GetTokenVersionUseCase } from './usecases/get-token-version/get-token-v
         password: configService.get<string>('AUTH_DB_PASSWORD'),
         database: configService.get<string>('AUTH_DB_NAME'),
         entities: [Auth, AuthToken],
+        migrations: ['dist/migrations/*.js'],
+        migrationsRun: configService.get<string>('NODE_ENV') !== 'development',
         synchronize: configService.get<string>('NODE_ENV') === 'development',
       }),
     }),
