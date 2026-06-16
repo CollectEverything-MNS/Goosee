@@ -5,6 +5,16 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
+  if (process.env.NODE_ENV === 'production') {
+    const requiredSecrets = ['JWT_SECRET', 'JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'];
+    const isDefault = (value?: string) =>
+      !value || ['postgres', 'minioadmin'].includes(value) || value.includes('change_me');
+    const invalid = requiredSecrets.filter((key) => isDefault(process.env[key]));
+    if (invalid.length > 0) {
+      throw new Error(`Secrets par défaut interdits en production : ${invalid.join(', ')}`);
+    }
+  }
+
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 

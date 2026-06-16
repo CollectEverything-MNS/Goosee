@@ -4,6 +4,16 @@ import { AppModule } from './app.module';
 import { RmqOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
+  if (process.env.NODE_ENV === 'production') {
+    const requiredSecrets = ['USER_DB_PASSWORD'];
+    const isDefault = (value?: string) =>
+      !value || ['postgres', 'minioadmin'].includes(value) || value.includes('change_me');
+    const invalid = requiredSecrets.filter((key) => isDefault(process.env[key]));
+    if (invalid.length > 0) {
+      throw new Error(`Secrets par défaut interdits en production : ${invalid.join(', ')}`);
+    }
+  }
+
   const app = await NestFactory.create(AppModule);
 
 
