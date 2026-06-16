@@ -227,6 +227,21 @@ non traitée ici, migration écrite à la main pour rester ciblée.
 **Reste :** Lot 1.2 (rôles CLIENT/SUPERADMIN sur le User vitrine + guards d'ownership),
 puis 1.3 (catalogue de forfaits + option scalable).
 
+---
+
+## 2026-06-16 — Lot 1.2 : rôles CLIENT/SUPERADMIN + RolesGuard (goosee-vitrine)
+
+**Fait :**
+- Champ `role` (défaut CLIENT) sur l'entité `User` + migration `AddUserRole` ; rôle
+  injecté dans le JWT au login et exposé dans `JwtPayload`.
+- Décorateur `@Roles` + `RolesGuard` (shared/) pour réserver des routes à un rôle.
+- Ownership : déjà assuré par les usecases filtrant sur `user.sub` (ex. findByUserId).
+- Testé : build OK, migration appliquée, colonne `role` défaut CLIENT vérifiée.
+- Commit `feat(vitrine): ajoute les rôles CLIENT/SUPERADMIN et le RolesGuard`.
+
+**Reste :** Lot 1.3 — catalogue de forfaits (starter/commerce/enterprise + option scalable).
+
+
 
 
 

@@ -99,7 +99,7 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 | # | Tâche | Estim. | Statut |
 |---|---|---|---|
 | 1.1 | Étendre `Project` : `status` (PENDING/PROVISIONING/ACTIVE/STOPPED/FAILED), `infra` (docker/k8s), `instanceUrl`, `resources`, refs secrets, dates + migration | 1 j | ✅ |
-| 1.2 | Rôles `CLIENT` / `SUPERADMIN` + guards (rôle **et** ownership : un client ne voit que ses projets) | 1–2 j | ⬜ |
+| 1.2 | Rôles `CLIENT` / `SUPERADMIN` + guards (rôle **et** ownership : un client ne voit que ses projets) | 1–2 j | ✅ |
 | 1.3 | Catalogue de forfaits (starter/commerce/enterprise + option `scalable`) | 0.5–1 j | ⬜ |
 
 **Exemple de guard d'ownership :** refuser `GET /projects/:id` si `project.userId !== currentUser.id` et rôle ≠ SUPERADMIN.
