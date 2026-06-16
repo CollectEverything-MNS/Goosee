@@ -81,7 +81,7 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 
 | # | Tâche | Estim. | Statut |
 |---|---|---|---|
-| 0.1 | Migrations TypeORM sur les 5 services à DB (auth, user, page, product, log) | 2–4 j | ⬜ |
+| 0.1 | Migrations TypeORM sur les 5 services à DB (auth, user, page, product, log) | 2–4 j | ✅ |
 | 0.2 | Config 100 % par env + garde-fous (refus `synchronize` hors dev, validation secrets au boot) | 1 j | ⬜ |
 | 0.3 | Endpoints `/health` (readiness/liveness) gateway + services | 0.5 j | ⬜ |
 | 0.4 | Endpoint `/metrics` Prometheus (gateway + services) | 1 j | ⬜ |
