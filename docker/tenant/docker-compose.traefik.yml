@@ -1,0 +1,30 @@
+# Reverse-proxy central du POC : route chaque tenant par son host (slug.127.0.0.1.nip.io)
+# vers sa gateway, via le réseau partagé goosee_platform. Démarrer avant tout tenant.
+#
+# Provider « fichier » : l'orchestrateur écrit un fichier de routage par tenant dans
+# ./dynamic (un router Host -> la gateway du tenant, joignable par son nom de conteneur
+# sur goosee_platform). Choix volontaire : pas d'accès au socket Docker (l'accès du
+# provider Docker de Traefik échoue avec Docker Desktop sous Windows) et routage piloté
+# explicitement par le control plane.
+services:
+  traefik:
+    image: traefik:v3.3
+    container_name: goosee-traefik
+    restart: unless-stopped
+    command:
+      - --providers.file.directory=/dynamic
+      - --providers.file.watch=true
+      - --entryPoints.web.address=:80
+      - --api.dashboard=true
+      - --api.insecure=true
+    ports:
+      - '80:80'
+      - '8090:8080'
+    volumes:
+      - ./dynamic:/dynamic:ro
+    networks:
+      - goosee_platform
+
+networks:
+  goosee_platform:
+    name: goosee_platform
