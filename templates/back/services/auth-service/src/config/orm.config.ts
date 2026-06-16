@@ -14,5 +14,5 @@ export const AppDataSource = new DataSource({
   database: configService.get<string>('AUTH_DB_NAME'),
   entities: [Auth, AuthToken],
   migrations: ['src/migrations/*.ts'],
-  synchronize: configService.get<string>('NODE_ENV') === 'development',
+  synchronize: false,
 });
