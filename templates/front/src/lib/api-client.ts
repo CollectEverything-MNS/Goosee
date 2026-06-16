@@ -1,7 +1,16 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// URL de la gateway :
+//  - NEXT_PUBLIC_API_URL si défini (dev, ou override) ;
+//  - sinon dérivée du host au runtime (multi-tenant : api.<host-du-tenant>),
+//    ce qui permet de builder l'image front UNE fois pour tous les tenants ;
+//  - sinon fallback dev.
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== 'undefined'
+    ? `${window.location.protocol}//api.${window.location.host}`
+    : 'http://localhost:3001');
 
 export const apiClient = axios.create({
   baseURL: API_URL,
