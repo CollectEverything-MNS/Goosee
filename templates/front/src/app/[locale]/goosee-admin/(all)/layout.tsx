@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/providers/auth-provider';
+import { AdminThemeProvider } from '@/providers/admin-theme-provider';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { routes } from '@/config/routes.config';
@@ -41,5 +42,5 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
   const pageKey = getPageKeyFromPathname(pathname);
   if (pageKey && !canAccess(pageKey)) return null;
 
-  return <>{children}</>;
+  return <AdminThemeProvider>{children}</AdminThemeProvider>;
 }

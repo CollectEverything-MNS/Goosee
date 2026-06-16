@@ -1,37 +1,33 @@
 'use client';
 
-import { Separator } from '@/components/ui/separator';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import React from 'react';
-import { AdminSidebar } from '@/components/layout/admin/components/admin-sidebar';
-import { AdminSearchbar } from '@/components/layout/admin/components/admin-searchbar';
+
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+
 import { AdminProfileDropdown } from './admin-profile-dropdown';
+import { AdminSearchbar } from './admin-searchbar';
+import { AdminSidebar } from './admin-sidebar';
 
 interface Props {
-  children: React.ReactNode
-  breadcrumb?: React.ReactNode
+  children: React.ReactNode;
 }
 
-export default function AdminLayout({ children, breadcrumb }: Props) {
+export default function AdminLayout({ children }: Props) {
   return (
     <SidebarProvider>
       <AdminSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-[#1D3647]">
-          <div className="flex items-center gap-2 px-3">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            {breadcrumb}
-          </div>
-          <div className={'flex items-center gap-2 px-3'}>
+      <SidebarInset className="bg-muted/30">
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-border bg-background px-4 lg:px-6">
+          <SidebarTrigger className="-ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-foreground hover:bg-muted hover:text-foreground" />
+          <div className="mx-auto w-full max-w-2xl">
             <AdminSearchbar />
+          </div>
+          <div className="flex items-center gap-3">
             <AdminProfileDropdown />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min">{children}</div>
-        </div>
+        <main className="flex-1 px-6 py-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

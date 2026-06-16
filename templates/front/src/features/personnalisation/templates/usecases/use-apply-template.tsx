@@ -3,6 +3,22 @@ import { api } from '@/lib/api-client';
 import { TemplateDefinition } from '../data/drive-template';
 
 async function applyTemplate(template: TemplateDefinition) {
+  try {
+    const currentSettings = await api.get<{
+      metadata?: Record<string, unknown>;
+    }>('/settings');
+    await api.put('/settings', {
+      primaryColor: template.accentColor,
+      metadata: {
+        ...(currentSettings?.metadata ?? {}),
+        templateCategory: template.category,
+        templateId: template.id,
+      },
+    });
+  } catch (err) {
+    console.warn('Could not persist template theme to settings', err);
+  }
+
   const existingPages = await api.get<{ pages: any[] }>('/pages');
   const pages = existingPages.pages ?? existingPages ?? [];
   const existingBySlug: Record<string, any> = {};
@@ -72,6 +88,7 @@ export function useApplyTemplate() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pages'] });
       queryClient.invalidateQueries({ queryKey: ['menus'] });
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
     },
   });
 }

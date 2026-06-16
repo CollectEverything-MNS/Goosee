@@ -78,6 +78,7 @@ import { GetProductAttributeController } from './usecases/get-product-attribute/
 import { GetProductAttributeUseCase } from './usecases/get-product-attribute/get-product-attribute.usecase';
 import { GetTagController } from './usecases/get-tag/get-tag.controller';
 import { GetTagUseCase } from './usecases/get-tag/get-tag.usecase';
+import { ProductSeederService } from './shared/product-seeder.service';
 
 const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttribute];
 
@@ -183,6 +184,7 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     deleteProductAttributeUseCase,
     GetTagUseCase,
     GetProductAttributeUseCase,
+    ProductSeederService,
   ],
 })
 export class AppModule {}

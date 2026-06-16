@@ -1,16 +1,18 @@
-import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
 import { Calendar } from 'lucide-react';
+
+import { AdminStatusBadge, AdminStatusTone } from '@/components/layout/admin/components/admin-status-badge';
+
 import { Log, LogLevel } from '../data/log.types';
 
-const LEVEL_BADGE: Record<LogLevel, string> = {
-  INFO: 'bg-blue-100 text-blue-800 border-blue-200',
-  SUCCESS: 'bg-green-100 text-green-800 border-green-200',
-  WARNING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  ERROR: 'bg-red-100 text-red-800 border-red-200',
-  CRITICAL: 'bg-purple-100 text-purple-800 border-purple-200',
-  DEBUG: 'bg-gray-100 text-gray-800 border-gray-200',
+const LEVEL_TONE: Record<LogLevel, AdminStatusTone> = {
+  INFO: 'info',
+  SUCCESS: 'success',
+  WARNING: 'warning',
+  ERROR: 'danger',
+  CRITICAL: 'accent',
+  DEBUG: 'neutral',
 };
 
 const formatDate = (iso: string) => {
@@ -30,13 +32,10 @@ export function getLogsColumns(): ColumnDef<Log>[] {
       accessorKey: 'createdAt',
       header: t('admin.logs.table.date'),
       cell: ({ row }) => (
-        <Badge
-          variant="outline"
-          className="gap-1 bg-gray-100 text-gray-700 border-gray-200 font-normal"
-        >
+        <AdminStatusBadge tone="neutral">
           <Calendar className="h-3 w-3" />
           {formatDate(row.original.createdAt)}
-        </Badge>
+        </AdminStatusBadge>
       ),
     },
     {
@@ -47,11 +46,11 @@ export function getLogsColumns(): ColumnDef<Log>[] {
       },
       cell: ({ row }) => {
         const level = row.original.level;
-        if (!level) return '—';
+        if (!level) return <span className="text-muted-foreground">—</span>;
         return (
-          <Badge variant="outline" className={LEVEL_BADGE[level]}>
+          <AdminStatusBadge tone={LEVEL_TONE[level]} withDot>
             {tLevels(level)}
-          </Badge>
+          </AdminStatusBadge>
         );
       },
     },
@@ -61,7 +60,9 @@ export function getLogsColumns(): ColumnDef<Log>[] {
       filterFn: (row, columnId, filterValue) => {
         return row.getValue(columnId) === filterValue;
       },
-      cell: ({ row }) => row.original.service ?? '—',
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.service ?? '—'}</span>
+      ),
     },
     {
       accessorKey: 'message',

@@ -10,6 +10,10 @@ export const CATEGORY_ECOMMERCE_COMPONENTS: ComponentDefinition[] = [
       title: 'Nos produits',
       subtitle: 'Découvrez notre sélection',
       columns: 3,
+      categoryId: '',
+      limit: 8,
+      sort: 'recent',
+      availableOnly: false,
       products: JSON.stringify([
         { name: 'Produit 1', price: '29,99 €', image: '', link: '#' },
         { name: 'Produit 2', price: '49,99 €', image: '', link: '#' },

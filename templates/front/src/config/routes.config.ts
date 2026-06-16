@@ -3,13 +3,22 @@ export const routes = {
     home: {
       getHref: (locale: string) => `/${locale}/`,
     },
+    account: {
+      getHref: (locale: string) => `/${locale}/compte`,
+    },
   },
   gooseeAdmin: {
     login: {
       getHref: (locale: string) => `/${locale}/goosee-admin/login`,
     },
+    forgotPassword: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/forgot-password`,
+    },
     dashboard: {
       getHref: (locale: string) => `/${locale}/goosee-admin/dashboard`,
+    },
+    analytics: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/analytics`,
     },
     products: {
       getHref: (locale: string) => `/${locale}/goosee-admin/products`,

@@ -1,53 +1,73 @@
-'use client'
-import { routes } from './routes.config'
+'use client';
+
 import {
-  Archive,
-  FileText,
+  BarChart3,
   Layers,
   LayoutDashboard,
+  LucideIcon,
   Menu,
-  MessageSquare,
   Package,
-  Palette,
-  Settings,
+  ScrollText,
   Shield,
   ShoppingCart,
+  Tags,
   Users,
-} from 'lucide-react'
-import { useLocale } from 'next-intl'
+} from 'lucide-react';
+import { useLocale } from 'next-intl';
 
-export function getAdminMenu() {
-  const locale = useLocale()
+import { routes } from './routes.config';
+
+export interface AdminMenuItem {
+  name: string;
+  path: string;
+  icon: LucideIcon;
+  pageKey?: string;
+}
+
+export interface AdminMenuSection {
+  section: string;
+  items: AdminMenuItem[];
+}
+
+export function getAdminMenu(): AdminMenuSection[] {
+  const locale = useLocale();
   return [
     {
-      name: 'admin.sidebar.dashboard',
-      path: routes.gooseeAdmin.dashboard.getHref(locale),
-      icon: LayoutDashboard,
-      pageKey: 'dashboard',
-    },
-
-    {
-      title: 'admin.sidebar.products.label',
-      icon: Package,
+      section: 'admin.sidebar.sections.general',
       items: [
         {
-          name: 'admin.sidebar.products.categories',
-          path: routes.gooseeAdmin.categories.getHref(locale),
-          icon: Archive,
-          pageKey: 'categories',
+          name: 'admin.sidebar.dashboard',
+          path: routes.gooseeAdmin.dashboard.getHref(locale),
+          icon: LayoutDashboard,
+          pageKey: 'dashboard',
         },
         {
-          name: 'admin.sidebar.products.productsStock',
-          path: routes.gooseeAdmin.products.getHref(locale),
-          icon: Layers,
-          pageKey: 'products',
+          name: 'admin.sidebar.analytics',
+          path: routes.gooseeAdmin.analytics.getHref(locale),
+          icon: BarChart3,
+          pageKey: 'analytics',
         },
       ],
     },
-
     {
-      title: 'admin.sidebar.orders.label',
-      icon: ShoppingCart,
+      section: 'admin.sidebar.sections.catalog',
+      items: [
+        {
+          name: 'admin.sidebar.products.productsStock',
+          path: routes.gooseeAdmin.products.getHref(locale),
+          icon: Package,
+          pageKey: 'products',
+        },
+        {
+          name: 'admin.sidebar.products.categories',
+          path: routes.gooseeAdmin.categories.getHref(locale),
+          icon: Tags,
+          pageKey: 'categories',
+        },
+      ],
+    },
+    {
+      section: 'admin.sidebar.sections.orders',
       items: [
         {
           name: 'admin.sidebar.orders.label',
@@ -55,18 +75,10 @@ export function getAdminMenu() {
           icon: ShoppingCart,
           pageKey: 'orders',
         },
-        {
-          name: 'admin.sidebar.orders.history',
-          path: routes.gooseeAdmin.salesHistory.getHref(locale),
-          icon: Archive,
-          pageKey: 'sales-history',
-        },
       ],
     },
-
     {
-      title: 'admin.sidebar.clients.label',
-      icon: Users,
+      section: 'admin.sidebar.sections.community',
       items: [
         {
           name: 'admin.sidebar.clients.label',
@@ -74,18 +86,10 @@ export function getAdminMenu() {
           icon: Users,
           pageKey: 'clients',
         },
-        {
-          name: 'admin.sidebar.clients.returnClients',
-          path: routes.gooseeAdmin.returnClient.getHref(locale),
-          icon: MessageSquare,
-          pageKey: 'return-clients',
-        },
       ],
     },
-
     {
-      title: 'admin.sidebar.personnalisation.label',
-      icon: Palette,
+      section: 'admin.sidebar.sections.customization',
       items: [
         {
           name: 'admin.sidebar.personnalisation.pages',
@@ -94,29 +98,15 @@ export function getAdminMenu() {
           pageKey: 'pages',
         },
         {
-          name: 'admin.sidebar.personnalisation.templates',
-          path: routes.gooseeAdmin.templates.getHref(locale),
-          icon: Archive,
-          pageKey: 'templates',
-        },
-        {
           name: 'admin.sidebar.personnalisation.menu',
           path: routes.gooseeAdmin.menu.getHref(locale),
           icon: Menu,
           pageKey: 'menu',
         },
-        {
-          name: 'admin.sidebar.personnalisation.settings',
-          path: routes.gooseeAdmin.settings.getHref(locale),
-          icon: Settings,
-          pageKey: 'settings',
-        },
       ],
     },
-
     {
-      title: 'admin.sidebar.access.label',
-      icon: Shield,
+      section: 'admin.sidebar.sections.access',
       items: [
         {
           name: 'admin.sidebar.access.users',
@@ -130,13 +120,18 @@ export function getAdminMenu() {
           icon: Shield,
           pageKey: 'roles',
         },
+      ],
+    },
+    {
+      section: 'admin.sidebar.sections.system',
+      items: [
         {
           name: 'admin.sidebar.access.logs',
           path: routes.gooseeAdmin.logs.getHref(locale),
-          icon: FileText,
+          icon: ScrollText,
           pageKey: 'logs',
         },
       ],
     },
-  ]
+  ];
 }

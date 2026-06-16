@@ -7,6 +7,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+const decimalToNumber = {
+  to: (value?: number) => value,
+  from: (value: string | null) => (value == null ? null : Number(value)),
+};
+
 @Entity('product')
 export class Product {
   @PrimaryGeneratedColumn('uuid')
@@ -18,7 +23,7 @@ export class Product {
   @Column({ nullable: true })
   description: string;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2, transformer: decimalToNumber })
   price: number;
 
   @Column({ default: 0 })

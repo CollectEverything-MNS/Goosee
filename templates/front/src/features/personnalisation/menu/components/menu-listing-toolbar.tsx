@@ -5,9 +5,7 @@ import { DataTableViewOptions } from '@/components/data-table/data-table-view-op
 import { DataTableFilter } from '@/components/data-table/data-table-filter';
 import { Button } from '@/components/ui/button';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMenu } from '../context/menu-provider';
 
 interface Props {
   table: any;
@@ -16,17 +14,11 @@ interface Props {
 export function MenuListingToolbar({ table }: Props) {
   const t = useTranslations();
   const isFiltered = table.getState().columnFilters.length > 0;
-  const { setOpen, setCurrentRow } = useMenu();
 
   const statusOptions = [
     { label: t('admin.menu.status.active'), value: 'true' },
     { label: t('admin.menu.status.inactive'), value: 'false' },
   ];
-
-  const handleAddNew = () => {
-    setCurrentRow(null);
-    setOpen('create');
-  };
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -49,11 +41,6 @@ export function MenuListingToolbar({ table }: Props) {
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         )}
-      </div>
-      <div className="flex items-center">
-        <Button variant="default" onClick={handleAddNew}>
-          <Plus /> <span className="hidden md:block">{t('admin.menu.addNew')}</span>
-        </Button>
       </div>
     </div>
   );

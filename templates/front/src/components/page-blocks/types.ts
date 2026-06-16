@@ -98,6 +98,10 @@ export interface FeaturedProductsBlockProps {
   subtitle?: string
   columns: 2 | 3 | 4
   products: string
+  categoryId?: string
+  limit?: number
+  sort?: 'recent' | 'price-asc' | 'price-desc' | 'name'
+  availableOnly?: boolean
   backgroundColor?: string
   textColor?: string
 }

@@ -4,8 +4,10 @@ import { Role } from '../entities/role.entity';
 
 const ALL_PAGE_KEYS = [
   'dashboard',
+  'analytics',
   'users',
   'roles',
+  'logs',
   'clients',
   'return-clients',
   'products',
@@ -36,7 +38,21 @@ export class RoleSeederService implements OnApplicationBootstrap {
   ): Promise<void> {
     const existing = await this.roleRepo.findByName(name);
     if (existing) {
-      this.logger.log(`Role ${name} already present, skipping seed`);
+      if (existing.isSystem) {
+        const current = existing.pageKeys ?? [];
+        const same =
+          current.length === pageKeys.length &&
+          current.every((k) => pageKeys.includes(k));
+        if (!same) {
+          existing.pageKeys = pageKeys;
+          await this.roleRepo.save(existing);
+          this.logger.log(`Role ${name} page keys synchronized`);
+        } else {
+          this.logger.log(`Role ${name} already present, skipping seed`);
+        }
+      } else {
+        this.logger.log(`Role ${name} already present, skipping seed`);
+      }
       return;
     }
 

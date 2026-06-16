@@ -9,6 +9,7 @@ import { SharedSecurityModule } from './shared/shared-security.module';
 import { CategoriesModule } from './services/categories/categories.module';
 import { ProductsModule } from './services/products/products.module';
 import { TagsModule } from './services/tags/tags.module';
+import { LogsModule } from './services/logs/logs.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TagsModule } from './services/tags/tags.module';
     ProductsModule,
     CategoriesModule,
     TagsModule,
+    LogsModule,
   ],
   controllers: [],
   providers: [],

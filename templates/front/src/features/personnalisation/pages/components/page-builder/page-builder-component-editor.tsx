@@ -22,9 +22,15 @@ import {
 import { FileUpload } from '@/components/ui/file-upload'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUploadFile } from '@/features/personnalisation/settings/usecases/use-upload-file'
+import { useListCategories } from '@/features/products/usecases/use-list-categories'
 import { Link2, Palette, Settings, Type, Upload, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
+
+import { ListField } from './list-field'
+
+const LIST_FIELD_KEYS = ['products', 'testimonials', 'features'] as const
+type ListFieldComponentType = 'featured-products' | 'testimonials' | 'features'
 
 function ImageField({
   label,
@@ -40,23 +46,51 @@ function ImageField({
   uploadPlaceholder: string
 }) {
   return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <Input
-        type="url"
-        placeholder="https://example.com/image.jpg"
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      <FileUpload
-        value={value}
-        onChange={onChange}
-        onUpload={onUpload}
-        accept={{ 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'] }}
-        placeholder={uploadPlaceholder}
-      />
-      {value && (
-        <img src={value} alt="Aperçu" className="rounded-md border max-h-32 w-full object-cover" />
+    <div className="min-w-0 space-y-2">
+      <Label className="text-xs font-medium">{label}</Label>
+
+      {value ? (
+        <div className="flex items-center gap-3 rounded-lg border bg-background p-2">
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border bg-muted">
+            <img src={value} alt="" className="h-full w-full object-cover" />
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <Input
+              type="url"
+              placeholder="https://..."
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className="h-9 text-xs"
+            />
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+            onClick={() => onChange('')}
+            title="Retirer"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <Input
+            type="url"
+            placeholder="https://..."
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            className="h-10"
+          />
+          <FileUpload
+            value=""
+            onChange={onChange}
+            onUpload={onUpload}
+            accept={{ 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg'] }}
+            placeholder={uploadPlaceholder}
+          />
+        </div>
       )}
     </div>
   )
@@ -66,18 +100,21 @@ interface PageBuilderComponentEditorProps {
   component: PageComponent
   onUpdate: (props: Record<string, unknown>) => void
   onClose: () => void
+  embedded?: boolean
 }
 
 export function PageBuilderComponentEditor({
   component,
   onUpdate,
   onClose,
+  embedded = false,
 }: PageBuilderComponentEditorProps) {
   const tComponents = useTranslations('admin.pageBuilder.components')
   const tEditor = useTranslations('admin.pageBuilder.editor')
   const tLabels = useTranslations('admin.pageBuilder.editor.labels')
   const tOptions = useTranslations('admin.pageBuilder.editor.options')
   const uploadMutation = useUploadFile()
+  const { data: categories = [] } = useListCategories()
 
   const definition = COMPONENT_DEFINITIONS.find((d) => d.type === component.type)
   const componentLabel = tComponents(component.type as never)
@@ -93,7 +130,15 @@ export function PageBuilderComponentEditor({
 
   const IMAGE_FIELD_KEYS = ['src', 'backgroundImage']
 
+  const LABEL_OVERRIDES: Record<string, string> = {
+    categoryId: 'Catégorie',
+    limit: 'Nombre de produits',
+    sort: 'Tri',
+    availableOnly: 'Produits disponibles uniquement',
+  }
+
   const formatLabel = (key: string): string => {
+    if (LABEL_OVERRIDES[key]) return LABEL_OVERRIDES[key]
     try {
       return tLabels(key as never)
     } catch {
@@ -122,6 +167,68 @@ export function PageBuilderComponentEditor({
     }
 
     if (typeof value !== 'string' && typeof value !== 'number') return null
+
+    // Selecteur de categorie (filtre les produits affiches par ce bloc)
+    if (key === 'categoryId') {
+      const ALL = '__all__'
+      return (
+        <div key={key} className="space-y-2">
+          <Label>Catégorie</Label>
+          <Select
+            value={value ? (value as string) : ALL}
+            onValueChange={(v) => handleChange(key, v === ALL ? '' : v)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Toutes les catégories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>Toutes les catégories</SelectItem>
+              {(categories as Array<{ id: string; name: string }>).map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-[11px] text-muted-foreground">
+            Affiche uniquement les produits de cette catégorie.
+          </p>
+        </div>
+      )
+    }
+
+    // Tri des produits affiches par le bloc
+    if (key === 'sort') {
+      return (
+        <div key={key} className="space-y-2">
+          <Label>{formatLabel(key)}</Label>
+          <Select value={(value as string) || 'recent'} onValueChange={(v) => handleChange(key, v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Plus récents</SelectItem>
+              <SelectItem value="price-asc">Prix croissant</SelectItem>
+              <SelectItem value="price-desc">Prix décroissant</SelectItem>
+              <SelectItem value="name">Nom (A-Z)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )
+    }
+
+    if ((LIST_FIELD_KEYS as readonly string[]).includes(key) && typeof value === 'string') {
+      const listType = component.type as ListFieldComponentType
+      return (
+        <ListField
+          key={key}
+          label={formatLabel(key)}
+          value={value}
+          onChange={(v) => handleChange(key, v)}
+          componentType={listType}
+        />
+      )
+    }
 
     if (IMAGE_FIELD_KEYS.includes(key)) {
       return (
@@ -448,7 +555,10 @@ export function PageBuilderComponentEditor({
   const optionsProps: [string, unknown][] = []
 
   const currentBackgroundType = component.props.backgroundType as string | undefined;
-  const propsEntries = Object.entries(component.props);
+  // Fusionne les props par defaut de la definition pour que les champs ajoutes
+  // (ex. filtres produits) apparaissent aussi sur les blocs deja enregistres.
+  const mergedProps = { ...(definition?.defaultProps ?? {}), ...component.props };
+  const propsEntries = Object.entries(mergedProps);
 
   if (currentBackgroundType === 'image' && !('backgroundImage' in component.props)) {
     propsEntries.push(['backgroundImage', '']);
@@ -474,6 +584,8 @@ export function PageBuilderComponentEditor({
       typeof value === 'boolean' ||
       key === 'columns' ||
       key === 'limit' ||
+      key === 'categoryId' ||
+      key === 'sort' ||
       key === 'height' ||
       key === 'gap' ||
       key === 'width' ||
@@ -503,31 +615,39 @@ export function PageBuilderComponentEditor({
   if (hasStyle) defaultOpen.push('style')
 
   return (
-    <div className="absolute right-0 top-0 z-50 flex h-full w-80 flex-col border-l bg-card shadow-lg">
-      <div className="flex items-center justify-between border-b p-3">
-        <div>
-          <h3 className="text-sm font-semibold">
-            {componentLabel || definition?.label || component.type}
-          </h3>
-          <p className="text-xs text-muted-foreground">{tEditor('editComponent')}</p>
+    <div
+      className={
+        embedded
+          ? 'flex h-full flex-col bg-background'
+          : 'absolute right-0 top-0 z-50 flex h-full w-80 flex-col border-l bg-card shadow-lg'
+      }
+    >
+      {!embedded && (
+        <div className="flex items-center justify-between border-b p-3">
+          <div>
+            <h3 className="text-sm font-semibold">
+              {componentLabel || definition?.label || component.type}
+            </h3>
+            <p className="text-xs text-muted-foreground">{tEditor('editComponent')}</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+      )}
 
       <ScrollArea className="flex-1">
-        <Accordion type="multiple" defaultValue={defaultOpen} className="px-3 py-2">
+        <Accordion type="multiple" defaultValue={defaultOpen} className="divide-y divide-border">
           {hasContent && (
             <AccordionItem value="content" className="border-b-0">
-              <AccordionTrigger className="py-2 hover:no-underline">
-                <div className="flex items-center gap-2 text-sm">
-                  <Type className="h-4 w-4 text-muted-foreground" />
+              <AccordionTrigger className="px-5 py-3 hover:bg-muted/40 hover:no-underline data-[state=open]:bg-muted/30">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Type className="h-3.5 w-3.5" />
                   <span>{tEditor('sections.content')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-4 pb-2">
+                <div className="space-y-4 px-5 pb-5 pt-2">
                   {contentProps.map(([key, value]) => renderField(key, value))}
                 </div>
               </AccordionContent>
@@ -536,14 +656,14 @@ export function PageBuilderComponentEditor({
 
           {hasStyle && (
             <AccordionItem value="style" className="border-b-0">
-              <AccordionTrigger className="py-2 hover:no-underline">
-                <div className="flex items-center gap-2 text-sm">
-                  <Palette className="h-4 w-4 text-muted-foreground" />
+              <AccordionTrigger className="px-5 py-3 hover:bg-muted/40 hover:no-underline data-[state=open]:bg-muted/30">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Palette className="h-3.5 w-3.5" />
                   <span>{tEditor('sections.style')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-4 pb-2">
+                <div className="space-y-4 px-5 pb-5 pt-2">
                   {styleProps.map(([key, value]) => renderField(key, value))}
                 </div>
               </AccordionContent>
@@ -552,14 +672,14 @@ export function PageBuilderComponentEditor({
 
           {hasOptions && (
             <AccordionItem value="options" className="border-b-0">
-              <AccordionTrigger className="py-2 hover:no-underline">
-                <div className="flex items-center gap-2 text-sm">
-                  <Settings className="h-4 w-4 text-muted-foreground" />
+              <AccordionTrigger className="px-5 py-3 hover:bg-muted/40 hover:no-underline data-[state=open]:bg-muted/30">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Settings className="h-3.5 w-3.5" />
                   <span>{tEditor('sections.options')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-4 pb-2">
+                <div className="space-y-4 px-5 pb-5 pt-2">
                   {optionsProps.map(([key, value]) => renderField(key, value))}
                 </div>
               </AccordionContent>

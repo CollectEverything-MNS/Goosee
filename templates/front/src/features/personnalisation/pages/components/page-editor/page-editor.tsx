@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Page, PageComponent, PageStatus, PageType } from '../../types/page.types';
-import { PageBuilder } from '../page-builder/page-builder';
+import { PageBuilderStack } from '../page-builder/page-builder-stack';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -231,7 +231,7 @@ export function PageEditor({ page }: PageEditorProps) {
           </Button>
         </div>
       </div>
-      <PageBuilder components={components} onChange={setComponents} />
+      <PageBuilderStack components={components} onChange={setComponents} />
     </div>
   );
 }

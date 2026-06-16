@@ -38,11 +38,11 @@ export function ButtonBlock({
       onClick={context?.onSelect}
     >
       {isPreview ? (
-        <Button variant={buttonVariant} size={SIZE_MAP[size]} className="pointer-events-none">
+        <Button variant={buttonVariant} size={SIZE_MAP[size]} className="block-button pointer-events-none">
           {text || 'Bouton'}
         </Button>
       ) : (
-        <Button variant={buttonVariant} size={SIZE_MAP[size]} asChild>
+        <Button variant={buttonVariant} size={SIZE_MAP[size]} asChild className="block-button">
           <a href={link || '#'}>{text || 'Bouton'}</a>
         </Button>
       )}

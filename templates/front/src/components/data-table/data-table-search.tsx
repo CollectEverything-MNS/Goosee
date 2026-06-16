@@ -21,7 +21,7 @@ export function DataTableSearch({ table }: Props) {
   return (
     <Input
       type="text"
-      placeholder={t('admin.search')}
+      placeholder={t('admin.search.placeholder')}
       value={value}
       onChange={(e) => setValue(e.target.value)}
       className="h-8 w-64 bg-card"

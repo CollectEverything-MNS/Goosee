@@ -31,7 +31,7 @@ export class TypeOrmTagRepository implements ITagRepository {
   async findByProductId(productId: string): Promise<Tag[]> {
     return this.repository
       .createQueryBuilder('tag')
-      .innerJoin('product_tag', 'pt', 'pt.tagId = tag.id')
+      .innerJoin('product_tag', 'pt', 'pt.tagId = tag.id::text')
       .where('pt.productId = :productId', { productId })
       .orderBy('tag.name', 'ASC')
       .getMany();

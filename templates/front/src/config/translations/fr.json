@@ -1,6 +1,24 @@
 {
   "admin": {
-    "search": "Rechercher...",
+    "search": {
+      "placeholder": "Rechercher partout...",
+      "groups": {
+        "quickActions": "Actions rapides",
+        "navigation": "Navigation",
+        "products": "Produits",
+        "categories": "Catégories",
+        "users": "Administrateurs",
+        "clients": "Clients",
+        "pages": "Pages",
+        "roles": "Rôles"
+      },
+      "actions": {
+        "newProduct": "Nouveau produit",
+        "newCategory": "Nouvelle catégorie",
+        "newUser": "Nouvel utilisateur",
+        "newPage": "Nouvelle page"
+      }
+    },
     "noResults": "Aucun résultat trouvé",
     "previous": "Précédent",
     "next": "Suivant",
@@ -8,6 +26,27 @@
     "display": "Afficher",
     "lines": "lignes",
     "cancel": "Annuler",
+    "dashboard": {
+      "subtitle": "{count, plural, =0 {Aucun produit en catalogue} one {# produit en catalogue} other {# produits en catalogue}}",
+      "stats": {
+        "admins": "Administrateurs",
+        "customers": "Clients",
+        "products": "Produits",
+        "categories": "Catégories"
+      },
+      "recentLogs": {
+        "title": "Activité récente",
+        "viewAll": "Voir tout",
+        "empty": "Aucune activité récente."
+      },
+      "quickLinks": {
+        "title": "Accès rapides",
+        "products": "Gérer les produits",
+        "categories": "Gérer les catégories",
+        "users": "Gérer les utilisateurs",
+        "pages": "Gérer les pages"
+      }
+    },
     "profileDropdown": {
       "settings": "Paramètres",
       "support": "Support",
@@ -76,19 +115,54 @@
       "close": "Fermer"
     },
     "login": {
-      "title": "Goose Administration",
+      "title": "Connectez-vous",
+      "subtitle": "Accédez à votre espace d'administration.",
+      "tagline": "L'administration",
+      "quote": "Une plateforme pensée pour vous faire gagner du temps. Chaque jour. Sur chaque tâche.",
+      "quoteAuthor": "L'équipe Goosee",
+      "emailPlaceholder": "vous@entreprise.com",
+      "passwordPlaceholder": "Votre mot de passe",
       "email": "Email",
       "password": "Mot de passe",
       "forgotPassword": "Mot de passe oublié ?",
-      "loginButton": "Se connecter"
+      "loginButton": "Se connecter",
+      "footer": "© {year} Goosee. Tous droits réservés."
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "requestSubtitle": "Saisissez votre adresse email pour recevoir un code de réinitialisation.",
+      "confirmSubtitle": "Saisissez le code reçu par email et choisissez un nouveau mot de passe.",
+      "email": "Email",
+      "otp": "Code de vérification",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "sendCode": "Envoyer le code",
+      "resetButton": "Réinitialiser le mot de passe",
+      "backToLogin": "Retour à la connexion",
+      "successRequest": "Si un compte existe pour cet email, un code vous a été envoyé.",
+      "successReset": "Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "genericError": "Une erreur est survenue, veuillez réessayer."
     },
     "sidebar": {
       "toggleSidebar": "Basculer la barre latérale",
+      "tagline": "Administration",
+      "viewSite": "Voir le site",
       "dashboard": "Tableau de bord",
+      "analytics": "Statistiques",
+      "sections": {
+        "general": "Général",
+        "catalog": "Catalogue",
+        "orders": "Commandes",
+        "community": "Communauté",
+        "customization": "Personnalisation",
+        "access": "Accès",
+        "system": "Système"
+      },
       "products": {
         "label": "Produits",
         "categories": "Catégories",
-        "productsStock": "Produits / Stocks"
+        "productsStock": "Produits"
       },
       "orders": {
         "label": "Commandes",
@@ -103,19 +177,27 @@
         "pages": "Pages",
         "templates": "Templates",
         "menu": "Menu",
-        "settings": "Paramètres du site"
+        "settings": "Paramètres"
       },
       "access": {
         "label": "Accès",
         "users": "Utilisateurs",
         "roles": "Rôles",
-        "logs": "Journal (Logs)"
+        "logs": "Logs"
       },
       "logout": "Déconnexion"
+    },
+    "create": {
+      "label": "Créer",
+      "product": "Nouveau produit",
+      "category": "Nouvelle catégorie",
+      "user": "Nouvel utilisateur",
+      "page": "Nouvelle page"
     },
     "menu": {
       "title": "Menu",
       "addNew": "Ajouter un item",
+      "count": "{count, plural, =0 {Aucun item} one {# item} other {# items}}",
       "table": {
         "label": "Libellé",
         "type": "Type",
@@ -173,27 +255,44 @@
     },
     "siteSettings": {
       "title": "Paramètres du site",
+      "subtitle": "Configurez l'identité de votre site",
+      "sections": {
+        "identity": "Identité du site",
+        "branding": "Identité visuelle",
+        "theme": "Thème",
+        "preview": "Aperçu"
+      },
       "form": {
         "title": "Titre du site",
         "titlePlaceholder": "Mon site",
         "description": "Description",
         "descriptionPlaceholder": "Description du site pour le SEO",
-        "logoUrl": "URL du logo",
-        "logoUrlPlaceholder": "https://example.com/logo.png",
-        "faviconUrl": "URL du favicon",
-        "faviconUrlPlaceholder": "https://example.com/favicon.ico",
+        "logoUrl": "Logo",
+        "logoUrlPlaceholder": "Téléversez votre logo",
+        "faviconUrl": "Favicon",
+        "faviconUrlPlaceholder": "Téléversez votre favicon",
         "primaryColor": "Couleur principale",
+        "primaryColorHint": "Utilisée pour les boutons et accents du site.",
         "save": "Enregistrer",
+        "reset": "Réinitialiser",
         "saveSuccess": "Paramètres enregistrés avec succès",
         "saveError": "Erreur lors de l'enregistrement",
         "siteDescription": "Configurez les paramètres généraux de votre site",
         "descriptionHelp": "Cette description sera utilisée pour le référencement SEO",
         "logoHelp": "Logo du site affiché dans le header",
         "faviconHelp": "Favicon affiché dans l'onglet du navigateur (max 1MB)"
+      },
+      "preview": {
+        "tagline": "Tel qu'affiché sur votre site",
+        "logoEmpty": "Logo non défini",
+        "faviconEmpty": "Favicon non défini",
+        "noTitle": "Mon site",
+        "noDescription": "Aucune description renseignée."
       }
     },
     "pageTitles": {
       "dashboard": "Tableau de bord",
+      "analytics": "Statistiques",
       "products": "Produits",
       "categories": "Catégories",
       "clients": "Clients",
@@ -208,8 +307,46 @@
       "salesHistory": "Historiques",
       "logs": "Journal (Logs)"
     },
+    "analytics": {
+      "title": "Statistiques",
+      "subtitle": "Vue d'ensemble des performances de votre boutique",
+      "note": "Données de démonstration",
+      "filters": {
+        "pickDates": "Choisir des dates",
+        "periods": {
+          "all": "Toute la période",
+          "last7": "7 derniers jours",
+          "last30": "30 derniers jours",
+          "month": "Ce mois-ci",
+          "custom": "Personnalisé"
+        }
+      },
+      "kpis": {
+        "revenue": "Chiffre d'affaires",
+        "orders": "Commandes",
+        "avgBasket": "Panier moyen",
+        "customers": "Clients",
+        "itemsSold": "{count, plural, =0 {Aucun article vendu} one {# article vendu} other {# articles vendus}}",
+        "cancellationRate": "{rate}% annulées"
+      },
+      "charts": {
+        "revenue": "Chiffre d'affaires par jour",
+        "revenueDesc": "Évolution du CA (commandes non annulées)",
+        "status": "Commandes par statut",
+        "statusDesc": "Répartition des commandes",
+        "topProducts": "Meilleures ventes",
+        "topProductsDesc": "Top produits par quantité vendue",
+        "topProductsTooltip": "Vendus · CA",
+        "categories": "Catalogue par catégorie",
+        "categoriesDesc": "Nombre de produits par catégorie",
+        "categoriesTooltip": "Produits",
+        "empty": "Aucune donnée à afficher"
+      }
+    },
     "pages": {
       "addNewPage": "Ajouter une page",
+      "applyTemplate": "Appliquer un template",
+      "count": "{count, plural, =0 {Aucune page} one {# page} other {# pages}}",
       "table": {
         "title": "Titre",
         "status": "Statut",
@@ -234,17 +371,32 @@
     },
     "users": {
       "addNewUser": "Ajouter un utilisateur",
+      "count": "{count, plural, =0 {Aucun utilisateur} one {# utilisateur} other {# utilisateurs}}",
+      "searchPlaceholder": "Rechercher un utilisateur...",
+      "statusValues": {
+        "active": "Actif",
+        "inactive": "Inactif",
+        "banned": "Banni"
+      },
       "table": {
-        "firstname": "Prénom",
+        "firstname": "Nom",
         "lastname": "Nom",
         "email": "Email",
         "role": "Rôle",
         "status": "Statut",
+        "createdAt": "Créé le",
         "actions": "Actions"
       },
       "form": {
-        "createTitle": "Ajouter un administrateur",
+        "createTitle": "Nouvel administrateur",
+        "createSubtitle": "Créez un compte avec un rôle administrateur.",
         "editTitle": "Modifier l'utilisateur",
+        "editSubtitle": "Mettez à jour les informations de ce compte.",
+        "sections": {
+          "identity": "Identité",
+          "contact": "Contact",
+          "permissions": "Permissions"
+        },
         "firstName": "Prénom",
         "firstNamePlaceholder": "Jean",
         "lastName": "Nom",
@@ -252,8 +404,8 @@
         "email": "Email",
         "phone": "Téléphone (optionnel)",
         "cancel": "Annuler",
-        "create": "Créer",
-        "update": "Mettre à jour",
+        "create": "Créer le compte",
+        "update": "Enregistrer",
         "createSuccess": "Utilisateur créé avec succès",
         "createError": "Erreur lors de la création",
         "updateSuccess": "Utilisateur mis à jour avec succès",
@@ -270,19 +422,152 @@
         "error": "Erreur lors de la suppression"
       }
     },
+    "products": {
+      "addNew": "Ajouter un produit",
+      "count": "{count, plural, =0 {Aucun produit} one {# produit} other {# produits}}",
+      "searchPlaceholder": "Rechercher un produit...",
+      "clearFilters": "Réinitialiser",
+      "table": {
+        "product": "Produit",
+        "category": "Catégorie",
+        "price": "Prix",
+        "stock": "Stock",
+        "availability": "Disponibilité",
+        "createdAt": "Créé le",
+        "available": "Disponible",
+        "unavailable": "Indisponible",
+        "unit": "unité",
+        "units": "unités"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "form": {
+        "createTitle": "Nouveau produit",
+        "createSubtitle": "Ajoutez un produit à votre catalogue.",
+        "editTitle": "Modifier le produit",
+        "editSubtitle": "Mettez à jour les informations de ce produit.",
+        "sections": {
+          "identity": "Identité",
+          "pricing": "Tarification",
+          "logistics": "Logistique",
+          "visibility": "Visibilité"
+        },
+        "name": "Nom du produit",
+        "namePlaceholder": "Château Margaux 2019",
+        "description": "Description",
+        "descriptionPlaceholder": "Décrivez votre produit...",
+        "category": "Catégorie",
+        "categoryPlaceholder": "Sélectionner une catégorie",
+        "noCategories": "Aucune catégorie disponible — créez-en une d'abord.",
+        "price": "Prix",
+        "stock": "Stock disponible",
+        "preparationTime": "Temps de préparation",
+        "preparationHint": "Délai estimé avant expédition (0 = immédiat).",
+        "minutes": "min",
+        "sizeValue": "Taille / Contenance",
+        "sizeUnit": "Unité",
+        "isAvailable": "Produit disponible à la vente",
+        "isAvailableHint": "Désactivez pour le retirer temporairement du catalogue.",
+        "cancel": "Annuler",
+        "create": "Créer le produit",
+        "update": "Enregistrer",
+        "createSuccess": "Produit créé avec succès",
+        "createError": "Erreur lors de la création",
+        "updateSuccess": "Produit mis à jour",
+        "updateError": "Erreur lors de la mise à jour"
+      },
+      "delete": {
+        "title": "Supprimer le produit",
+        "description": "Êtes-vous sûr de vouloir supprimer « {name} » ? Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer",
+        "success": "Produit supprimé",
+        "error": "Erreur lors de la suppression"
+      }
+    },
+    "categories": {
+      "addNew": "Ajouter une catégorie",
+      "count": "{count, plural, =0 {Aucune catégorie} one {# catégorie} other {# catégories}}",
+      "searchPlaceholder": "Rechercher une catégorie...",
+      "clearFilters": "Réinitialiser",
+      "table": {
+        "category": "Catégorie",
+        "productCount": "Produits",
+        "order": "Ordre",
+        "status": "Statut",
+        "createdAt": "Créé le",
+        "active": "Actif",
+        "inactive": "Inactif",
+        "product": "produit",
+        "products": "produits"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "form": {
+        "createTitle": "Nouvelle catégorie",
+        "createSubtitle": "Organisez votre catalogue en regroupant vos produits.",
+        "editTitle": "Modifier la catégorie",
+        "editSubtitle": "Mettez à jour les informations de cette catégorie.",
+        "sections": {
+          "identity": "Identité",
+          "visual": "Visuel",
+          "organization": "Organisation"
+        },
+        "name": "Nom",
+        "namePlaceholder": "Vins rouges",
+        "description": "Description",
+        "descriptionPlaceholder": "Notre sélection de vins rouges...",
+        "imageUrl": "URL de l'image",
+        "imageUrlHint": "Lien vers une image hébergée (optionnel).",
+        "parent": "Catégorie parente",
+        "parentPlaceholder": "Sélectionner une catégorie",
+        "noParent": "— Aucune —",
+        "order": "Ordre d'affichage",
+        "isActive": "Catégorie active",
+        "isActiveHint": "Les catégories inactives ne sont pas affichées sur le site.",
+        "cancel": "Annuler",
+        "create": "Créer la catégorie",
+        "update": "Enregistrer",
+        "createSuccess": "Catégorie créée avec succès",
+        "createError": "Erreur lors de la création de la catégorie",
+        "updateSuccess": "Catégorie mise à jour avec succès",
+        "updateError": "Erreur lors de la mise à jour"
+      },
+      "delete": {
+        "title": "Supprimer la catégorie",
+        "description": "Êtes-vous sûr de vouloir supprimer la catégorie « {name} » ? Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer",
+        "success": "Catégorie supprimée avec succès",
+        "error": "Erreur lors de la suppression"
+      }
+    },
     "clients": {
       "addNewClient": "Ajouter un client",
+      "count": "{count, plural, =0 {Aucun client} one {# client} other {# clients}}",
       "table": {
         "firstname": "Prénom",
         "lastname": "Nom",
         "email": "Email",
         "status": "Statut",
         "actions": "Actions",
-        "role": "Rôle"
+        "role": "Rôle",
+        "createdAt": "Créé le"
       },
       "form": {
-        "createTitle": "Ajouter un client",
+        "createTitle": "Nouveau client",
+        "createSubtitle": "Ajoutez un client à votre base.",
         "editTitle": "Modifier le client",
+        "editSubtitle": "Mettez à jour les informations du client.",
+        "sections": {
+          "identity": "Identité",
+          "contact": "Contact",
+          "permissions": "Permissions"
+        },
         "firstName": "Prénom",
         "firstNamePlaceholder": "Jean",
         "lastName": "Nom",
@@ -290,8 +575,8 @@
         "email": "Email",
         "phone": "Téléphone (optionnel)",
         "cancel": "Annuler",
-        "create": "Créer",
-        "update": "Mettre à jour",
+        "create": "Créer le client",
+        "update": "Enregistrer",
         "createSuccess": "Client créé avec succès",
         "createError": "Erreur lors de la création",
         "updateSuccess": "Client mis à jour avec succès",
@@ -310,12 +595,26 @@
     },
     "pageBuilder": {
       "title": "Page Builder",
+      "addBlock": "Ajouter un bloc",
+      "actions": {
+        "move": "Déplacer",
+        "edit": "Modifier",
+        "duplicate": "Dupliquer",
+        "delete": "Supprimer",
+        "close": "Fermer"
+      },
+      "picker": {
+        "title": "Ajouter un bloc",
+        "subtitle": "Choisissez un composant à insérer dans la page",
+        "searchPlaceholder": "Rechercher un bloc...",
+        "empty": "Aucun composant trouvé"
+      },
       "sidebar": {
         "title": "Composants",
-        "subtitle": "Glissez dans la page"
+        "subtitle": "Cliquez pour ajouter"
       },
       "canvas": {
-        "emptyState": "Glissez des composants depuis la barre latérale",
+        "emptyState": "Aucun bloc pour l'instant",
         "gridDropZone": "Glissez des composants ici"
       },
       "preview": {
@@ -335,6 +634,34 @@
           "content": "Contenu",
           "style": "Style",
           "options": "Options"
+        },
+        "lists": {
+          "addItem": "Ajouter un élément",
+          "empty": "Aucun élément. Cliquez sur \"Ajouter\" pour commencer.",
+          "product": {
+            "fallback": "Nouveau produit",
+            "name": "Nom",
+            "namePlaceholder": "Ex : Café latté",
+            "price": "Prix",
+            "image": "Image",
+            "link": "Lien"
+          },
+          "testimonial": {
+            "fallback": "Nouveau témoignage",
+            "name": "Auteur",
+            "namePlaceholder": "Ex : Marie D.",
+            "text": "Témoignage",
+            "textPlaceholder": "Le texte du témoignage...",
+            "rating": "Note"
+          },
+          "feature": {
+            "fallback": "Nouvel avantage",
+            "icon": "Icône",
+            "title": "Titre",
+            "titlePlaceholder": "Ex : Livraison gratuite",
+            "description": "Description",
+            "descriptionPlaceholder": "Ex : Dès 50€ d'achat"
+          }
         },
         "labels": {
           "title": "Titre",
@@ -375,7 +702,10 @@
           "logoPosition": "Position du logo",
           "showMenu": "Afficher le menu",
           "menuAlignment": "Alignement du menu",
-          "sticky": "Sticky (fixé)"
+          "sticky": "Sticky (fixé)",
+          "products": "Produits",
+          "testimonials": "Témoignages",
+          "features": "Avantages"
         },
         "options": {
           "level": {
@@ -511,6 +841,7 @@
     },
     "roles": {
       "addNewRole": "Ajouter un rôle",
+      "count": "{count, plural, =0 {Aucun rôle} one {# rôle} other {# rôles}}",
       "system": "Système",
       "table": {
         "name": "Nom",
@@ -523,6 +854,10 @@
         "createTitle": "Créer un rôle",
         "editTitle": "Modifier le rôle",
         "description": "Définissez le nom du rôle et les pages auxquelles il donne accès.",
+        "sections": {
+          "identity": "Identité",
+          "permissions": "Permissions"
+        },
         "name": "Nom",
         "namePlaceholder": "Ex : REDACTEUR",
         "descriptionLabel": "Description",
@@ -551,7 +886,43 @@
         "CUSTOMER": "Client"
       }
     },
+    "orders": {
+      "count": "{count, plural, =0 {Aucune commande} one {# commande} other {# commandes}}",
+      "searchPlaceholder": "Rechercher une commande...",
+      "table": {
+        "reference": "Référence",
+        "customer": "Client",
+        "items": "Articles",
+        "itemsCount": "{count, plural, =0 {0 article} one {# article} other {# articles}}",
+        "total": "Total",
+        "status": "Statut",
+        "createdAt": "Date"
+      },
+      "statusValues": {
+        "pending": "En attente",
+        "preparing": "En préparation",
+        "ready": "Prête",
+        "delivered": "Livrée",
+        "cancelled": "Annulée"
+      },
+      "actions": {
+        "view": "Voir",
+        "clearFilters": "Réinitialiser"
+      },
+      "detail": {
+        "customer": "Client",
+        "items": "Articles",
+        "product": "Produit",
+        "quantity": "Quantité",
+        "unitPrice": "Prix unitaire",
+        "subtotal": "Sous-total",
+        "total": "Total",
+        "notes": "Notes",
+        "close": "Fermer"
+      }
+    },
     "logs": {
+      "count": "{count, plural, =0 {Aucun log} one {# log} other {# logs}}",
       "table": {
         "date": "Date",
         "level": "Niveau",

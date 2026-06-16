@@ -110,7 +110,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('refresh_token');
     Cookies.remove('access_token');
     setUser(null);
-    router.push(routes.gooseeAdmin.login.getHref(locale));
+    // Full reload to purge all in-memory state (React Query cache, providers, etc.)
+    if (typeof window !== 'undefined') {
+      window.location.href = routes.gooseeAdmin.login.getHref(locale);
+    } else {
+      router.replace(routes.gooseeAdmin.login.getHref(locale));
+    }
   }, [router, locale]);
 
   const canAccess = useCallback((pageKey: string) => {

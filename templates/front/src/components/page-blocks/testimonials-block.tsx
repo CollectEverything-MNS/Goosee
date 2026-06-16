@@ -39,7 +39,7 @@ export function TestimonialsBlock({
         )}
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {testimonials.map((t, i) => (
-            <Card key={i}>
+            <Card key={i} className="block-card">
               <CardContent className="p-6">
                 {t.rating && (
                   <div className="flex gap-0.5 mb-3">

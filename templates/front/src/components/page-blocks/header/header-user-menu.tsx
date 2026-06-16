@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LogOut, User } from 'lucide-react';
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
+import { LogOut, ShoppingBag, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { api } from '@/lib/api-client';
+import { routes } from '@/config/routes.config';
 import Cookies from 'js-cookie';
 import { LoginModal } from './header-login-modal';
 
@@ -22,6 +25,7 @@ interface SiteUser {
 }
 
 export function HeaderUserMenu({ textColor }: { textColor?: string }) {
+  const locale = useLocale();
   const [user, setUser] = useState<SiteUser | null>(null);
   const [checked, setChecked] = useState(false);
 
@@ -79,9 +83,17 @@ export function HeaderUserMenu({ textColor }: { textColor?: string }) {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            Mon compte
+          <DropdownMenuItem asChild>
+            <Link href={routes.public.account.getHref(locale)}>
+              <User className="mr-2 h-4 w-4" />
+              Mon profil
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href={`${routes.public.account.getHref(locale)}?tab=orders`}>
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              Mes commandes
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={handleLogout}>
@@ -94,6 +106,7 @@ export function HeaderUserMenu({ textColor }: { textColor?: string }) {
 }
 
 export function MobileUserMenu() {
+  const locale = useLocale();
   const [user, setUser] = useState<SiteUser | null>(null);
   const [checked, setChecked] = useState(false);
 
@@ -133,9 +146,23 @@ export function MobileUserMenu() {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
       <p className="text-xs text-muted-foreground">{user.email}</p>
+      <Link
+        href={routes.public.account.getHref(locale)}
+        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
+      >
+        <User className="h-4 w-4" />
+        Mon profil
+      </Link>
+      <Link
+        href={`${routes.public.account.getHref(locale)}?tab=orders`}
+        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
+      >
+        <ShoppingBag className="h-4 w-4" />
+        Mes commandes
+      </Link>
       <button
         onClick={handleLogout}
         className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-accent"

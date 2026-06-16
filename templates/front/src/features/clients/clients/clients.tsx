@@ -1,22 +1,48 @@
 'use client';
+
+import { Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { AdminTitle } from '@/components/layout/admin/components/admin-title';
 import { DataTable } from '@/components/data-table/data-table';
-import { ClientsListingToolbar } from './components/clients-listing-toolbar';
-import { getClientsColumns } from './components/clients-columns';
-import ClientsProvider from './context/clients-provider';
-import { ClientFormDialog } from './components/client-form-dialog';
-import { ClientDeleteDialog } from './components/client-delete-dialog';
+import { Button } from '@/components/ui/button';
 import { useListCustomers } from '@/features/users/usecases/use-list-customers';
 
-export function Clients() {
+import ClientsProvider, { useClient } from './context/clients-provider';
+import { ClientDeleteDialog } from './components/client-delete-dialog';
+import { ClientFormDialog } from './components/client-form-dialog';
+import { ClientsListingToolbar } from './components/clients-listing-toolbar';
+import { getClientsColumns } from './components/clients-columns';
+
+function ClientsContent() {
+  const t = useTranslations();
+  const { setOpen } = useClient();
   const { data: customers = [] } = useListCustomers();
 
   return (
-    <div>
-      <ClientsProvider>
-        <DataTable columns={getClientsColumns()} data={customers} Toolbar={ClientsListingToolbar} />
-        <ClientFormDialog />
-        <ClientDeleteDialog />
-      </ClientsProvider>
+    <div className="space-y-6">
+      <AdminTitle
+        size="h1"
+        title={t('admin.pageTitles.clients')}
+        subtitle={t('admin.clients.count', { count: customers.length })}
+        actions={
+          <Button onClick={() => setOpen('create')} className="h-10 gap-2">
+            <Plus className="h-4 w-4" />
+            {t('admin.clients.addNewClient')}
+          </Button>
+        }
+      />
+      <DataTable columns={getClientsColumns()} data={customers} Toolbar={ClientsListingToolbar} />
+      <ClientFormDialog />
+      <ClientDeleteDialog />
     </div>
-  )
+  );
+}
+
+export function Clients() {
+  return (
+    <ClientsProvider>
+      <ClientsContent />
+    </ClientsProvider>
+  );
 }

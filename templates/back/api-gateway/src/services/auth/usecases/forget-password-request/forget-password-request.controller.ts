@@ -22,6 +22,6 @@ export class ForgetPasswordRequestController {
   @ApiOperation({ summary: 'Mot de passe oublié demande' })
   async forgetPasswordRequest(@Body() dto: ForgetPasswordRequestDto) {
     const url = routesConfig.auth.forgetPasswordRequest.link(this.services.auth);
-    return this.httpProxy.post(url, dto, 'Forget password request failed');
+    return this.httpProxy.put(url, dto, 'Forget password request failed');
   }
 }

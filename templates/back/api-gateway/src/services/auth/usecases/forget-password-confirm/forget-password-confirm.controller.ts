@@ -20,7 +20,7 @@ export class ForgetPasswordConfirmController {
   @Put(routesConfig.auth.forgetPasswordConfirm.path)
   @ApiOperation({ summary: 'Mot de passe oublié confirmation' })
   async forgetPasswordConfirm(@Body() dto: ForgetPasswordConfirmDto) {
-    const url = routesConfig.auth.forgetPasswordRequest.link(this.services.auth);
-    return this.httpProxy.post(url, dto, 'Forget password confirm failed');
+    const url = routesConfig.auth.forgetPasswordConfirm.link(this.services.auth);
+    return this.httpProxy.put(url, dto, 'Forget password confirm failed');
   }
 }

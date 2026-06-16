@@ -1,6 +1,6 @@
 'use client';
 
-import { AVAILABLE_TEMPLATES } from './data/drive-template';
+import { AVAILABLE_TEMPLATES } from './data';
 import { TemplateCard } from './components/template-card';
 
 export function Templates() {

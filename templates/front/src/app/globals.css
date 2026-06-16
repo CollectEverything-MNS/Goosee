@@ -32,14 +32,17 @@
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 240 6% 7%;
+    --sidebar-foreground: 240 5% 75%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 240 6% 7%;
+    --sidebar-accent: 240 5% 14%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 240 5% 14%;
+    --sidebar-ring: 45 100% 51%;
+
+    --admin-accent: 45 100% 51%;
+    --admin-accent-foreground: 240 6% 7%;
   }
 
   .dark {
@@ -88,4 +91,106 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ------------------------------------------------------------------
+   Site template themes — applied via SiteThemeProvider (data-site-template)
+   Each value tweaks fonts, radius, tracking & spacing for the
+   public-facing page blocks so each template feels visually distinct.
+   ------------------------------------------------------------------ */
+.site-themed {
+  --block-font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --block-font-heading: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --block-heading-weight: 700;
+  --block-heading-style: normal;
+  --block-heading-tracking: -0.02em;
+  --block-radius: 0.5rem;
+  --block-button-radius: 0.5rem;
+  --block-button-weight: 600;
+  --block-button-uppercase: none;
+  --block-button-tracking: 0;
+  --block-section-padding-y: 3rem;
+  --block-overline-tracking: 0.18em;
+  font-family: var(--block-font-body);
+}
+
+.site-themed h1,
+.site-themed h2,
+.site-themed h3,
+.site-themed h4 {
+  font-family: var(--block-font-heading);
+  font-weight: var(--block-heading-weight);
+  font-style: var(--block-heading-style);
+  letter-spacing: var(--block-heading-tracking);
+}
+
+.site-themed .block-button {
+  border-radius: var(--block-button-radius);
+  font-weight: var(--block-button-weight);
+  text-transform: var(--block-button-uppercase);
+  letter-spacing: var(--block-button-tracking);
+}
+
+.site-themed .block-card,
+.site-themed .block-image {
+  border-radius: var(--block-radius);
+}
+
+/* DRIVE — moderne, sans serif, arrondi généreux */
+[data-site-template='drive'] {
+  --block-font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --block-font-heading: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --block-heading-weight: 800;
+  --block-heading-tracking: -0.035em;
+  --block-radius: 1rem;
+  --block-button-radius: 9999px;
+  --block-button-weight: 700;
+  --block-button-uppercase: none;
+}
+
+/* BAKERY — chaleureux, serif, courbes douces */
+[data-site-template='bakery'] {
+  --block-font-body: 'Georgia', 'Times New Roman', serif;
+  --block-font-heading: 'Georgia', 'Times New Roman', serif;
+  --block-heading-weight: 600;
+  --block-heading-style: italic;
+  --block-heading-tracking: -0.005em;
+  --block-radius: 0.75rem;
+  --block-button-radius: 0.5rem;
+  --block-button-weight: 600;
+  --block-button-uppercase: none;
+  --block-section-padding-y: 4rem;
+  --block-overline-tracking: 0.3em;
+}
+
+/* RESTAURANT — élégant, serif anguleux, raffinement bistronomique */
+[data-site-template='restaurant'] {
+  --block-font-body: 'Georgia', 'Times New Roman', serif;
+  --block-font-heading: 'Playfair Display', 'Times New Roman', serif;
+  --block-heading-weight: 500;
+  --block-heading-style: italic;
+  --block-heading-tracking: -0.01em;
+  --block-radius: 0;
+  --block-button-radius: 0;
+  --block-button-weight: 500;
+  --block-button-uppercase: uppercase;
+  --block-button-tracking: 0.15em;
+  --block-section-padding-y: 5rem;
+  --block-overline-tracking: 0.4em;
+}
+
+/* BEAUTY — féminin, serif italique, formes rondes */
+[data-site-template='beauty'] {
+  --block-font-body: 'Georgia', 'Times New Roman', serif;
+  --block-font-heading: 'Georgia', 'Times New Roman', serif;
+  --block-heading-weight: 400;
+  --block-heading-style: italic;
+  --block-heading-tracking: -0.015em;
+  --block-radius: 1.5rem;
+  --block-button-radius: 9999px;
+  --block-button-weight: 500;
+  --block-button-uppercase: uppercase;
+  --block-button-tracking: 0.25em;
+  --block-section-padding-y: 4rem;
+  --block-overline-tracking: 0.35em;
 }

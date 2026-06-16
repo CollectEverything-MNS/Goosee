@@ -1,5 +1,5 @@
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
+import { AdminStatusBadge } from '@/components/layout/admin/components/admin-status-badge';
 import { PagesTableActions } from '@/features/personnalisation/pages/components/pages-table-actions';
 import { ColumnDef } from '@tanstack/react-table';
 import { useLocale, useTranslations } from 'next-intl';
@@ -41,7 +41,7 @@ export function usePagesColumns(): ColumnDef<Page>[] {
         return (
           <Link
             href={`/${locale}/${page.slug}`}
-            className="font-medium hover:underline hover:text-primary transition-colors"
+            className="font-medium text-foreground hover:text-primary hover:underline transition-colors"
           >
             {page.title}
           </Link>
@@ -53,10 +53,11 @@ export function usePagesColumns(): ColumnDef<Page>[] {
       header: t('admin.pages.table.status'),
       cell: ({ row }) => {
         const status = row.getValue('status') as PageStatus;
+        const tone = status === PageStatus.PUBLISHED ? 'success' : 'neutral';
         return (
-          <Badge variant={status === PageStatus.PUBLISHED ? 'default' : 'secondary'}>
+          <AdminStatusBadge tone={tone} withDot>
             {t(`admin.pages.status.${status}`)}
-          </Badge>
+          </AdminStatusBadge>
         );
       },
       filterFn: (row, id, value) => {
@@ -65,7 +66,7 @@ export function usePagesColumns(): ColumnDef<Page>[] {
     },
     {
       id: 'actions',
-      header: t('admin.pages.table.actions'),
+      header: '',
       cell: ({ row }) => <PagesTableActions row={row} />,
     },
   ]

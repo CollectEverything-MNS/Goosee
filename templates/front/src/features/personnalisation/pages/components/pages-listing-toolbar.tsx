@@ -3,9 +3,7 @@ import { DataTableViewOptions } from '@/components/data-table/data-table-view-op
 import { DataTableFilter } from '@/components/data-table/data-table-filter'
 import { Button } from '@/components/ui/button'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import { Plus } from 'lucide-react'
-import { useTranslations, useLocale } from 'next-intl'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { PageStatus } from '../types/page.types'
 
 interface Props {
@@ -14,7 +12,6 @@ interface Props {
 
 export function PagesListingToolbar({ table }: Props) {
   const t = useTranslations()
-  const locale = useLocale()
   const isFiltered = table.getState().columnFilters.length > 0
 
   const statusOptions = [
@@ -43,13 +40,6 @@ export function PagesListingToolbar({ table }: Props) {
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         )}
-      </div>
-      <div className={'flex items-center'}>
-        <Link href={`/${locale}/goosee-admin/pages/create`}>
-          <Button variant="default">
-            <Plus /> <div className={'hidden md:block'}>{t('admin.pages.addNewPage')}</div>
-          </Button>
-        </Link>
       </div>
     </div>
   )

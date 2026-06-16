@@ -8,11 +8,13 @@ import { DeleteUserController } from './usecases/delete-user/delete-user.control
 import { ListCustomersController } from './usecases/list-customers/list-customers.controller';
 import { ListAdminsController } from './usecases/list-admins/list-admins.controller';
 import { GetMeController } from './usecases/get-me/get-me.controller';
+import { UpdateMeController } from './usecases/update-me/update-me.controller';
 
 @Module({
   imports: [SharedSecurityModule],
   controllers: [
     GetMeController,
+    UpdateMeController,
     CreateUserController,
     GetUserController,
     ListUsersController,

@@ -4,6 +4,7 @@
  */
 export const ROUTE_PAGE_KEY_MAP: Record<string, string> = {
   dashboard: 'dashboard',
+  analytics: 'analytics',
   users: 'users',
   roles: 'roles',
   logs: 'logs',

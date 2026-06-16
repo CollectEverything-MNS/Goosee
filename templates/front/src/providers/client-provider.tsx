@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import { queryClient } from '@/lib/react-query';
 import { useSettings } from '@/features/personnalisation/settings/usecases/use-get-settings';
+import { Toaster } from '@/components/ui/sonner';
 
 function DynamicFavicon() {
   const { data: settings } = useSettings();
@@ -34,6 +35,7 @@ export const ClientProvider = ({ children }: PropsWithChildren) => {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <DynamicFavicon />
         {children}
+        <Toaster richColors position="top-right" />
       </ThemeProvider>
     </QueryClientProvider>
   );

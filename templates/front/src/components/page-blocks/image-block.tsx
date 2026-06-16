@@ -48,13 +48,13 @@ export function ImageBlock({
           <img
             src={src}
             alt={alt || 'Image'}
-            className={cn('h-auto w-full object-cover', rounded && 'rounded-lg')}
+            className={cn('h-auto w-full object-cover', rounded && 'block-image rounded-lg')}
           />
         ) : (
           <div
             className={cn(
               'flex aspect-video items-center justify-center bg-muted',
-              rounded && 'rounded-lg'
+              rounded && 'block-image rounded-lg'
             )}
           >
             <div className="text-center text-muted-foreground">

@@ -1,9 +1,11 @@
-import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
-import { RolesTableActions } from './roles-table-actions';
-import { Role } from '../data/role.types';
+
+import { AdminStatusBadge } from '@/components/layout/admin/components/admin-status-badge';
 import { useRoleLabel } from '@/features/users/data/roles.data';
+
+import { Role } from '../data/role.types';
+import { RolesTableActions } from './roles-table-actions';
 
 export function getRolesColumns(): ColumnDef<Role>[] {
   const t = useTranslations();
@@ -17,11 +19,9 @@ export function getRolesColumns(): ColumnDef<Role>[] {
         const role = row.original;
         return (
           <div className="flex items-center gap-2">
-            <span className="font-medium">{getRoleLabel(role.name)}</span>
+            <span className="font-medium text-foreground">{getRoleLabel(role.name)}</span>
             {role.isSystem && (
-              <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">
-                {t('admin.roles.system')}
-              </Badge>
+              <AdminStatusBadge tone="accent">{t('admin.roles.system')}</AdminStatusBadge>
             )}
           </div>
         );
@@ -30,7 +30,9 @@ export function getRolesColumns(): ColumnDef<Role>[] {
     {
       accessorKey: 'description',
       header: t('admin.roles.table.description'),
-      cell: ({ row }) => row.original.description ?? '—',
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.description ?? '—'}</span>
+      ),
     },
     {
       accessorKey: 'pageKeys',
@@ -38,15 +40,15 @@ export function getRolesColumns(): ColumnDef<Role>[] {
       cell: ({ row }) => {
         const count = row.original.pageKeys?.length ?? 0;
         return (
-          <Badge variant="outline">
+          <AdminStatusBadge tone="neutral">
             {t('admin.roles.table.pagesCount', { count })}
-          </Badge>
+          </AdminStatusBadge>
         );
       },
     },
     {
       id: 'actions',
-      header: t('admin.roles.table.actions'),
+      header: '',
       cell: RolesTableActions,
     },
   ];

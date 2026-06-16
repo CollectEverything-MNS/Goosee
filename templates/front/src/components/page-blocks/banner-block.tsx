@@ -44,7 +44,7 @@ export function BannerBlock({
           <Button
             size="lg"
             variant="secondary"
-            className="mt-2"
+            className="block-button mt-2"
             asChild={context?.mode !== 'preview'}
           >
             {context?.mode === 'preview' ? (
