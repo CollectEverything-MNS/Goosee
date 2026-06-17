@@ -1,0 +1,241 @@
+# Pile complète et ISOLÉE d'un tenant (un site généré). Déployée par l'orchestrateur :
+#   docker compose -p tenant-<slug> --env-file <env généré> -f docker-compose.tenant.yml up -d
+#
+# Tout est interne au réseau du projet (préfixé par -p) ; seules la gateway et le front
+# rejoignent le réseau partagé goosee_platform avec un alias <slug>-gateway / <slug>-front,
+# que Traefik cible via un fichier de routage. NODE_ENV=production : migrations jouées au
+# boot + garde-fous secrets actifs (d'où des secrets générés, non par défaut).
+services:
+  front:
+    image: goosee/front:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    networks:
+      tenant_net:
+      goosee_platform:
+        aliases: ['${TENANT_SLUG}-front']
+
+  gateway:
+    image: goosee/api-gateway:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      API_GATEWAY_PORT: 3001
+      AUTH_SERVICE_HOST: auth
+      AUTH_SERVICE_PORT: 3003
+      USER_SERVICE_HOST: user
+      USER_SERVICE_PORT: 3002
+      PAGE_SERVICE_HOST: page
+      PAGE_SERVICE_PORT: 3004
+      LOG_SERVICE_HOST: log
+      LOG_SERVICE_PORT: 3005
+      PRODUCT_SERVICE_HOST: product
+      PRODUCT_SERVICE_PORT: 3006
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+      NEXT_PUBLIC_WEB_URL: 'http://${TENANT_SLUG}.127.0.0.1.nip.io'
+    depends_on: [auth, user, page, log, product]
+    networks:
+      tenant_net:
+      goosee_platform:
+        aliases: ['${TENANT_SLUG}-gateway']
+
+  auth:
+    image: goosee/auth-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      AUTH_SERVICE_PORT: 3003
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      AUTH_DB_HOST: auth-db
+      AUTH_DB_PORT: 5432
+      AUTH_DB_USER: postgres
+      AUTH_DB_PASSWORD: ${DB_PASSWORD}
+      AUTH_DB_NAME: auth_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      NEXT_PUBLIC_API_URL: 'http://api.${TENANT_SLUG}.127.0.0.1.nip.io'
+    depends_on: [auth-db, rabbitmq]
+    networks: [tenant_net]
+
+  user:
+    image: goosee/user-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      USER_SERVICE_PORT: 3002
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      USER_DB_HOST: user-db
+      USER_DB_PORT: 5432
+      USER_DB_USER: postgres
+      USER_DB_PASSWORD: ${DB_PASSWORD}
+      USER_DB_NAME: user_db
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+    depends_on: [user-db, rabbitmq]
+    networks: [tenant_net]
+
+  page:
+    image: goosee/page-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PAGE_SERVICE_PORT: 3004
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      PAGE_DB_HOST: page-db
+      PAGE_DB_PORT: 5432
+      PAGE_DB_USER: postgres
+      PAGE_DB_PASSWORD: ${DB_PASSWORD}
+      PAGE_DB_NAME: page_db
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: 'false'
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: goosee-uploads
+      MINIO_PUBLIC_URL: 'http://${TENANT_SLUG}.127.0.0.1.nip.io'
+    depends_on: [page-db, rabbitmq, minio]
+    networks: [tenant_net]
+
+  log:
+    image: goosee/log-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOG_SERVICE_PORT: 3005
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      LOG_DB_HOST: log-db
+      LOG_DB_PORT: 5432
+      LOG_DB_USER: postgres
+      LOG_DB_PASSWORD: ${DB_PASSWORD}
+      LOG_DB_NAME: log_db
+    depends_on: [log-db, rabbitmq]
+    networks: [tenant_net]
+
+  product:
+    image: goosee/product-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PRODUCT_SERVICE_PORT: 3006
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      PRODUCT_DB_HOST: product-db
+      PRODUCT_DB_PORT: 5432
+      PRODUCT_DB_USER: postgres
+      PRODUCT_DB_PASSWORD: ${DB_PASSWORD}
+      PRODUCT_DB_NAME: product_db
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: 'false'
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: goosee-uploads
+      MINIO_PUBLIC_URL: 'http://${TENANT_SLUG}.127.0.0.1.nip.io'
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+    depends_on: [product-db, rabbitmq, minio]
+    networks: [tenant_net]
+
+  notifier:
+    image: goosee/notifier-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_SECURE: 'false'
+      SMTP_USER: ''
+      SMTP_PASSWORD: ''
+      SMTP_FROM: 'no-reply@${TENANT_SLUG}.anaduck.fr'
+    depends_on: [rabbitmq, mailhog]
+    networks: [tenant_net]
+
+  auth-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: auth_db
+    volumes: ['auth_db_data:/var/lib/postgresql/data']
+    networks: [tenant_net]
+
+  user-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: user_db
+    volumes: ['user_db_data:/var/lib/postgresql/data']
+    networks: [tenant_net]
+
+  page-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: page_db
+    volumes: ['page_db_data:/var/lib/postgresql/data']
+    networks: [tenant_net]
+
+  log-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: log_db
+    volumes: ['log_db_data:/var/lib/postgresql/data']
+    networks: [tenant_net]
+
+  product-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: product_db
+    volumes: ['product_db_data:/var/lib/postgresql/data']
+    networks: [tenant_net]
+
+  rabbitmq:
+    image: rabbitmq:management
+    restart: unless-stopped
+    volumes: ['rabbitmq_data:/var/lib/rabbitmq']
+    networks: [tenant_net]
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes: ['minio_data:/data']
+    networks: [tenant_net]
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    restart: unless-stopped
+    networks: [tenant_net]
+
+networks:
+  tenant_net:
+  goosee_platform:
+    external: true
+
+volumes:
+  auth_db_data:
+  user_db_data:
+  page_db_data:
+  log_db_data:
+  product_db_data:
+  rabbitmq_data:
+  minio_data:
