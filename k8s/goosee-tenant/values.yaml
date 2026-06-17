@@ -31,14 +31,35 @@ secrets:
   stripeWebhookSecret: ''
 
 # Gateway HTTP (seule porte d'entrée API) et front Next.js.
+# readyPath : la gateway n'a que /health ; les microservices ont /health/ready (check DB).
 gateway:
   name: gateway
   image: goosee/api-gateway
   port: 3001
+  readyPath: /health
 front:
   name: front
   image: goosee/front
   port: 3000
+
+# Ressources (requests/limits) et autoscaling. requests.cpu est requis pour l'HPA.
+resources:
+  app:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+  db:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 256Mi }
+  infra:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+
+# Autoscaling horizontal (gateway + microservices + front), sur l'usage CPU.
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUPercent: 80
 
 # Microservices HTTP internes (Deployment + Service ClusterIP). Chacun a sa base dédiée.
 backendServices:

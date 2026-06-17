@@ -158,7 +158,7 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 |---|---|---|---|
 | 6.1 | Chart Helm paramétrable (workloads + StatefulSets Postgres + MinIO + RabbitMQ) | 3–4 j | ✅ |
 | 6.2 | ConfigMap/Secret par tenant, `Ingress` host, cert-manager/Traefik | 2–3 j | ✅ (TLS/cert-manager hors POC local, HTTP via nip.io) |
-| 6.3 | Probes HTTP, `requests`/`limits`, **HPA** | 1.5–2 j | ⬜ |
+| 6.3 | Probes HTTP, `requests`/`limits`, **HPA** | 1.5–2 j | ✅ |
 | 6.4 | Jobs de migration + de seed au déploiement | 1.5–2 j | ⬜ |
 | 6.5 | Isolation : namespace + `NetworkPolicy` + `ResourceQuota` | 2–3 j | ⬜ |
 

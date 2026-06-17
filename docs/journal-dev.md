@@ -628,6 +628,28 @@ cert-manager + un `tls:` sur l'Ingress.
 **Reste Lot 6 :** 6.3 probes + requests/limits + HPA, 6.4 Jobs migration/seed,
 6.5 NetworkPolicy + ResourceQuota.
 
+---
+
+## 2026-06-17 — Lot 6.3 : probes, ressources et autoscaling (HPA)
+
+**Fait :**
+- **Probes** : liveness `/health` + readiness `/health/ready` sur les microservices,
+  `/health` pour la gateway (pas de `/health/ready`), `GET /` pour le front. Les bases
+  Postgres ont une readiness `pg_isready` → les Services ne routent que vers des pods prêts,
+  ce qui supprime le crash-loop des microservices au premier boot.
+- **requests/limits** sur tous les workloads (app / db / infra, valeurs dans `values.yaml`).
+- **HPA** (`templates/hpa.yaml`) : un HorizontalPodAutoscaler par charge HTTP (gateway +
+  8 microservices + front), cible **CPU 80 %**, min 1 / max 3. Piloté par `values.hpa`.
+
+**Pourquoi :** fiabiliser le démarrage (ordre via readiness), cadrer la consommation
+(requests/limits) et permettre la montée en charge automatique — cœur du « forfait scalable ».
+
+**Testé en réel** (upgrade release `demo`) : tous les pods applicatifs **1/1, 0 restart**
+(plus de crash-loop au boot), et **10 HPA actifs** avec métriques réelles
+(`cpu: 6–8%/80%`, metrics-server de k3s). 
+
+**Reste Lot 6 :** 6.4 Jobs migration/seed, 6.5 NetworkPolicy + ResourceQuota.
+
 
 
 

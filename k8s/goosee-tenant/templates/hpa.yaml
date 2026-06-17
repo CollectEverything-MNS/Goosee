@@ -1,0 +1,28 @@
+# Autoscaling horizontal des charges HTTP (gateway + microservices + front) sur l'usage CPU.
+# Nécessite metrics-server (fourni par k3s) et des requests.cpu sur les pods.
+{{- if .Values.hpa.enabled }}
+{{- range concat (list .Values.gateway .Values.front) .Values.backendServices }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "goosee.labels" $ | nindent 4 }}
+    app.kubernetes.io/name: {{ .name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .name }}
+  minReplicas: {{ $.Values.hpa.minReplicas }}
+  maxReplicas: {{ $.Values.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $.Values.hpa.targetCPUPercent }}
+{{- end }}
+{{- end }}

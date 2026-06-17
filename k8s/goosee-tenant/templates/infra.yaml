@@ -44,6 +44,8 @@ spec:
           ports:
             - containerPort: 5672
             - containerPort: 15672
+          resources:
+            {{- toYaml .Values.resources.infra | nindent 12 }}
           volumeMounts:
             - name: data
               mountPath: /var/lib/rabbitmq
@@ -112,6 +114,8 @@ spec:
                 secretKeyRef:
                   name: goosee-secrets
                   key: MINIO_ROOT_PASSWORD
+          resources:
+            {{- toYaml .Values.resources.infra | nindent 12 }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -167,3 +171,5 @@ spec:
           ports:
             - containerPort: 1025
             - containerPort: 8025
+          resources:
+            {{- toYaml .Values.resources.infra | nindent 12 }}

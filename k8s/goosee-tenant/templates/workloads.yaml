@@ -48,6 +48,20 @@ spec:
                 name: goosee-env
             - secretRef:
                 name: goosee-secrets
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .port }}
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: {{ .readyPath | default "/health/ready" }}
+              port: {{ .port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml $.Values.resources.app | nindent 12 }}
 {{- end }}
 
 # ----- Notifier (RMQ uniquement, pas de Service ni de port HTTP) -----
@@ -79,6 +93,8 @@ spec:
                 name: goosee-env
             - secretRef:
                 name: goosee-secrets
+          resources:
+            {{- toYaml .Values.resources.app | nindent 12 }}
 
 # ----- Front Next.js (NODE_ENV uniquement : l'URL API est dérivée du host au runtime) -----
 ---
@@ -123,3 +139,17 @@ spec:
           env:
             - name: NODE_ENV
               value: production
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.front.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.front.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources.app | nindent 12 }}

@@ -51,6 +51,13 @@ spec:
                 secretKeyRef:
                   name: goosee-secrets
                   key: DB_PASSWORD
+          readinessProbe:
+            exec:
+              command: ['pg_isready', '-U', 'postgres', '-d', '{{ .db }}']
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml $.Values.resources.db | nindent 12 }}
           volumeMounts:
             - name: data
               mountPath: /var/lib/postgresql/data
