@@ -64,19 +64,45 @@ ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, role = EXCLUDED.
 }
 
 // Crée/maj un site : tenant (registre) + project (vitrine), en STOPPED.
-// userId résolu par sous-requête sur l'e-mail (pas de round-trip d'UUID).
-function upsertSite(userEmail, { slug, plan, infra, label }) {
+// On stocke le nom du propriétaire sur le tenant pour que le démarrage à la demande seede
+// l'OWNER avec le bon nom (« Bob Durand » et non « Admin Goosee »).
+function upsertSite(owner, { slug, plan, infra, label }) {
   psql(
     'orchestrator_db',
     `DELETE FROM tenants WHERE slug = '${esc(slug)}';
-INSERT INTO tenants (slug, "ownerEmail", plan, infra, status, "instanceUrl", "apiUrl")
-VALUES ('${esc(slug)}', '${esc(userEmail)}', '${plan}', '${infra}', 'STOPPED', '${instanceUrl(slug, infra)}', '${apiUrl(slug, infra)}');`
+INSERT INTO tenants (slug, "ownerEmail", "ownerFirstName", "ownerLastName", plan, infra, status, "instanceUrl", "apiUrl")
+VALUES ('${esc(slug)}', '${esc(owner.email)}', '${esc(owner.firstName)}', '${esc(owner.lastName)}', '${plan}', '${infra}', 'STOPPED', '${instanceUrl(slug, infra)}', '${apiUrl(slug, infra)}');`
   );
   psql(
     'vitrine_db',
     `DELETE FROM projects WHERE subdomain = '${esc(slug)}';
 INSERT INTO projects ("userId", "businessName", subdomain, "domainType", plan, status, infra, "instanceUrl")
-VALUES ((SELECT id FROM users WHERE email = '${esc(userEmail)}'), '${esc(label)}', '${esc(slug)}', 'subdomain', '${plan}', 'STOPPED', '${infra}', '${instanceUrl(slug, infra)}');`
+VALUES ((SELECT id FROM users WHERE email = '${esc(owner.email)}'), '${esc(label)}', '${esc(slug)}', 'subdomain', '${plan}', 'STOPPED', '${infra}', '${instanceUrl(slug, infra)}');`
+  );
+}
+
+// Tarifs mensuels par forfait (cents).
+const PLAN_PRICE = { starter: 1500, commerce: 2900, enterprise: 9900 };
+
+// Crée/maj l'abonnement + quelques factures payées d'un client (module billing de la vitrine).
+// Alice/Bob ont déjà des sites : ils sont donc supposés avoir un abonnement actif.
+function upsertBilling(email, plan) {
+  const price = PLAN_PRICE[plan] ?? 2900;
+  const uid = `(SELECT id FROM users WHERE email = '${esc(email)}')`;
+  // Idempotent : on repart d'un état propre pour ce client.
+  psql(
+    'vitrine_db',
+    `DELETE FROM invoices WHERE "userId" = ${uid};
+DELETE FROM subscriptions WHERE "userId" = ${uid};
+INSERT INTO subscriptions ("userId", plan, status, "currentPeriodStart", "currentPeriodEnd", "cardBrand", "cardLast4", "cardExpMonth", "cardExpYear")
+VALUES (${uid}, '${plan}', 'active', date_trunc('month', now()), date_trunc('month', now()) + interval '1 month', 'visa', '4242', 12, 2030);
+-- 3 dernières factures payées (3 derniers mois)
+INSERT INTO invoices ("userId", "amountCents", currency, status, "paidAt", "periodStart", "periodEnd")
+SELECT ${uid}, ${price}, 'eur', 'paid',
+       date_trunc('month', now()) - (g || ' month')::interval,
+       date_trunc('month', now()) - (g || ' month')::interval,
+       date_trunc('month', now()) - ((g - 1) || ' month')::interval
+FROM generate_series(1, 3) AS g;`
   );
 }
 
@@ -92,28 +118,19 @@ function main() {
   });
   ok('superadmin@goosee.dev / ' + SUPERADMIN_PW + ' (SUPERADMIN)');
 
-  upsertUser({
-    email: 'alice@goosee.dev',
-    password: DEMO_PW,
-    role: 'CLIENT',
-    firstName: 'Alice',
-    lastName: 'Martin',
-  });
-  upsertSite('alice@goosee.dev', {
+  const alice = { email: 'alice@goosee.dev', firstName: 'Alice', lastName: 'Martin' };
+  upsertUser({ ...alice, password: DEMO_PW, role: 'CLIENT' });
+  upsertSite(alice, {
     slug: 'atelier-alice',
     plan: 'commerce',
     infra: 'docker',
     label: "L'Atelier d'Alice",
   });
-  ok('alice@goosee.dev / ' + DEMO_PW + ' — 1 site Docker (atelier-alice)');
+  upsertBilling(alice.email, 'commerce');
+  ok('alice@goosee.dev / ' + DEMO_PW + ' — 1 site Docker (atelier-alice) + abonnement commerce');
 
-  upsertUser({
-    email: 'bob@goosee.dev',
-    password: DEMO_PW,
-    role: 'CLIENT',
-    firstName: 'Bob',
-    lastName: 'Durand',
-  });
+  const bob = { email: 'bob@goosee.dev', firstName: 'Bob', lastName: 'Durand' };
+  upsertUser({ ...bob, password: DEMO_PW, role: 'CLIENT' });
   const bobSites = [
     { slug: 'resto-bob', plan: 'commerce', infra: 'docker', label: 'Resto Bob' },
     { slug: 'mode-bob', plan: 'enterprise', infra: 'k8s', label: 'Mode Bob' },
@@ -122,9 +139,11 @@ function main() {
     { slug: 'sport-bob', plan: 'enterprise', infra: 'k8s', label: 'Sport Bob' },
   ];
   for (const s of bobSites) {
-    upsertSite('bob@goosee.dev', s);
+    upsertSite(bob, s);
   }
-  ok('bob@goosee.dev / ' + DEMO_PW + ' — 5 sites (1 Docker + 4 K8s)');
+  // Bob a des sites enterprise : abonnement enterprise (forfait le plus élevé qu'il possède).
+  upsertBilling(bob.email, 'enterprise');
+  ok('bob@goosee.dev / ' + DEMO_PW + ' — 5 sites (1 Docker + 4 K8s) + abonnement enterprise');
 
   console.log('\n\x1b[1mComptes prêts.\x1b[0m Charlie (scénario 3) se crée en live via l’onboarding.');
   console.log('Déploiement + données des sites : `yarn presentation`.');
