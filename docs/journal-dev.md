@@ -324,6 +324,25 @@ valide même avec guillemets/backticks/retours ligne.
 **Reste Lot 3 :** 3.4 suivi SSE, 3.6 seed owner + e-mail creds, et le câblage
 vitrine → orchestrateur (déclencher le provisioning après inscription/paiement).
 
+---
+
+## 2026-06-17 — Lot 3.6 + 3.7 : seed owner + câblage vitrine → orchestrateur
+
+**Fait :**
+- **Seed owner** : `ProvisioningService.seedOwner()` crée l'OWNER dans les bases internes
+  du tenant via `docker compose exec psql` (SQL stdin, retry), hash `bcryptjs`. `provision`
+  renvoie `{ tenant, ownerPassword }`. Testé : login OWNER sur la gateway du tenant → token.
+- **Câblage vitrine → orchestrateur** : `ProvisioningClient` (HTTP) + endpoint authentifié
+  `POST /user/me/project/provision` qui crée/maj le `Project`, appelle l'orchestrateur et
+  met à jour le `Project` (status/infra/instanceUrl). `projectId` relié côté tenant.
+
+**🎉 FLUX COMPLET DU POC VALIDÉ end-to-end :** register → login → provision depuis la
+vitrine → site e-commerce **isolé déployé** sur `myshop.127.0.0.1.nip.io` (front + api 200),
+OWNER seedé, `Project` ACTIVE. Commits `feat(orchestrator): seed…`, `feat(vitrine): déclenche…`.
+
+**Reste :** Stripe en amont du trigger (Lot 2), e-mail creds (Mailhog), suivi SSE,
+puis Lot 5 (cart/order/payment du site généré), Lot 6 (K8s), Lot 7 (superadmin), Lot 8 (UI).
+
 
 
 
