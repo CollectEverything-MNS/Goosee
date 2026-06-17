@@ -1,0 +1,25 @@
+# Isolation réseau du tenant : tout l'ingress est refusé par défaut (dès qu'un pod est
+# sélectionné par une policy Ingress), sauf depuis le même namespace et depuis le namespace
+# du contrôleur d'ingress (Traefik / kube-system). Les autres tenants ne peuvent donc pas
+# joindre les pods de ce namespace. L'egress reste ouvert (POC) pour ne pas casser DNS.
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tenant-isolation
+  labels:
+    {{- include "goosee.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Trafic intra-namespace (les services du tenant se parlent entre eux)
+    - from:
+        - podSelector: {}
+    # Contrôleur d'ingress (Traefik) pour atteindre gateway et front
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+{{- end }}

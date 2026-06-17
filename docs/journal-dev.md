@@ -677,6 +677,36 @@ gateway** (`POST /auth/login`) renvoie un JWT `roles:[OWNER]`. Tenant k8s connec
 
 **Reste Lot 6 :** 6.5 NetworkPolicy + ResourceQuota.
 
+---
+
+## 2026-06-17 — Lot 6.5 : isolation namespace (NetworkPolicy + ResourceQuota)
+
+**Fait :**
+- **`networkpolicy.yaml`** (`tenant-isolation`) : `podSelector: {}` + `policyTypes: [Ingress]`
+  → ingress refusé par défaut, autorisé uniquement depuis le **même namespace** et depuis
+  **kube-system** (contrôleur Traefik). Les autres tenants ne peuvent pas joindre les pods.
+  Egress laissé ouvert (POC, pour ne pas casser le DNS).
+- **`resourcequota.yaml`** (`tenant-quota`) : plafonne requests/limits CPU+mémoire et le
+  nombre de pods du namespace. Impose des requests/limits sur chaque pod → `resources`
+  ajoutées aussi au **Job de seed**. Dimensionné socle + marge HPA (requestsCpu 6 /
+  requestsMemory 8Gi / limitsCpu 24 / limitsMemory 24Gi / pods 80).
+- Flags `networkPolicy.enabled` et `resourceQuota.enabled` dans `values.yaml`.
+
+**Pourquoi :** isolation totale par tenant (non négociable du POC) au niveau réseau, et
+garde-fou de consommation pour qu'un tenant ne sature pas le cluster.
+
+**Testé en réel** (release `demo`, révision 6) :
+- ResourceQuota active : `requests.cpu 1100m/6`, `requests.memory 2816Mi/8Gi`, `pods 22/80`,
+  `limits.cpu 11/24` — marge confortable pour l'autoscaling.
+- L'ingress fonctionne toujours (login OWNER via Traefik → **201**).
+- **Isolation prouvée** : un pod du namespace `default` tentant de joindre
+  `gateway.tenant-demo:3001` obtient `000` (timeout/refus), alors que l'intra-namespace et
+  Traefik passent.
+
+**🎉 Lot 6 terminé** (6.1→6.5 ✅) : forfait Kubernetes scalable et isolé par tenant, validé
+de bout en bout sur k3d (chart Helm, ingress, probes, HPA, seed OWNER, NetworkPolicy +
+ResourceQuota). Reste : Lot 7 (superadmin), Lot 8 (UI/UX).
+
 
 
 

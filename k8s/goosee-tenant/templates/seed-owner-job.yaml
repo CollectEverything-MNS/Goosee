@@ -30,6 +30,8 @@ spec:
           envFrom:
             - secretRef:
                 name: goosee-secrets
+          resources:
+            {{- toYaml .Values.resources.db | nindent 12 }}
           command: ['/bin/sh', '-c']
           args:
             - |

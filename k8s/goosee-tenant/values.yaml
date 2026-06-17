@@ -67,6 +67,22 @@ hpa:
   maxReplicas: 3
   targetCPUPercent: 80
 
+# Isolation réseau : refuse l'ingress venant des autres tenants (namespaces), n'autorise
+# que l'intra-namespace et le contrôleur d'ingress (Traefik dans kube-system).
+networkPolicy:
+  enabled: true
+
+# Plafond de ressources du namespace du tenant (borne la consommation, requests + limits
+# obligatoires sur chaque pod — d'où les resources sur tous les workloads et le Job de seed).
+resourceQuota:
+  enabled: true
+  # Dimensionné pour le socle (~22 pods) + la marge d'autoscaling (HPA jusqu'à x3).
+  requestsCpu: '6'
+  requestsMemory: 8Gi
+  limitsCpu: '24'
+  limitsMemory: 24Gi
+  pods: '80'
+
 # Microservices HTTP internes (Deployment + Service ClusterIP). Chacun a sa base dédiée.
 backendServices:
   - { name: auth, image: goosee/auth-service, port: 3003 }

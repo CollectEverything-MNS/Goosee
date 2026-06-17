@@ -1,0 +1,18 @@
+# Plafond de ressources du namespace du tenant : borne CPU/mémoire (requests + limits) et
+# le nombre de pods, pour éviter qu'un tenant ne consomme tout le cluster. Impose que chaque
+# pod déclare ses requests/limits (assuré sur tous les workloads et le Job de seed).
+{{- if .Values.resourceQuota.enabled }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-quota
+  labels:
+    {{- include "goosee.labels" . | nindent 4 }}
+spec:
+  hard:
+    requests.cpu: {{ .Values.resourceQuota.requestsCpu | quote }}
+    requests.memory: {{ .Values.resourceQuota.requestsMemory | quote }}
+    limits.cpu: {{ .Values.resourceQuota.limitsCpu | quote }}
+    limits.memory: {{ .Values.resourceQuota.limitsMemory | quote }}
+    pods: {{ .Values.resourceQuota.pods | quote }}
+{{- end }}
