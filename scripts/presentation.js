@@ -180,20 +180,26 @@ function startVitrine() {
   run('corepack yarn install', { cwd: VITRINE, capture: true });
   run('corepack yarn workspace api migration:run', { cwd: VITRINE, capture: true });
   run('corepack yarn workspace orchestrator migration:run', { cwd: VITRINE, capture: true });
-  // Purge le cache de build du front : un `.next` issu d'un `next build` (prod) casse
-  // `next dev` (chunks vendor manquants, ex. @formatjs). On repart propre.
+  // Le front est servi en PRODUCTION (build + next start) : `next dev` est instable sous
+  // Windows avec next-intl (chunks vendor @formatjs manquants → 500 + recompilations qui
+  // rament). On repart d'un .next propre puis on build une fois.
+  log('Build du front (prod, ~30-60s)');
   fs.rmSync(path.join(VITRINE, 'apps', 'web', '.next'), { recursive: true, force: true });
+  run('corepack yarn workspace web build', { cwd: VITRINE });
+
   const logsDir = path.join(VITRINE, '.presentation-logs');
   fs.mkdirSync(logsDir, { recursive: true });
-  for (const app of ['orchestrator', 'api', 'web']) {
+  // api/orchestrateur en dev (légers), front en prod (stable).
+  const procs = [['orchestrator', 'dev'], ['api', 'dev'], ['web', 'start']];
+  for (const [app, mode] of procs) {
     const out = fs.openSync(path.join(logsDir, `${app}.log`), 'a');
-    const child = spawn('corepack', ['yarn', 'workspace', app, 'dev'], {
+    const child = spawn('corepack', ['yarn', 'workspace', app, mode], {
       cwd: VITRINE, detached: true, stdio: ['ignore', out, out], shell: true,
       env: { ...process.env, MSYS_NO_PATHCONV: '1' },
     });
     child.unref();
   }
-  ok('Vitrine en démarrage : web :3000 · api :3002 · orchestrateur :4000 (logs: .presentation-logs/)');
+  ok('Vitrine démarrée : web :3000 (prod) · api :3002 · orchestrateur :4000 (logs: .presentation-logs/)');
 }
 
 function seedAccounts() {
