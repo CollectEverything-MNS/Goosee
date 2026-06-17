@@ -983,6 +983,39 @@ Prometheus `bistrot` scrapée. Le chemin k8s réutilise le `helm install` valid�
 l'orchestrateur, métriques infra live, `my-orders` par `customerId`, Prometheus central,
 script de présentation, READMEs, docs/architecture alignées. Reste : Lot 8 (UI/UX).
 
+---
+
+## 2026-06-17 — Démo orchestrée : 3 scénarios, Mes sites, e-mails simulés, seeder, launcher
+
+**Fait (repos `Goosee` + `goosee-vitrine`) :**
+- **`scenario.md`** (racine Goosee) : 3 scénarios, comptes + mots de passe en clair, flux pas à pas.
+- **Vitrine « Mes sites »** : `GET /user/me/projects` + page `/mes-sites` (cartes + bouton
+  « Administrer » → `instanceUrl/fr/goosee-admin`), liens navbar (Mes sites / Superadmin).
+- **Onboarding réel** : le dernier écran crée le compte (si nouveau), connecte et provisionne
+  le site → e-mails **simulés en toast** (bienvenue + identifiants OWNER en clair) → scénario 3
+  fonctionnel.
+- **`yarn seed:demo`** : comptes superadmin / alice (1 site) / bob (5 sites) + Projects/Tenants
+  (registre, STOPPED), identifiants déterministes (Demo#2026 / Superadmin#2026), idempotent.
+- **`yarn presentation`** réécrit : plateforme + cluster + **vitrine** (Postgres + migrations +
+  orchestrateur/api/web détachés) + seed des comptes + **déploiement & peuplement** d'un
+  sous-ensemble (Alice + resto-bob Docker + N K8s) avec OWNER Demo#2026 et données réelles
+  (clients, produits, commandes payées) via l'API gateway, puis statut `ACTIVE`. Récapitulatif final.
+- **Image front** : ARG `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` inliné au build ; `build-images.sh`
+  le passe depuis `.env.dev`. La présentation **rebuild toujours** les images (corrige les
+  images obsolètes — ex. routes orders absentes d'une vieille gateway).
+
+**Testé :** `seed-demo` (3 comptes + 6 sites en base) ; chaîne `seedTenantData` (login, register
+client, catégorie, produit, commande, paiement) → **201** après rebuild de la gateway ;
+déploiement Docker + seed OWNER validés ; `presentation.js` syntaxe OK. Le run complet (rebuild
+11 images + vitrine + 3 tenants) n'a pas été exécuté d'un bloc (lourd/long) mais chaque
+composant est validé individuellement.
+
+**Liaisons vérifiées :** web → api → orchestrateur → tenants (Docker/K8s) ; superadmin → api
+`/superadmin/*` → orchestrateur ; Project vitrine ⇄ Tenant registre (slug) ; supervision lit le
+jeton interne via `secretsRef` renseigné par la présentation.
+
+**Reste :** Lot 8 (UI/UX).
+
 
 
 

@@ -37,6 +37,12 @@ généré correspondant (le propriétaire du site = le compte vitrine).
 Les sites d'Alice et Bob ont déjà **clients, produits et commandes** (KPI/CA non nuls). Le
 site créé par Charlie démarre **vide**.
 
+> **Sites réellement déployés + peuplés par `yarn presentation`** (par défaut) :
+> `atelier-alice` et `resto-bob` (Docker) + `mode-bob` (K8s, `PRESENTATION_K8S_COUNT`).
+> Les autres sites de Bob (`tech-bob`, `deco-bob`, `sport-bob`) existent au **registre**
+> (visibles dans « Mes sites » et le superadmin, statut STOPPED) et se déploient à la demande.
+> La clé publique Stripe est **inlinée au build** de l'image front (via `build-images.sh`).
+
 > **Scale-to-zero** : les sites pré-provisionnés sont déployés, peuplés, puis **arrêtés** pour
 > tenir sur une seule machine. Ils apparaissent dans le superadmin ; on **démarre** celui
 > qu'on veut montrer juste avant (bouton « Démarrer » dans le superadmin, ou
