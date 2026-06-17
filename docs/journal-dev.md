@@ -602,6 +602,32 @@ chacun sur sa base dédiée. Premier boot : un redémarrage le temps que la base
 **Reste Lot 6 :** 6.2 Ingress (host `<slug>.127.0.0.1.nip.io`), 6.3 probes + requests/limits
 + HPA, 6.4 Jobs migration/seed, 6.5 NetworkPolicy + ResourceQuota.
 
+---
+
+## 2026-06-17 — Lot 6.2 : Ingress du tenant (Traefik k3s)
+
+**Fait :**
+- **`templates/ingress.yaml`** (+ flag `ingress.enabled`/`className` dans `values.yaml`) :
+  un Ingress Traefik route `<slug>.<domain>` → front et `api.<slug>.<domain>` → gateway.
+  Seules ces deux entrées sortent du namespace (le reste est interne, conforme au principe
+  « une seule porte d'entrée »).
+- ConfigMap/Secret par tenant : déjà livrés en 6.1.
+
+**Pourquoi :** rendre le site et son API joignables sous leur nom de domaine simulé, comme
+côté Compose (Traefik file provider), mais via l'ingress natif de k3s.
+
+**Testé en réel** (release `demo`, loadbalancer k3d sur :8081) :
+- `http://demo.127.0.0.1.nip.io:8081/` → **307** (redirection locale Next.js du front),
+- `http://api.demo.127.0.0.1.nip.io:8081/health` → **200** `{"status":"ok"}`,
+- `…/products` → **200** avec les vrais produits (chemin front → ingress → gateway →
+  product-service → product_db validé).
+
+**Note :** TLS/cert-manager hors périmètre POC local (HTTP via nip.io). En prod, ajouter
+cert-manager + un `tls:` sur l'Ingress.
+
+**Reste Lot 6 :** 6.3 probes + requests/limits + HPA, 6.4 Jobs migration/seed,
+6.5 NetworkPolicy + ResourceQuota.
+
 
 
 

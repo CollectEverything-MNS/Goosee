@@ -11,6 +11,13 @@ image:
   tag: local
   pullPolicy: IfNotPresent
 
+# Ingress (Traefik fourni par k3s). Le site est servi sur <slug>.<domain> et l'API sur
+# api.<slug>.<domain>. En local, ces hôtes nip.io résolvent vers 127.0.0.1 ; le port
+# dépend du mapping du loadbalancer k3d (8081 par défaut dans le README).
+ingress:
+  enabled: true
+  className: traefik
+
 # Secrets du tenant (générés par l'orchestrateur ; valeurs de démo NON utilisables en prod).
 secrets:
   dbPassword: changeme-db
