@@ -14,7 +14,8 @@
  *      identifiants OWNER déterministes (Demo#2026), puis statut ACTIVE.
  *   6. Récapitulatif (URLs + comptes en clair).
  *
- * Variables : PRESENTATION_K8S_COUNT (défaut 1, max 4), TENANT_BASE_DOMAIN, K8S_INGRESS_PORT.
+ * Variables (env/.env.dev) : PRESENTATION_K8S_COUNT (défaut 2, max 4),
+ * PRESENTATION_DOCKER_COUNT (défaut 1, max 2), TENANT_BASE_DOMAIN, K8S_INGRESS_PORT.
  */
 const path = require('path');
 const fs = require('fs');
@@ -25,9 +26,25 @@ const bcrypt = require('bcryptjs');
 
 const ROOT = path.join(__dirname, '..');
 const VITRINE = path.join(ROOT, '..', 'goosee-vitrine');
+
+// Charge env/.env.dev dans process.env (sans écraser les variables déjà définies dans le shell)
+// pour piloter la démo depuis un .env : PRESENTATION_K8S_COUNT, PRESENTATION_DOCKER_COUNT, etc.
+(function loadEnvDev() {
+  try {
+    const content = fs.readFileSync(path.join(ROOT, 'env', '.env.dev'), 'utf8');
+    for (const line of content.split(/\r?\n/)) {
+      const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+      if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
+    }
+  } catch {
+    /* env/.env.dev absent : on garde les valeurs du shell */
+  }
+})();
+
 const BASE_DOMAIN = process.env.TENANT_BASE_DOMAIN || '127.0.0.1.nip.io';
 const K8S_PORT = process.env.K8S_INGRESS_PORT || '8081';
-const K8S_COUNT = Math.min(Number(process.env.PRESENTATION_K8S_COUNT || 1), 4);
+// Nombre de sites K8s de Bob réellement déployés (réglable dans env/.env.dev). Défaut : 2.
+const K8S_COUNT = Math.min(Number(process.env.PRESENTATION_K8S_COUNT || 2), 4);
 const CLUSTER = 'goosee';
 const DEMO_PW = 'Demo#2026';
 const CHART = path.join(ROOT, 'k8s', 'goosee-tenant');
@@ -45,7 +62,7 @@ const IMAGES = [
 ].map((n) => `goosee/${n}:local`);
 
 // Sous-ensemble réellement déployé + peuplé (le reste reste registre/STOPPED, démarrable
-// à la demande). Défaut allégé : 1 site Docker + 1 site K8s.
+// à la demande). Défaut : 1 site Docker + 2 sites K8s (réglable dans env/.env.dev).
 const DOCKER_COUNT = Math.min(Number(process.env.PRESENTATION_DOCKER_COUNT || 1), 2);
 // Nom réel du propriétaire de chaque site (seedé comme OWNER dans le site généré → l'admin
 // affiche « Alice Martin »/« Bob Durand » et non un générique « Admin Goosee »).
