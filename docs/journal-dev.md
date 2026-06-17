@@ -786,6 +786,35 @@ que sur un tenant `infra=k8s` ; les tenants Docker enregistrent l'allocation dan
 
 **Reste Lot 7 :** 7.4 allocation intelligente (recommandation heuristique selon l'usage).
 
+---
+
+## 2026-06-17 — Lot 7.4 : allocation intelligente (recommandation heuristique)
+
+**Fait (repo `goosee-vitrine`) :**
+- **Orchestrateur** : `SupervisionService.recommend(tenant)` calcule un **score de charge**
+  pondéré à partir des KPI métier réels (commandes payées ×4, commandes ×2, produits ×1,
+  clients ×1) → palier `low/medium/high` → ressources recommandées (CPU, mémoire, bornes
+  HPA) + une **justification lisible**. Sans données d'usage (tenant injoignable) : palier
+  bas par défaut. Endpoint `GET /tenants/:id/recommendation`.
+- **API vitrine** : `GET /superadmin/tenants/:id/recommendation` (SUPERADMIN).
+- **Web** : panneau « Recommandation intelligente » par tenant (badge de palier, justification,
+  valeurs recommandées) avec un bouton **Appliquer la reco** qui pousse directement
+  l'allocation via le PATCH ressources (7.3) et rafraîchit la liste.
+
+**Pourquoi :** assister le superadmin avec une suggestion d'allocation fondée sur l'usage
+observé, applicable en un clic — l'« allocation intelligente » du cahier des charges.
+
+**Heuristique transparente** (paliers) : low `250m/256Mi/HPA 1–2`, medium `500m/512Mi/1–3`,
+high `1/1Gi/2–5`. Seuils score : <20 low, <100 medium, ≥100 high.
+
+**Testé :** orchestrateur + api + web compilent.
+
+**🎉 Lot 7 terminé** (7.1→7.4 ✅) : espace superadmin, supervision des tenants + KPI métier
+temps réel, allocation ressources manuelle **et** recommandation intelligente.
+
+**🏁 Jalon 2 atteint** (lots 5→7) : forfait scalable (k8s) + supervision temps réel
+opérationnels → **POC fonctionnellement complet**. Reste le Lot 8 (UI/UX).
+
 
 
 
