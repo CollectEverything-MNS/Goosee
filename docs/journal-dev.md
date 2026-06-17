@@ -760,6 +760,32 @@ actif provisionné par l'orchestrateur (gateway `/internal/kpi` joignable + jeto
 **Reste Lot 7 :** 7.3 allocation K8s manuelle (requests/limits/HPA), 7.4 allocation
 intelligente (recommandation heuristique).
 
+---
+
+## 2026-06-17 — Lot 7.3 : allocation manuelle des ressources K8s (goosee-vitrine)
+
+**Fait (repo `goosee-vitrine`) :**
+- **Orchestrateur** : `TenantService.updateResources(id, {cpu, memory, minReplicas,
+  maxReplicas})` persiste l'allocation dans le registre, puis — si `infra=k8s` —
+  l'applique au déploiement via `ProvisioningService.applyK8sResources` (`helm upgrade
+  --reset-then-reuse-values --set resources.app.limits.* / hpa.min|maxReplicas`, chart
+  `k8s/goosee-tenant` localisé via `GOOSEE_CHART_DIR`). Endpoint
+  `PATCH /tenants/:id/resources` (+ DTO validé).
+- **API vitrine** : `PATCH /superadmin/tenants/:id/resources` (SUPERADMIN) → relaie
+  l'orchestrateur.
+- **Web** : formulaire d'allocation par tenant dans le panneau déplié (CPU/pod, mémoire/pod,
+  replicas min/max), pré-rempli depuis le registre, `Enregistrer` → mutation + invalidation
+  de la liste. Le libellé indique si l'allocation est « appliquée au cluster » (k8s) ou
+  simplement « enregistrée » (docker).
+
+**Pourquoi :** donner au superadmin le levier d'allocation des ressources par tenant
+(requests/limits/HPA), socle de l'allocation intelligente (7.4).
+
+**Testé :** orchestrateur + api + web compilent. L'effet « live » (helm upgrade) ne s'exerce
+que sur un tenant `infra=k8s` ; les tenants Docker enregistrent l'allocation dans le registre.
+
+**Reste Lot 7 :** 7.4 allocation intelligente (recommandation heuristique selon l'usage).
+
 
 
 

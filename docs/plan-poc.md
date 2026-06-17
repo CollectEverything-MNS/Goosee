@@ -168,7 +168,7 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 |---|---|---|---|
 | 7.1 | Espace `SUPERADMIN` + routes protégées | 1 j | ✅ |
 | 7.2 | Prometheus central + scrape `/metrics` et `/internal/kpi` → API d'agrégation (infra + business par tenant) | 3–4 j | ✅ (agrégation KPI métier à la demande ; Prometheus central simplifié pour le POC) |
-| 7.3 | Allocation ressources K8s **manuelle** (requests/limits/HPA) | 2–3 j | ⬜ |
+| 7.3 | Allocation ressources K8s **manuelle** (requests/limits/HPA) | 2–3 j | ✅ |
 | 7.4 | Allocation **intelligente** (recommandation heuristique selon l'usage observé) | 2–3 j | ⬜ |
 
 > **Jalon 2** après les lots 5→7 : forfait scalable + supervision temps réel
