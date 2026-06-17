@@ -493,6 +493,30 @@ la liste admin des commandes sur `order-service` (remplacer `orders.mock.ts`) re
 **Lot 5 terminé** (5.1, 5.2, 5.4, 5.5 ✅ ; 5.3 = scaffold). Reste : Lot 6 (K8s),
 Lot 7 (superadmin), Lot 8 (UI/UX).
 
+---
+
+## 2026-06-17 — Lot 5.2 (suite) : liste admin des commandes sur données réelles
+
+**Fait (front, back-office) :**
+- **`features/orders/usecases/use-list-orders.tsx`** : récupère `GET /orders` (gateway) et
+  mappe la commande back (montants en centimes, statuts `pending|paid|shipped|cancelled`)
+  vers la forme attendue par l'admin : référence dérivée de l'UUID (`CMD-XXXXXXXX`), client
+  depuis l'e-mail, prix en euros, statut traduit (`paid→preparing`, `shipped→delivered` ;
+  le back ne connaît pas « ready »).
+- **`orders.tsx`** consomme ce hook à la place de `MOCK_ORDERS` : le back-office affiche
+  désormais les vraies commandes passées au checkout (filtre statut, recherche et détail —
+  lecture seule — inchangés).
+
+**Pourquoi :** boucler la chaîne storefront → admin. Les commandes créées au checkout
+remontent dans le back-office ; combiné aux KPI (5.4), l'exploitant voit son activité réelle.
+`MOCK_ORDERS` reste utilisé par l'analytics (sera traité au Lot 7).
+
+**Testé :** `tsc` clean, `next build` OK (route admin/orders). Back `order-service` validé
+en standalone (5.2).
+
+**Reste (hors POC immédiat) :** UI de changement de statut dans le détail admin (le back
+expose déjà `PATCH /orders/:id/status`), et bascule de l'analytics sur données réelles.
+
 
 
 

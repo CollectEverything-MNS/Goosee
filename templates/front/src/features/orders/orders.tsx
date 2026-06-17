@@ -9,11 +9,11 @@ import OrdersProvider from './context/orders-provider';
 import { OrderDetailDialog } from './components/orders/order-detail-dialog';
 import { OrdersListingToolbar } from './components/orders/orders-listing-toolbar';
 import { useOrdersColumns } from './components/orders/orders-columns';
-import { MOCK_ORDERS } from './data/orders.mock';
+import { useListOrders } from './usecases/use-list-orders';
 
 function OrdersContent() {
   const t = useTranslations();
-  const orders = MOCK_ORDERS;
+  const { data: orders = [] } = useListOrders();
   const columns = useOrdersColumns();
 
   return (
