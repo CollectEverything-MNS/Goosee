@@ -25,6 +25,8 @@ services:
       ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
       CART_SERVICE_HOST: ${CART_SERVICE_HOST}
       CART_SERVICE_PORT: ${CART_SERVICE_PORT}
+      PAYMENT_SERVICE_HOST: ${PAYMENT_SERVICE_HOST}
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
       JWT_SECRET: ${JWT_SECRET}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
@@ -38,6 +40,7 @@ services:
       - goosee-product-service-prod
       - goosee-order-service-prod
       - goosee-cart-service-prod
+      - goosee-payment-service-prod
     networks:
       - goosee_net
 
@@ -418,6 +421,58 @@ services:
     networks:
       - goosee_net
 
+  # ─────────── PAYMENT ───────────
+  goosee-payment-service-prod:
+    container_name: goosee-payment-service-prod
+    build:
+      context: ../..
+      dockerfile: templates/back/services/payment-service/Dockerfile
+    command: node dist/main
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
+      PAYMENT_DB_HOST: ${PAYMENT_DB_HOST}
+      PAYMENT_DB_PORT: ${PAYMENT_DB_PORT}
+      PAYMENT_DB_USER: ${PAYMENT_DB_USER}
+      PAYMENT_DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      PAYMENT_DB_NAME: ${PAYMENT_DB_NAME}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    expose:
+      - "${PAYMENT_SERVICE_PORT}"
+    depends_on:
+      goosee-payment-db-prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${PAYMENT_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - goosee_net
+
+  goosee-payment-db-prod:
+    image: postgres:16-alpine
+    container_name: goosee-payment-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PAYMENT_DB_USER}
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      POSTGRES_DB: ${PAYMENT_DB_NAME}
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    expose:
+      - "${PAYMENT_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PAYMENT_DB_USER} -d ${PAYMENT_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
   # ─────────── NOTIFIER ───────────
   goosee-notifier-service-prod:
     container_name: goosee-notifier-service-prod
@@ -446,6 +501,7 @@ volumes:
   product_db_data:
   order_db_data:
   cart_db_data:
+  payment_db_data:
 
 networks:
   goosee_net:

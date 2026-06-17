@@ -8,6 +8,7 @@ export type ServiceUrls = {
   product: string;
   order: string;
   cart: string;
+  payment: string;
 };
 
 export const serviceUrl = (config: ConfigService): ServiceUrls => ({
@@ -18,4 +19,5 @@ export const serviceUrl = (config: ConfigService): ServiceUrls => ({
   product: `http://${config.get('PRODUCT_SERVICE_HOST')}:${config.get('PRODUCT_SERVICE_PORT')}`,
   order: `http://${config.get('ORDER_SERVICE_HOST')}:${config.get('ORDER_SERVICE_PORT')}`,
   cart: `http://${config.get('CART_SERVICE_HOST')}:${config.get('CART_SERVICE_PORT')}`,
+  payment: `http://${config.get('PAYMENT_SERVICE_HOST')}:${config.get('PAYMENT_SERVICE_PORT')}`,
 });

@@ -14,6 +14,7 @@ import { CategoriesModule } from './services/categories/categories.module';
 import { ProductsModule } from './services/products/products.module';
 import { OrdersModule } from './services/orders/orders.module';
 import { CartModule } from './services/cart/cart.module';
+import { PaymentsModule } from './services/payments/payments.module';
 import { TagsModule } from './services/tags/tags.module';
 import { LogsModule } from './services/logs/logs.module';
 
@@ -32,6 +33,7 @@ import { LogsModule } from './services/logs/logs.module';
     ProductsModule,
     OrdersModule,
     CartModule,
+    PaymentsModule,
     CategoriesModule,
     TagsModule,
     LogsModule,

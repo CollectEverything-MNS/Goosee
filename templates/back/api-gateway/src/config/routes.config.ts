@@ -8,6 +8,7 @@ const categoriesBasePath = '/categories';
 const tagsBasePath = '/tags';
 const ordersBasePath = '/orders';
 const cartBasePath = '/cart';
+const paymentsBasePath = '/payments';
 
 export const routesConfig = {
   upload: {
@@ -228,6 +229,21 @@ export const routesConfig = {
     listProductsByCategory: {
       path: `${categoriesBasePath}/:id/products`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${categoriesBasePath}/${id}/products`,
+    },
+  },
+
+  payment: {
+    createPayment: {
+      path: paymentsBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${paymentsBasePath}`,
+    },
+    webhook: {
+      path: `${paymentsBasePath}/webhook`,
+      link: (serviceUrl: string) => `${serviceUrl}${paymentsBasePath}/webhook`,
+    },
+    getPayment: {
+      path: `${paymentsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${paymentsBasePath}/${id}`,
     },
   },
 

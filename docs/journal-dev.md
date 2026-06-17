@@ -405,6 +405,39 @@ source du futur passage de commande (5.5) vers `order-service`.
 **Reste Lot 5 :** 5.3 `payment-service` (scaffold, Stripe branché par Florent),
 5.4 `/internal/kpi` réel, 5.5 storefront panier/checkout + branchement au page builder.
 
+---
+
+## 2026-06-17 — Lot 5.3 : microservice de paiement (`payment-service`, scaffold)
+
+**Fait :**
+- **Nouveau microservice `payment-service`** (port 3009, base `payment_db` dédiée), même
+  Clean Architecture : entité `Payment` (réf. commande UUID, montant centimes, devise,
+  statut `pending|succeeded|failed|refunded`, `provider` + `providerRef`), repository
+  interface + impl, 3 usecases : create-payment, get-payment, handle-webhook. HTTP pur,
+  `/health` + `/metrics`, garde-fou `PAYMENT_DB_PASSWORD`, migration au boot.
+- **Abstraction prestataire `IPaymentProvider`** + **`StripePaymentProvider` (scaffold)** :
+  seam propre pour brancher Stripe sans toucher aux usecases. Sans `STRIPE_SECRET_KEY`, le
+  provider tourne en **mode mock** (intention simulée, webhook piloté par un corps JSON)
+  pour tester le flux. Les appels SDK réels sont balisés `TODO(Florent)` (createIntent +
+  vérif signature webhook). `main.ts` active `rawBody` (requis par `constructEvent`).
+- **Routes gateway** : `POST /payments` (checkout, public), `GET /payments/:id`,
+  `POST /payments/webhook` (relai du corps + header `stripe-signature` ; `TODO` raw-body
+  passthrough pour la vraie vérif de signature).
+- **Infra** : service + base aux compose dev/prod et au template tenant isolé
+  (`payment` + `payment-db`), variables `PAYMENT_*` + `STRIPE_*` dans `.env.example`,
+  `turbo.json` et `tenant.env.example`, image `goosee/payment-service:local`.
+
+**Pourquoi :** poser toute la tuyauterie du paiement boutique (entité, statuts, webhook,
+routing, isolation) pour que Florent n'ait plus qu'à remplir les appels Stripe SDK.
+
+**Testé** (Postgres jetable, mode mock) : migration OK, create → `pending` + providerRef
++ clientSecret mock, webhook `succeeded` → statut mis à jour, 404 providerRef inconnu,
+400 statut invalide / montant < 1, 404 paiement inconnu. `payment-service` et `api-gateway`
+compilent.
+
+**Reste Lot 5 :** 5.4 `/internal/kpi` réel (clients/produits/commandes/CA), 5.5 storefront
+panier/checkout + branchement au page builder. (5.1, 5.2 faits ; 5.3 = scaffold.)
+
 
 
 

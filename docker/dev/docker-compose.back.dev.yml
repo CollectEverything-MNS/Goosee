@@ -26,6 +26,8 @@ services:
       ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
       CART_SERVICE_HOST: goosee-cart-service-dev
       CART_SERVICE_PORT: ${CART_SERVICE_PORT}
+      PAYMENT_SERVICE_HOST: goosee-payment-service-dev
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -280,6 +282,36 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${CART_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-payment-service-dev:
+    container_name: goosee-payment-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/payment-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
+      PAYMENT_DB_HOST: goosee-payment-db-dev
+      PAYMENT_DB_PORT: 5432
+      PAYMENT_DB_USER: ${PAYMENT_DB_USER}
+      PAYMENT_DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      PAYMENT_DB_NAME: ${PAYMENT_DB_NAME}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    expose:
+      - "${PAYMENT_SERVICE_PORT}"
+    depends_on:
+      goosee-payment-db-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${PAYMENT_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10
