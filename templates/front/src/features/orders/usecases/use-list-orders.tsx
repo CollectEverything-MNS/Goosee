@@ -2,14 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { Order, OrderStatus } from '../data/order.types';
 
-// Commande telle que renvoyée par order-service (montants en centimes, statuts back).
+// Commande telle que renvoyée par order-service (montants en centimes). Les statuts
+// sont désormais identiques côté admin et back (pas de correspondance à maintenir).
 interface BackendOrder {
   id: string;
   customerId?: string | null;
   customerEmail: string;
   items: { productId: string; name: string; unitPriceCents: number; quantity: number }[];
   totalCents: number;
-  status: 'pending' | 'paid' | 'shipped' | 'cancelled';
+  status: OrderStatus;
   createdAt: string;
 }
 
@@ -17,14 +18,6 @@ interface ListOrdersResponse {
   message: string;
   orders: BackendOrder[];
 }
-
-// Correspondance statut back -> vocabulaire de l'admin (le back ne connaît pas « ready »).
-const STATUS_MAP: Record<BackendOrder['status'], OrderStatus> = {
-  pending: 'pending',
-  paid: 'preparing',
-  shipped: 'delivered',
-  cancelled: 'cancelled',
-};
 
 function toAdminOrder(order: BackendOrder): Order {
   return {
@@ -36,7 +29,7 @@ function toAdminOrder(order: BackendOrder): Order {
       lastName: '',
       email: order.customerEmail,
     },
-    status: STATUS_MAP[order.status],
+    status: order.status,
     items: order.items.map((item) => ({
       id: item.productId,
       productName: item.name,

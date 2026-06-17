@@ -900,9 +900,8 @@
       },
       "statusValues": {
         "pending": "En attente",
-        "preparing": "En préparation",
-        "ready": "Prête",
-        "delivered": "Livrée",
+        "paid": "Payée",
+        "shipped": "Expédiée",
         "cancelled": "Annulée"
       },
       "actions": {
@@ -918,6 +917,9 @@
         "subtotal": "Sous-total",
         "total": "Total",
         "notes": "Notes",
+        "statusLabel": "Statut",
+        "statusUpdated": "Statut de la commande mis à jour",
+        "statusUpdateError": "Échec de la mise à jour du statut",
         "close": "Fermer"
       }
     },

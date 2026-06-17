@@ -540,6 +540,33 @@ que le back-office et les KPI superadmin), plus aucune donnée fictive côté co
 **Note :** le mock client `account/my-orders.mock.ts` (espace « mes commandes » côté
 storefront) reste, distinct — il faudra plus tard retrouver les commandes par `customerId`.
 
+---
+
+## 2026-06-17 — Changement de statut commande (admin) + alignement du vocabulaire
+
+**Fait (front, back-office) :**
+- **Vocabulaire de statuts aligné sur le back** : `OrderStatus` passe de la version
+  « restaurant » (pending/preparing/ready/delivered/cancelled) à celle d'order-service
+  (**pending/paid/shipped/cancelled**). Mise à jour des libellés i18n (fr/en), des tons de
+  badge (`orders-columns`, `order-detail-dialog`), des couleurs de graphe (`analytics-shared`)
+  et du mock client `my-orders`. `use-list-orders` n'a plus de correspondance à maintenir
+  (statut identité). Fini le mapping lossy.
+- **Sélecteur de statut dans le détail admin** : `order-detail-dialog` propose un `Select`
+  des 4 statuts qui appelle `PATCH /orders/:id/status` (hook `use-update-order-status`),
+  avec mise à jour optimiste de la ligne et invalidation de la requête `['admin','orders']`
+  — la liste **et** l'analytics se rafraîchissent (CA recalculé quand une commande passe
+  `paid`/`shipped`).
+
+**Pourquoi :** rendre la démo complète sans Stripe — l'exploitant marque une commande
+`paid`/`shipped`, ce qui alimente immédiatement le CA des KPI (5.4) et de l'analytics.
+
+**Testé :** JSON i18n valides, `tsc` clean, `next build` OK. Back `PATCH /orders/:id/status`
+validé en standalone (5.2).
+
+**Chaîne e-commerce du POC complète** : catalogue (page builder) → panier → checkout →
+commande + paiement (scaffold) → back-office (liste + changement de statut) → KPI + analytics,
+le tout sur données réelles et isolé par tenant.
+
 
 
 

@@ -7,7 +7,7 @@ export const MY_ORDERS_MOCK: Order[] = [
     id: 'my-ord-001',
     reference: 'CMD-2026-0142',
     customer: { firstName: 'Vous', lastName: '', email: '' },
-    status: 'delivered',
+    status: 'shipped',
     items: [
       { id: 'i-1', productName: 'Cookie chocolat', quantity: 2, unitPrice: 3.5 },
       { id: 'i-2', productName: 'Café latté', quantity: 1, unitPrice: 4.2 },
@@ -19,7 +19,7 @@ export const MY_ORDERS_MOCK: Order[] = [
     id: 'my-ord-002',
     reference: 'CMD-2026-0128',
     customer: { firstName: 'Vous', lastName: '', email: '' },
-    status: 'preparing',
+    status: 'paid',
     items: [
       { id: 'i-1', productName: 'Sandwich poulet', quantity: 1, unitPrice: 7.9 },
       { id: 'i-2', productName: 'Smoothie mangue', quantity: 1, unitPrice: 5.5 },

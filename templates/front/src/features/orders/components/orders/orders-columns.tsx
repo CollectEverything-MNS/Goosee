@@ -12,9 +12,8 @@ import { Order, OrderStatus } from '../../data/order.types';
 
 const STATUS_TONE: Record<OrderStatus, AdminStatusTone> = {
   pending: 'warning',
-  preparing: 'info',
-  ready: 'accent',
-  delivered: 'success',
+  paid: 'info',
+  shipped: 'success',
   cancelled: 'danger',
 };
 

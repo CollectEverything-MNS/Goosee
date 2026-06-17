@@ -901,9 +901,8 @@
       },
       "statusValues": {
         "pending": "Pending",
-        "preparing": "Preparing",
-        "ready": "Ready",
-        "delivered": "Delivered",
+        "paid": "Paid",
+        "shipped": "Shipped",
         "cancelled": "Cancelled"
       },
       "actions": {
@@ -919,6 +918,9 @@
         "subtotal": "Subtotal",
         "total": "Total",
         "notes": "Notes",
+        "statusLabel": "Status",
+        "statusUpdated": "Order status updated",
+        "statusUpdateError": "Failed to update status",
         "close": "Close"
       }
     },

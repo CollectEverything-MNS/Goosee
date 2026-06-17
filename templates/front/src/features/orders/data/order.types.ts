@@ -1,9 +1,5 @@
-export type OrderStatus =
-  | 'pending'
-  | 'preparing'
-  | 'ready'
-  | 'delivered'
-  | 'cancelled';
+// Statuts alignés sur order-service (database-per-service, source de vérité).
+export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'cancelled';
 
 export interface OrderItem {
   id: string;
@@ -29,10 +25,4 @@ export interface Order {
   notes?: string;
 }
 
-export const ORDER_STATUSES: OrderStatus[] = [
-  'pending',
-  'preparing',
-  'ready',
-  'delivered',
-  'cancelled',
-];
+export const ORDER_STATUSES: OrderStatus[] = ['pending', 'paid', 'shipped', 'cancelled'];

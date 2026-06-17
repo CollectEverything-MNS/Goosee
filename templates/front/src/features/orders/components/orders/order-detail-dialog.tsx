@@ -1,7 +1,8 @@
 'use client';
 
-import { ShoppingBag } from 'lucide-react';
+import { Loader2, ShoppingBag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 import { AdminStatusBadge, AdminStatusTone } from '@/components/layout/admin/components/admin-status-badge';
 import { Button } from '@/components/ui/button';
@@ -12,15 +13,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 import { useOrder } from '../../context/orders-provider';
-import { OrderStatus } from '../../data/order.types';
+import { ORDER_STATUSES, OrderStatus } from '../../data/order.types';
+import { useUpdateOrderStatus } from '../../usecases/use-update-order-status';
 
 const STATUS_TONE: Record<OrderStatus, AdminStatusTone> = {
   pending: 'warning',
-  preparing: 'info',
-  ready: 'accent',
-  delivered: 'success',
+  paid: 'info',
+  shipped: 'success',
   cancelled: 'danger',
 };
 
@@ -49,8 +57,25 @@ export function OrderDetailDialog() {
   const tStatus = useTranslations('admin.orders.statusValues');
   const locale = useLocale();
   const { open, setOpen, currentRow, setCurrentRow } = useOrder();
+  const updateStatus = useUpdateOrderStatus();
 
   const isOpen = open === 'detail' && !!currentRow;
+
+  const handleStatusChange = (status: OrderStatus) => {
+    if (!currentRow || status === currentRow.status) return;
+    // Mise à jour optimiste de la ligne ouverte ; la liste est rafraîchie au succès.
+    setCurrentRow({ ...currentRow, status });
+    updateStatus.mutate(
+      { id: currentRow.id, status },
+      {
+        onSuccess: () => toast.success(t('detail.statusUpdated')),
+        onError: () => {
+          toast.error(t('detail.statusUpdateError'));
+          setCurrentRow((prev) => (prev ? { ...prev, status: currentRow.status } : prev));
+        },
+      }
+    );
+  };
 
   const handleClose = () => {
     setCurrentRow(null);
@@ -164,7 +189,31 @@ export function OrderDetailDialog() {
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/20 px-6 py-4">
+        <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/20 px-6 py-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              {t('detail.statusLabel')}
+            </span>
+            <Select
+              value={order.status}
+              onValueChange={(v) => handleStatusChange(v as OrderStatus)}
+              disabled={updateStatus.isPending}
+            >
+              <SelectTrigger className="h-9 w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ORDER_STATUSES.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {tStatus(status)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {updateStatus.isPending && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+          </div>
           <Button type="button" variant="ghost" onClick={handleClose}>
             {t('detail.close')}
           </Button>
