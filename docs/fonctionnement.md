@@ -52,8 +52,14 @@ Il définit les standards techniques et structurels communs à toutes les instan
 ### 1. Database-per-service
 Chaque microservice possède sa propre base PostgreSQL. Aucun service ne lit la base d'un autre. Les références cross-services se font par UUID, sans foreign key.
 
-### 2. Communication asynchrone par défaut
-Les opérations qui ne nécessitent pas de réponse immédiate (notifications, logs, events) passent par **RabbitMQ**. Les services peuvent tomber sans bloquer les autres.
+### 2. Communication : HTTP pour la gateway, événements entre services
+- **Front → Gateway** et **Gateway → chaque microservice** : HTTP request/response (la gateway
+  doit répondre au navigateur de façon synchrone).
+- **Service ↔ service** : les opérations sans réponse immédiate (notifications, logs,
+  synchronisation user/auth) passent par **RabbitMQ** (`@EventPattern`/`@MessagePattern`).
+  Un service peut tomber sans bloquer les autres.
+- **Exception paiement** : `payment-service` reste en **HTTP pur, sans event** (intention +
+  webhook Stripe) — pour ne jamais risquer de perdre un paiement dans le bus asynchrone.
 
 ### 3. Clean Architecture
 Chaque microservice suit la même structure : `entities` → `repositories` (interface + impl) → `usecases` → `controllers`. Voir [Étape 1](./back/1-structure-micro-service.md).
@@ -75,6 +81,10 @@ La stack complète (front + back + infra) tourne dans Docker via `yarn start:dev
 | auth-service     | 3003  | Authentification, JWT, sessions                   |
 | page-service     | 3004  | Pages, menus, settings, uploads d'images          |
 | log-service      | 3005  | Centralisation des logs via RabbitMQ              |
+| product-service  | 3006  | Produits, catégories, tags, attributs, images     |
+| order-service    | 3007  | Commandes (statuts, KPI commandes/CA)             |
+| cart-service     | 3008  | Panier serveur (par sessionKey)                   |
+| payment-service  | 3009  | Paiement Stripe + webhook (HTTP pur, sans event)  |
 | notifier-service | —     | Envoi d'emails, SMS, push (RMQ-only, pas d'HTTP)  |
 
 ---

@@ -940,6 +940,26 @@ supervision) ; un Prometheus in-cluster serait l'étape suivante hors POC.
 
 **Reste demandé :** READMEs + script `yarn presentation`, alignement docs/architecture.
 
+---
+
+## 2026-06-17 — Vérification + alignement de l'architecture (docs)
+
+**Vérifié dans le code :**
+- **Gateway → microservices** : HTTP partout (`HttpProxyService`, aucun `ClientProxy` côté
+  gateway) — request/response, nécessaire pour répondre au navigateur.
+- **Service ↔ service** : événements **RabbitMQ** (`@EventPattern`/`@MessagePattern`) pour
+  l'asynchrone transverse — logs (`create-log`), notifications (`notifier`), sync user/auth
+  (`soft-delete`, `update-email`, `create-user`).
+- **Paiement** : `payment-service` est **HTTP pur, sans aucun event** (intention + webhook) —
+  conforme au principe « ne jamais perdre un paiement dans le bus ».
+
+**Aligné :** `docs/fonctionnement.md` (table des microservices complétée avec product/order/
+cart/payment + ports ; principe de communication précisé HTTP/events/paiement). `CLAUDE.md`
+mis à jour aussi (local, gitignoré). NB : la formule « tout en event » vaut pour
+l'inter-service ; le hop gateway→service est bien HTTP.
+
+**Reste demandé :** READMEs + script `yarn presentation`.
+
 
 
 
