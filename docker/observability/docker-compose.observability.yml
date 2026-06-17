@@ -1,0 +1,20 @@
+# Observabilité de la plateforme : Prometheus central sur le réseau partagé goosee_platform.
+# Démarrer après Traefik (qui crée le réseau). Cibles découvertes via ./targets (file_sd)
+# alimenté par l'orchestrateur. UI sur http://localhost:9090.
+services:
+  goosee-prometheus:
+    image: prom/prometheus:latest
+    container_name: goosee-prometheus
+    restart: unless-stopped
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./targets:/etc/prometheus/targets
+    networks:
+      - goosee_platform
+
+networks:
+  goosee_platform:
+    name: goosee_platform
+    external: true

@@ -15,6 +15,8 @@
     "init:user": "dotenv -e env/.env.dev -- node scripts/init-user.js",
     "provision": "node scripts/provision.js",
     "build:images": "bash scripts/build-images.sh",
+    "observability": "docker compose -f docker/observability/docker-compose.observability.yml up -d",
+    "observability:down": "docker compose -f docker/observability/docker-compose.observability.yml down",
     "start:dev:build": "yarn install && docker compose --env-file env/.env.dev -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.back.dev.yml up --build",
     "start:dev": "yarn install && docker compose --env-file env/.env.dev -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.back.dev.yml up",
     "stop:dev": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.front.dev.yml -f docker/dev/docker-compose.infra.dev.yml -f docker/dev/docker-compose.back.dev.yml down",

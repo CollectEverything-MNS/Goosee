@@ -1,0 +1,3 @@
+# Cibles générées par l'orchestrateur (une par tenant) — non versionnées.
+*.json
+!.gitignore

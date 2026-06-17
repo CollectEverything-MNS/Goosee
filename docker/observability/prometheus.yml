@@ -1,0 +1,18 @@
+# Prometheus central de la plateforme Goosee. Scrape les gateways des tenants Docker via
+# service discovery par fichiers (file_sd) : l'orchestrateur écrit/retire un fichier de
+# cibles par tenant dans ./targets, Prometheus le recharge automatiquement (refresh_interval).
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Gateways des tenants (alias <slug>-gateway sur le réseau goosee_platform).
+  - job_name: tenants
+    metrics_path: /metrics
+    file_sd_configs:
+      - files: ['/etc/prometheus/targets/*.json']
+        refresh_interval: 30s

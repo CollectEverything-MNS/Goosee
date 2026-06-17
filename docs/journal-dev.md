@@ -916,6 +916,30 @@ le parcours storefront (commande → « Mes commandes »).
 **Reste demandé :** Prometheus central, READMEs + script `yarn presentation`,
 alignement docs/architecture.
 
+---
+
+## 2026-06-17 — Prometheus central (observabilité plateforme)
+
+**Fait (repos `Goosee` + `goosee-vitrine`) :**
+- **Goosee** : `docker/observability/` — `docker-compose.observability.yml` (Prometheus sur
+  le réseau partagé `goosee_platform`, UI :9090) + `prometheus.yml` (scrape self + job
+  `tenants` en **file_sd** depuis `./targets/*.json`). Scripts `yarn observability[:down]`.
+- **Orchestrateur (vitrine)** : à la création d'un tenant Docker, écrit une cible Prometheus
+  `targets/<slug>.json` (`<slug>-gateway:3001`, labels `tenant`/`infra`) ; la retire à la
+  suppression. Prometheus recharge le file_sd automatiquement (pas de restart).
+
+**Pourquoi :** observabilité centralisée explicitement demandée pour le POC. Les services
+exposent déjà `/metrics` (prom-client, Lot 0.4) ; Prometheus les agrège côté plateforme.
+
+**Testé :** Prometheus démarre, `GET /api/v1/targets` répond (cible self active, job `tenants`
+chargé). Réseau `goosee_platform` présent, compose valide.
+
+**Périmètre :** scrape les **gateways des tenants Docker** via leur alias réseau. Les tenants
+k8s exposent leurs métriques via metrics-server (déjà remontées par `kubectl top` dans la
+supervision) ; un Prometheus in-cluster serait l'étape suivante hors POC.
+
+**Reste demandé :** READMEs + script `yarn presentation`, alignement docs/architecture.
+
 
 
 
