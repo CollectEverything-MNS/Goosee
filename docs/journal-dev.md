@@ -960,6 +960,29 @@ l'inter-service ; le hop gateway→service est bien HTTP.
 
 **Reste demandé :** READMEs + script `yarn presentation`.
 
+---
+
+## 2026-06-17 — Script de présentation tout-en-un + READMEs
+
+**Fait :**
+- **`scripts/presentation.js`** (`yarn presentation` / `:down`, repo `Goosee`) : monte une démo
+  complète en une commande — préflight (docker/k3d/helm/kubectl), build/import des images,
+  cluster k3d, plateforme (Traefik + Prometheus), **1 tenant Docker** (compose isolé + route
+  Traefik + seed OWNER via psql + cible Prometheus) et **N tenants Kubernetes** (chart Helm,
+  values temporaire, le Job du chart seed l'OWNER). Récapitulatif final : URLs, identifiants,
+  Prometheus, commandes HPA/conso. `PRESENTATION_K8S_COUNT` paramétrable.
+- **READMEs complets** : `Goosee/README.md` (c'est quoi, archi résumée, démarrage dev,
+  présentation, Stripe, observabilité, commandes, docs) et `goosee-vitrine/README.md`
+  (apps api/web/orchestrator, articulation control plane → tenants, env, lancement, superadmin).
+
+**Testé en réel :** `yarn presentation` (variante 1 tenant Docker) → plateforme + tenant
+`bistrot` déployés ; front **307**, api `/health` **200**, **login OWNER 201**, cible
+Prometheus `bistrot` scrapée. Le chemin k8s réutilise le `helm install` validé au Lot 6.
+
+**🏁 Tous les compléments demandés livrés** : Stripe (test) câblé, provisioning K8s dans
+l'orchestrateur, métriques infra live, `my-orders` par `customerId`, Prometheus central,
+script de présentation, READMEs, docs/architecture alignées. Reste : Lot 8 (UI/UX).
+
 
 
 
