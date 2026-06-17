@@ -4,8 +4,10 @@ import { useLocale } from 'next-intl';
 import { Package, ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import { Order, OrderStatus } from '@/features/orders/data/order.types';
-import { MY_ORDERS_MOCK } from '../data/my-orders.mock';
+import { useGetMe } from '../usecases/use-get-me';
+import { useMyOrders } from '../usecases/use-my-orders';
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: 'En attente',
@@ -83,7 +85,16 @@ function OrderCard({ order, locale }: { order: Order; locale: string }) {
 
 export function MyOrders() {
   const locale = useLocale();
-  const orders = MY_ORDERS_MOCK;
+  const { data: profile } = useGetMe(true);
+  const { data: orders = [], isLoading } = useMyOrders(profile?.id);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (orders.length === 0) {
     return (

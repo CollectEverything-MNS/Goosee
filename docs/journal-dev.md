@@ -896,6 +896,26 @@ kubectl (k3d-goosee) et metrics-server (fourni par k3s).
 **Reste demandé :** `my-orders` par `customerId`, Prometheus central, READMEs + script
 `yarn presentation`, alignement docs/architecture.
 
+---
+
+## 2026-06-17 — Espace client « Mes commandes » sur données réelles (par customerId)
+
+**Fait (repo `Goosee`, site généré) :**
+- **`useMyOrders(customerId)`** : récupère `GET /orders?customerId=<id>` (order-service via
+  gateway) et mappe vers la forme d'affichage (référence dérivée de l'UUID, statut, lignes,
+  total). `my-orders.tsx` consomme le compte connecté (`useGetMe`) + ce hook au lieu du mock.
+- **Checkout** : rattache la commande au client connecté (`customerId = profile.id` via
+  `/users/me`) et pré-remplit l'e-mail ; en invité, reste sans `customerId`.
+- Suppression de `account/data/my-orders.mock.ts` (orphelin).
+
+**Pourquoi :** l'espace client affiche enfin les vraies commandes du client connecté, bouclant
+le parcours storefront (commande → « Mes commandes »).
+
+**Testé :** `tsc` clean, `next build` OK (routes `compte`, `checkout`).
+
+**Reste demandé :** Prometheus central, READMEs + script `yarn presentation`,
+alignement docs/architecture.
+
 
 
 

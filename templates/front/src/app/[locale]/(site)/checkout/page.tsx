@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
@@ -15,6 +15,7 @@ import { stripePromise } from '@/lib/stripe';
 import { useCartContext } from '@/features/cart/context/cart-provider';
 import { useCreateOrder } from '@/features/cart/usecases/use-create-order';
 import { useCreatePayment } from '@/features/cart/usecases/use-create-payment';
+import { useGetMe } from '@/features/account/usecases/use-get-me';
 
 function formatPrice(cents: number, locale: string) {
   return new Intl.NumberFormat(locale, {
@@ -86,9 +87,18 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [orderTotal, setOrderTotal] = useState(0);
 
+  // Client connecté (facultatif) : rattache la commande à son compte pour l'espace « Mes commandes ».
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('access_token');
+  const { data: profile } = useGetMe(hasToken);
+
   const createOrder = useCreateOrder();
   const createPayment = useCreatePayment();
   const isPreparing = createOrder.isPending || createPayment.isPending;
+
+  // Pré-remplit l'e-mail avec celui du compte connecté.
+  useEffect(() => {
+    if (profile?.email) setEmail((prev) => prev || profile.email);
+  }, [profile?.email]);
 
   const items = cart?.items ?? [];
   const totalCents = cart?.totalCents ?? 0;
@@ -113,6 +123,7 @@ export default function CheckoutPage() {
     try {
       const order = await createOrder.mutateAsync({
         customerEmail: email,
+        customerId: profile?.id,
         items: items.map((i) => ({
           productId: i.productId,
           name: i.name,
