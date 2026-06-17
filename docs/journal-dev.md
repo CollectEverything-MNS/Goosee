@@ -343,6 +343,37 @@ OWNER seedé, `Project` ACTIVE. Commits `feat(orchestrator): seed…`, `feat(vit
 **Reste :** Stripe en amont du trigger (Lot 2), e-mail creds (Mailhog), suivi SSE,
 puis Lot 5 (cart/order/payment du site généré), Lot 6 (K8s), Lot 7 (superadmin), Lot 8 (UI).
 
+---
+
+## 2026-06-17 — Lot 5.2 : microservice de commandes (`order-service`)
+
+**Fait :**
+- **Nouveau microservice `order-service`** (port 3007, base `order_db` dédiée), même
+  Clean Architecture que les autres services : entité `Order` (items en `jsonb`, total en
+  centimes, statut `pending|paid|shipped|cancelled`, réf. client en UUID — pas de FK,
+  database-per-service), repository interface + implémentation TypeORM, 4 usecases
+  (create, list, get, update-status). HTTP pur (pas de RabbitMQ), `/health` + `/metrics`,
+  garde-fou secret `ORDER_DB_PASSWORD`, migration TypeORM jouée au boot en prod.
+- **Total recalculé côté serveur** : le front n'a pas autorité sur le prix
+  (`create-order.usecase.ts`).
+- **Routes gateway** : `POST /orders` (checkout, public — achat invité), `GET /orders`
+  (protégé `orders`), `GET /orders/:id` (public, page de confirmation),
+  `PATCH /orders/:id/status` (protégé `orders`). Le pageKey `orders` existe déjà côté OWNER.
+- **Infra** : service + base ajoutés aux compose dev/prod et au template tenant isolé
+  (`order` + `order-db`), variables `ORDER_*` dans `.env.example` + `turbo.json`, image
+  `goosee/order-service:local` dans `build-images.sh`.
+
+**Pourquoi :** remplacer le mock front des commandes par un vrai back, et nourrir plus
+tard les KPI métier (5.4) avec des commandes/CA réels.
+
+**Testé** (Postgres jetable `order_db_test`) : migration OK, CRUD complet (create → total
+7598 recalculé, get, list, patch statut), validations (UUID, statut, panier vide), 404 sur
+id inconnu, refus du mot de passe par défaut en `NODE_ENV=production`. `order-service` et
+`api-gateway` compilent.
+
+**Reste Lot 5 :** 5.1 `cart-service`, 5.3 `payment-service` (scaffold, Stripe branché par
+Florent), 5.4 `/internal/kpi` réel, 5.5 storefront panier/checkout + branchement au page builder.
+
 
 
 

@@ -16,6 +16,7 @@ build user-service     templates/back/services/user-service/Dockerfile
 build page-service     templates/back/services/page-service/Dockerfile
 build log-service      templates/back/services/log-service/Dockerfile
 build product-service  templates/back/services/product-service/Dockerfile
+build order-service    templates/back/services/order-service/Dockerfile
 build notifier-service templates/back/services/notifier-service/Dockerfile
 build front            templates/front/Dockerfile
 

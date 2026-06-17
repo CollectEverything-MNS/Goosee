@@ -6,6 +6,7 @@ const uploadBasePath = '/upload';
 const productsBasePath = '/products';
 const categoriesBasePath = '/categories';
 const tagsBasePath = '/tags';
+const ordersBasePath = '/orders';
 
 export const routesConfig = {
   upload: {
@@ -226,6 +227,25 @@ export const routesConfig = {
     listProductsByCategory: {
       path: `${categoriesBasePath}/:id/products`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${categoriesBasePath}/${id}/products`,
+    },
+  },
+
+  order: {
+    listOrders: {
+      path: ordersBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${ordersBasePath}`,
+    },
+    getOrder: {
+      path: `${ordersBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${ordersBasePath}/${id}`,
+    },
+    createOrder: {
+      path: ordersBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${ordersBasePath}`,
+    },
+    updateOrderStatus: {
+      path: `${ordersBasePath}/:id/status`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${ordersBasePath}/${id}/status`,
     },
   },
 

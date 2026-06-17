@@ -21,6 +21,8 @@ services:
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
       PRODUCT_SERVICE_HOST: ${PRODUCT_SERVICE_HOST}
       PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      ORDER_SERVICE_HOST: ${ORDER_SERVICE_HOST}
+      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
       JWT_SECRET: ${JWT_SECRET}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
@@ -32,6 +34,7 @@ services:
       - goosee-page-service-prod
       - goosee-log-service-prod
       - goosee-product-service-prod
+      - goosee-order-service-prod
     networks:
       - goosee_net
 
@@ -312,6 +315,56 @@ services:
     networks:
       - goosee_net
 
+  # ─────────── ORDER ───────────
+  goosee-order-service-prod:
+    container_name: goosee-order-service-prod
+    build:
+      context: ../..
+      dockerfile: templates/back/services/order-service/Dockerfile
+    command: node dist/main
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
+      ORDER_DB_HOST: ${ORDER_DB_HOST}
+      ORDER_DB_PORT: ${ORDER_DB_PORT}
+      ORDER_DB_USER: ${ORDER_DB_USER}
+      ORDER_DB_PASSWORD: ${ORDER_DB_PASSWORD}
+      ORDER_DB_NAME: ${ORDER_DB_NAME}
+    expose:
+      - "${ORDER_SERVICE_PORT}"
+    depends_on:
+      goosee-order-db-prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${ORDER_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - goosee_net
+
+  goosee-order-db-prod:
+    image: postgres:16-alpine
+    container_name: goosee-order-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${ORDER_DB_USER}
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD}
+      POSTGRES_DB: ${ORDER_DB_NAME}
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    expose:
+      - "${ORDER_DB_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ORDER_DB_USER} -d ${ORDER_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
   # ─────────── NOTIFIER ───────────
   goosee-notifier-service-prod:
     container_name: goosee-notifier-service-prod
@@ -338,6 +391,7 @@ volumes:
   page_db_data:
   log_db_data:
   product_db_data:
+  order_db_data:
 
 networks:
   goosee_net:

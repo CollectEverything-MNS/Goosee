@@ -22,6 +22,8 @@ services:
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
       PRODUCT_SERVICE_HOST: goosee-product-service-dev
       PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      ORDER_SERVICE_HOST: goosee-order-service-dev
+      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -220,6 +222,34 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${PRODUCT_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-order-service-dev:
+    container_name: goosee-order-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/order-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
+      ORDER_DB_HOST: goosee-order-db-dev
+      ORDER_DB_PORT: 5432
+      ORDER_DB_USER: ${ORDER_DB_USER}
+      ORDER_DB_PASSWORD: ${ORDER_DB_PASSWORD}
+      ORDER_DB_NAME: ${ORDER_DB_NAME}
+    expose:
+      - "${ORDER_SERVICE_PORT}"
+    depends_on:
+      goosee-order-db-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${ORDER_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10
