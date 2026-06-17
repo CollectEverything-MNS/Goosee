@@ -707,6 +707,32 @@ garde-fou de consommation pour qu'un tenant ne sature pas le cluster.
 de bout en bout sur k3d (chart Helm, ingress, probes, HPA, seed OWNER, NetworkPolicy +
 ResourceQuota). Reste : Lot 7 (superadmin), Lot 8 (UI/UX).
 
+---
+
+## 2026-06-17 — Lot 7.1 : espace SUPERADMIN + routes protégées (goosee-vitrine)
+
+**Fait (repo `goosee-vitrine`) :**
+- **API (`apps/api`)** : module `superadmin` avec `GET /superadmin/tenants` protégé par
+  `JwtAuthGuard + RolesGuard + @Roles('SUPERADMIN')`. Un `SupervisionClient` interroge
+  l'orchestrateur (`GET /tenants`, registre du control plane) et renvoie la vue d'ensemble
+  des tenants (slug, propriétaire, forfait, infra, statut, URLs, ressources).
+- **Web (`apps/web`)** : `useCurrentUser` expose désormais `role` + `isSuperadmin` (décodé
+  du JWT). Espace `/[locale]/superadmin` avec **layout-garde** (redirige tout non-SUPERADMIN
+  vers l'accueil) et une page listant les tenants (hook React Query `useSuperadminTenants`,
+  table fonctionnelle — fioritures UI au Lot 8).
+- Correctif au passage : `navbar.tsx` utilisait `<a href="/fr">` (lint `no-html-link-for-pages`
+  qui cassait le build web) → remplacé par `<Link>`.
+
+**Pourquoi :** poser l'espace réservé à l'équipe Goosee et le point d'entrée de la supervision
+(7.2 branchera les métriques infra + KPI métier par tenant).
+
+**Testé :** `apps/api` et `apps/web` compilent (`nest build`, `next build`), route
+`/[locale]/superadmin` générée. Le flux live (api + orchestrateur + utilisateur SUPERADMIN)
+sera validé quand la stack vitrine tourne.
+
+**Reste Lot 7 :** 7.2 Prometheus + agrégation métriques/KPI par tenant, 7.3 allocation K8s
+manuelle, 7.4 allocation intelligente.
+
 
 
 
