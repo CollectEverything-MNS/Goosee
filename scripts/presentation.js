@@ -293,12 +293,16 @@ async function seedOwnerDocker(slug, email, password) {
     `INSERT INTO auth (email, password, role, "isVerified", "verifiedAt") VALUES ('${esc(email)}', '${hash}', '{OWNER}', true, now()) ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, role = EXCLUDED.role, "isVerified" = true, "verifiedAt" = now() RETURNING id;`,
     'utf8'
   );
+  const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
   for (let i = 1; i <= 40; i += 1) {
-    const authId = cap(`docker compose -p ${project} exec -T auth-db psql -U postgres -d auth_db -tA < "${tmp}-auth.sql"`);
-    if (authId && /[0-9a-f-]{36}/.test(authId)) {
+    const out = cap(`docker compose -p ${project} exec -T auth-db psql -U postgres -d auth_db -tA < "${tmp}-auth.sql"`);
+    // psql renvoie l'id RETURNING + le tag de commande (« INSERT 0 1 ») : n'extraire que l'UUID,
+    // sinon il finit dans user.authId et /users/me (lookup par authId) renvoie 404.
+    const authId = (out.match(UUID_RE) || [])[0];
+    if (authId) {
       fs.writeFileSync(
         `${tmp}-user.sql`,
-        `INSERT INTO "user" ("authId", email, "firstName", "lastName", role) VALUES ('${authId.trim()}', '${esc(email)}', 'Admin', 'Goosee', '{OWNER}') ON CONFLICT (email) DO UPDATE SET "authId" = EXCLUDED."authId", role = EXCLUDED.role;`,
+        `INSERT INTO "user" ("authId", email, "firstName", "lastName", role) VALUES ('${authId}', '${esc(email)}', 'Admin', 'Goosee', '{OWNER}') ON CONFLICT (email) DO UPDATE SET "authId" = EXCLUDED."authId", role = EXCLUDED.role;`,
         'utf8'
       );
       run(`docker compose -p ${project} exec -T user-db psql -U postgres -d user_db < "${tmp}-user.sql"`, { capture: true });
@@ -395,6 +399,10 @@ async function provisionK8s(site) {
       jwtAccessSecret: secrets.JWT_ACCESS_SECRET, jwtRefreshSecret: secrets.JWT_REFRESH_SECRET,
       internalApiToken: secrets.INTERNAL_API_TOKEN, minioRootUser: secrets.MINIO_ROOT_USER,
       minioRootPassword: secrets.MINIO_ROOT_PASSWORD,
+      // Sans la clé secrète, le payment-service tombe en mode mock et le front (clé publique
+      // inlinée au build) échoue à confirmer le paiement Stripe.
+      stripeSecretKey: envDevValue('STRIPE_SECRET_KEY') || '',
+      stripeWebhookSecret: envDevValue('STRIPE_WEBHOOK_SECRET') || '',
     },
     owner: { email: owner, passwordHash: hash },
   };
@@ -422,17 +430,18 @@ function activate(slug, infra, secretsRef) {
 
 function down() {
   log('Démontage');
+  // cap() : tolère l'absence d'un site (jamais déployé) sans interrompre le démontage.
   for (const s of ALL_DOCKER) {
-    run(`docker compose -p tenant-${s.slug} down -v`, { capture: true });
+    cap(`docker compose -p tenant-${s.slug} down -v`);
     fs.rmSync(path.join(DYNAMIC_DIR, `${s.slug}.yml`), { force: true });
     fs.rmSync(path.join(TARGETS_DIR, `${s.slug}.json`), { force: true });
   }
   for (const s of ALL_K8S) {
-    run(`helm uninstall ${s.slug} -n tenant-${s.slug}`, { capture: true });
-    run(`kubectl delete namespace tenant-${s.slug} --ignore-not-found`, { capture: true });
+    cap(`helm uninstall ${s.slug} -n tenant-${s.slug}`);
+    cap(`kubectl delete namespace tenant-${s.slug} --ignore-not-found`);
   }
-  run(`docker compose -f "${OBS_COMPOSE}" down`, { capture: true });
-  run(`docker compose -f "${TRAEFIK_COMPOSE}" down`, { capture: true });
+  cap(`docker compose -f "${OBS_COMPOSE}" down`);
+  cap(`docker compose -f "${TRAEFIK_COMPOSE}" down`);
   // Vitrine (apps détachées) : à fermer manuellement (logs dans goosee-vitrine/.presentation-logs)
   ok('Tenants + plateforme arrêtés. Vitrine : fermer les process (ports 3000/3002/4000) si besoin.');
 }
