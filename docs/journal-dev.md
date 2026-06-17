@@ -374,6 +374,37 @@ id inconnu, refus du mot de passe par défaut en `NODE_ENV=production`. `order-s
 **Reste Lot 5 :** 5.1 `cart-service`, 5.3 `payment-service` (scaffold, Stripe branché par
 Florent), 5.4 `/internal/kpi` réel, 5.5 storefront panier/checkout + branchement au page builder.
 
+---
+
+## 2026-06-17 — Lot 5.1 : microservice de panier (`cart-service`)
+
+**Fait :**
+- **Nouveau microservice `cart-service`** (port 3008, base `cart_db` dédiée), même Clean
+  Architecture : entité `Cart` (clé `sessionKey` unique = id client connecté ou jeton
+  invité, lignes en `jsonb`, total en centimes, réf. client UUID — pas de FK), repository
+  interface + impl TypeORM, 5 usecases (get, add-item, update-item, remove-item, clear).
+  HTTP pur, `/health` + `/metrics`, garde-fou secret `CART_DB_PASSWORD`, migration au boot.
+- **Panier stateful & idempotent** : `get` ne persiste rien (panier inexistant = panier
+  vide), `add` fait du get-or-create et incrémente la ligne d'un produit déjà présent,
+  `update` à quantité 0 retire la ligne, `clear` vide. Total recalculé côté serveur après
+  chaque mutation (`Cart.recomputeTotal()`).
+- **Routes gateway** (publiques, panier identifié par `sessionKey`) :
+  `GET /cart/:sessionKey`, `POST /cart/:sessionKey/items`, `PATCH` et
+  `DELETE /cart/:sessionKey/items/:productId`, `DELETE /cart/:sessionKey`.
+- **Infra** : service + base ajoutés aux compose dev/prod et au template tenant isolé
+  (`cart` + `cart-db`), variables `CART_*` dans `.env.example` + `turbo.json`, image
+  `goosee/cart-service:local` dans `build-images.sh`.
+
+**Pourquoi :** fournir au storefront un panier serveur persistant (invité ou connecté),
+source du futur passage de commande (5.5) vers `order-service`.
+
+**Testé** (Postgres jetable `cart_db_test`) : migration OK, parcours complet (add → total
+8897, incrément du même produit, patch quantité, retrait via qty 0, remove, clear),
+404 sur panier inconnu, 400 sur UUID invalide. `cart-service` et `api-gateway` compilent.
+
+**Reste Lot 5 :** 5.3 `payment-service` (scaffold, Stripe branché par Florent),
+5.4 `/internal/kpi` réel, 5.5 storefront panier/checkout + branchement au page builder.
+
 
 
 

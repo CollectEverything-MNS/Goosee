@@ -7,6 +7,7 @@ const productsBasePath = '/products';
 const categoriesBasePath = '/categories';
 const tagsBasePath = '/tags';
 const ordersBasePath = '/orders';
+const cartBasePath = '/cart';
 
 export const routesConfig = {
   upload: {
@@ -227,6 +228,34 @@ export const routesConfig = {
     listProductsByCategory: {
       path: `${categoriesBasePath}/:id/products`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${categoriesBasePath}/${id}/products`,
+    },
+  },
+
+  cart: {
+    getCart: {
+      path: `${cartBasePath}/:sessionKey`,
+      link: (serviceUrl: string, sessionKey: string) =>
+        `${serviceUrl}${cartBasePath}/${sessionKey}`,
+    },
+    addItem: {
+      path: `${cartBasePath}/:sessionKey/items`,
+      link: (serviceUrl: string, sessionKey: string) =>
+        `${serviceUrl}${cartBasePath}/${sessionKey}/items`,
+    },
+    updateItem: {
+      path: `${cartBasePath}/:sessionKey/items/:productId`,
+      link: (serviceUrl: string, sessionKey: string, productId: string) =>
+        `${serviceUrl}${cartBasePath}/${sessionKey}/items/${productId}`,
+    },
+    removeItem: {
+      path: `${cartBasePath}/:sessionKey/items/:productId`,
+      link: (serviceUrl: string, sessionKey: string, productId: string) =>
+        `${serviceUrl}${cartBasePath}/${sessionKey}/items/${productId}`,
+    },
+    clearCart: {
+      path: `${cartBasePath}/:sessionKey`,
+      link: (serviceUrl: string, sessionKey: string) =>
+        `${serviceUrl}${cartBasePath}/${sessionKey}`,
     },
   },
 

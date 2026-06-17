@@ -34,12 +34,14 @@ services:
       PRODUCT_SERVICE_PORT: 3006
       ORDER_SERVICE_HOST: order
       ORDER_SERVICE_PORT: 3007
+      CART_SERVICE_HOST: cart
+      CART_SERVICE_PORT: 3008
       JWT_SECRET: ${JWT_SECRET}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
       NEXT_PUBLIC_WEB_URL: 'http://${TENANT_SLUG}.127.0.0.1.nip.io'
-    depends_on: [auth, user, page, log, product, order]
+    depends_on: [auth, user, page, log, product, order, cart]
     networks:
       tenant_net:
       goosee_platform:
@@ -156,6 +158,20 @@ services:
     depends_on: [order-db]
     networks: [tenant_net]
 
+  cart:
+    image: goosee/cart-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      CART_SERVICE_PORT: 3008
+      CART_DB_HOST: cart-db
+      CART_DB_PORT: 5432
+      CART_DB_USER: postgres
+      CART_DB_PASSWORD: ${DB_PASSWORD}
+      CART_DB_NAME: cart_db
+    depends_on: [cart-db]
+    networks: [tenant_net]
+
   notifier:
     image: goosee/notifier-service:local
     restart: unless-stopped
@@ -231,6 +247,16 @@ services:
     volumes: ['order_db_data:/var/lib/postgresql/data']
     networks: [tenant_net]
 
+  cart-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: cart_db
+    volumes: ['cart_db_data:/var/lib/postgresql/data']
+    networks: [tenant_net]
+
   rabbitmq:
     image: rabbitmq:management
     restart: unless-stopped
@@ -264,5 +290,6 @@ volumes:
   log_db_data:
   product_db_data:
   order_db_data:
+  cart_db_data:
   rabbitmq_data:
   minio_data:

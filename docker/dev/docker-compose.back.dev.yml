@@ -24,6 +24,8 @@ services:
       PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
       ORDER_SERVICE_HOST: goosee-order-service-dev
       ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
+      CART_SERVICE_HOST: goosee-cart-service-dev
+      CART_SERVICE_PORT: ${CART_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -250,6 +252,34 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${ORDER_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-cart-service-dev:
+    container_name: goosee-cart-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/cart-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      CART_SERVICE_PORT: ${CART_SERVICE_PORT}
+      CART_DB_HOST: goosee-cart-db-dev
+      CART_DB_PORT: 5432
+      CART_DB_USER: ${CART_DB_USER}
+      CART_DB_PASSWORD: ${CART_DB_PASSWORD}
+      CART_DB_NAME: ${CART_DB_NAME}
+    expose:
+      - "${CART_SERVICE_PORT}"
+    depends_on:
+      goosee-cart-db-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${CART_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10

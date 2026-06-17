@@ -13,6 +13,7 @@ import { SharedSecurityModule } from './shared/shared-security.module';
 import { CategoriesModule } from './services/categories/categories.module';
 import { ProductsModule } from './services/products/products.module';
 import { OrdersModule } from './services/orders/orders.module';
+import { CartModule } from './services/cart/cart.module';
 import { TagsModule } from './services/tags/tags.module';
 import { LogsModule } from './services/logs/logs.module';
 
@@ -30,6 +31,7 @@ import { LogsModule } from './services/logs/logs.module';
     RolesModule,
     ProductsModule,
     OrdersModule,
+    CartModule,
     CategoriesModule,
     TagsModule,
     LogsModule,

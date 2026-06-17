@@ -179,6 +179,26 @@ services:
     networks:
       - goosee_net
 
+  goosee-cart-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-cart-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${CART_DB_USER}
+      POSTGRES_PASSWORD: ${CART_DB_PASSWORD}
+      POSTGRES_DB: ${CART_DB_NAME}
+    ports:
+      - "${CART_DB_HOST_PORT:-5439}:5432"
+    volumes:
+      - cart_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CART_DB_USER} -d ${CART_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
 networks:
   goosee_net:
     name: goosee_net
@@ -193,3 +213,4 @@ volumes:
   log_db_data:
   product_db_data:
   order_db_data:
+  cart_db_data:
