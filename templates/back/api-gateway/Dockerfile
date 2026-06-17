@@ -1,29 +1,25 @@
+# Build : contexte = racine du monorepo, install deterministe via le yarn.lock racine.
 FROM node:22-alpine AS builder
-
+RUN corepack enable && corepack prepare yarn@1.22.22 --activate
+RUN yarn config set network-timeout 600000 -g
 WORKDIR /usr/src/app
-
 COPY package.json yarn.lock ./
-
+COPY templates/back/api-gateway/package.json ./templates/back/api-gateway/package.json
 RUN yarn install --frozen-lockfile
-
-COPY . .
-
+COPY templates/back/api-gateway ./templates/back/api-gateway
+WORKDIR /usr/src/app/templates/back/api-gateway
 RUN yarn build
 
-RUN yarn cache clean
-
-FROM node:20-alpine AS runner
-
+# Runner : dependances de production uniquement + dist compile.
+FROM node:22-alpine AS runner
+RUN corepack enable && corepack prepare yarn@1.22.22 --activate
+RUN yarn config set network-timeout 600000 -g
 WORKDIR /usr/src/app
-
 COPY package.json yarn.lock ./
-
-RUN yarn install --production --frozen-lockfile && yarn cache clean
-
-COPY --from=builder /usr/src/app/dist ./dist
-
-EXPOSE 3000
-
+COPY templates/back/api-gateway/package.json ./templates/back/api-gateway/package.json
+RUN yarn install --frozen-lockfile --production && yarn cache clean
+COPY --from=builder /usr/src/app/templates/back/api-gateway/dist ./templates/back/api-gateway/dist
+WORKDIR /usr/src/app/templates/back/api-gateway
 ENV NODE_ENV=production
-
+EXPOSE 3001
 CMD ["node", "dist/main.js"]
