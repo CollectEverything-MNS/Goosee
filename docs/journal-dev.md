@@ -277,6 +277,29 @@ l'orchestrateur devra **recharger Traefik** (restart ou SIGHUP). À implémenter
 
 **Reste :** template de tenant (compose isolé + routage Traefik), puis orchestrateur.
 
+---
+
+## 2026-06-17 — Lot 4.3 : template de déploiement d'un tenant (repo Goosee)
+
+**Fait :**
+- Front : URL de la gateway dérivée du host au runtime (`api.<host>`) → image front
+  unique réutilisable (commit `feat(front)`).
+- Dockerfiles **gateway** et **front** réparés (contexte racine) : le gateway avait été
+  oublié en 0.6a (lançait `turbo build` global), le front copiait un yarn.lock absent.
+  `next.config` : ignore lint/erreurs TS au build (dette pré-existante) + hosts images
+  `*.nip.io`/`*.anaduck.fr` (commit `fix(docker)`).
+- `scripts/build-images.sh` (`yarn build:images`) : 8 images `goosee/*:local` une fois.
+- `docker/tenant/docker-compose.tenant.yml` : pile complète isolée d'un tenant
+  (16 conteneurs), gateway/front sur `goosee_platform` avec alias `<slug>-gateway/front`.
+  `tenant.env.example` (commit `feat(infra)`).
+- **Testé** : tenant `demo` déployé isolé (réseau + volumes dédiés), migrations jouées au
+  boot dans ses bases, `api.demo.127.0.0.1.nip.io/health` → 200 et
+  `demo.127.0.0.1.nip.io/` → 200 (locale `/fr`) via Traefik.
+
+**Reste :** Lot 3 — l'orchestrateur (`apps/orchestrator`) qui AUTOMATISE ce déploiement
+manuel : génère l'env/secrets, `compose up`, écrit la route Traefik + recharge Traefik
+(caveat fsnotify), seed owner, scale-to-zero, registre des tenants (table dédiée).
+
 
 
 

@@ -132,9 +132,9 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 
 | # | Tâche | Estim. | Statut |
 |---|---|---|---|
-| 4.1 | Traefik central, routage par `Host` via labels Docker | 1.5–2 j | ⬜ |
-| 4.2 | Slug → host `slug.127.0.0.1.nip.io` + TLS mkcert | 0.5–1 j | ⬜ |
-| 4.3 | Template « tenant Docker » : pile complète isolée (réseau + volumes dédiés) | 2–3 j | ⬜ |
+| 4.1 | Traefik central, routage par `Host` (provider **fichier**, pas labels Docker — KO Docker Desktop) | 1.5–2 j | ✅ |
+| 4.2 | Slug → host `slug.127.0.0.1.nip.io` + TLS mkcert | 0.5–1 j | 🟡 host nip.io fait ; TLS mkcert à faire (HTTP suffit pour le POC) |
+| 4.3 | Template « tenant Docker » : pile complète isolée (réseau + volumes dédiés) | 2–3 j | ✅ |
 
 > **Jalon 1** après les lots 0→4 (+2) : « payer → site Docker **isolé** en ligne sur
 > `slug.127.0.0.1.nip.io` → e-mail des identifiants ». **Le POC fonctionne sur le
