@@ -567,6 +567,41 @@ validé en standalone (5.2).
 commande + paiement (scaffold) → back-office (liste + changement de statut) → KPI + analytics,
 le tout sur données réelles et isolé par tenant.
 
+---
+
+## 2026-06-17 — Lot 6.1 : chart Helm d'un tenant sur Kubernetes (k3d)
+
+**Fait :**
+- **Cluster k3d** (`goosee`) : k3s embarque Traefik (ingress) et metrics-server (HPA), pas
+  d'install supplémentaire. API épinglée sur `127.0.0.1` (sinon kubeconfig vers un
+  `host.docker.internal` non résolu sous Windows — documenté dans `k8s/README.md`).
+- **Chart Helm `k8s/goosee-tenant/`** déployant la pile isolée d'un tenant :
+  - `configmap.yaml` (env non sensible partagé, hôtes = Services k8s) + `secret.yaml`
+    (DB/JWT/MinIO/Stripe/jeton interne) consommés par **`envFrom`** (même logique que le
+    `.env` Compose : chaque workload reçoit l'env complet).
+  - `databases.yaml` : un StatefulSet PostgreSQL **par service** (database-per-service),
+    en boucle sur `.Values.databases`.
+  - `infra.yaml` : RabbitMQ + MinIO (StatefulSets persistants) + Mailhog.
+  - `workloads.yaml` : gateway + 8 microservices + notifier + front (Deployments), en
+    boucle sur `.Values.backendServices`. Le front ne reçoit que `NODE_ENV` (l'URL API est
+    dérivée du host au runtime).
+  - `_helpers.tpl` (image, labels, hosts), `values.yaml` paramétrable (slug, domaine,
+    secrets, tag d'image).
+- **3 images manquantes construites** (order/cart/payment, jamais buildées) puis import des
+  11 images `goosee/*:local` dans le cluster (`k3d image import`).
+
+**Pourquoi :** offrir le forfait « scalable » Kubernetes en alternative au Compose, base des
+prochaines étapes (ingress, HPA, isolation réseau/quota).
+
+**Testé en réel :** `helm lint` OK, `helm template` rend les 22 charges. `helm install` du
+tenant `demo` (namespace `tenant-demo`) → **22 pods Running**. Les microservices jouent leurs
+migrations TypeORM au boot (logs `order` : routes mappées, « Order Service is running »),
+chacun sur sa base dédiée. Premier boot : un redémarrage le temps que la base soit prête
+(probes/ordre viendront en 6.3).
+
+**Reste Lot 6 :** 6.2 Ingress (host `<slug>.127.0.0.1.nip.io`), 6.3 probes + requests/limits
++ HPA, 6.4 Jobs migration/seed, 6.5 NetworkPolicy + ResourceQuota.
+
 
 
 

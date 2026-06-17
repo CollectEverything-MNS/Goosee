@@ -1,0 +1,89 @@
+# Variables d'environnement non sensibles, partagées par tous les workloads via envFrom.
+# Les hôtes pointent vers les Services k8s du namespace (résolution DNS interne).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: goosee-env
+  labels:
+    {{- include "goosee.labels" . | nindent 4 }}
+data:
+  NODE_ENV: production
+
+  # Gateway + microservices (host = nom du Service)
+  API_GATEWAY_PORT: "{{ .Values.gateway.port }}"
+  AUTH_SERVICE_HOST: auth
+  AUTH_SERVICE_PORT: "3003"
+  USER_SERVICE_HOST: user
+  USER_SERVICE_PORT: "3002"
+  PAGE_SERVICE_HOST: page
+  PAGE_SERVICE_PORT: "3004"
+  LOG_SERVICE_HOST: log
+  LOG_SERVICE_PORT: "3005"
+  PRODUCT_SERVICE_HOST: product
+  PRODUCT_SERVICE_PORT: "3006"
+  ORDER_SERVICE_HOST: order
+  ORDER_SERVICE_PORT: "3007"
+  CART_SERVICE_HOST: cart
+  CART_SERVICE_PORT: "3008"
+  PAYMENT_SERVICE_HOST: payment
+  PAYMENT_SERVICE_PORT: "3009"
+
+  # RabbitMQ
+  RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
+  # Bases (host = Service de la base, port interne 5432)
+  AUTH_DB_HOST: auth-db
+  AUTH_DB_PORT: "5432"
+  AUTH_DB_USER: postgres
+  AUTH_DB_NAME: auth_db
+  USER_DB_HOST: user-db
+  USER_DB_PORT: "5432"
+  USER_DB_USER: postgres
+  USER_DB_NAME: user_db
+  PAGE_DB_HOST: page-db
+  PAGE_DB_PORT: "5432"
+  PAGE_DB_USER: postgres
+  PAGE_DB_NAME: page_db
+  LOG_DB_HOST: log-db
+  LOG_DB_PORT: "5432"
+  LOG_DB_USER: postgres
+  LOG_DB_NAME: log_db
+  PRODUCT_DB_HOST: product-db
+  PRODUCT_DB_PORT: "5432"
+  PRODUCT_DB_USER: postgres
+  PRODUCT_DB_NAME: product_db
+  ORDER_DB_HOST: order-db
+  ORDER_DB_PORT: "5432"
+  ORDER_DB_USER: postgres
+  ORDER_DB_NAME: order_db
+  CART_DB_HOST: cart-db
+  CART_DB_PORT: "5432"
+  CART_DB_USER: postgres
+  CART_DB_NAME: cart_db
+  PAYMENT_DB_HOST: payment-db
+  PAYMENT_DB_PORT: "5432"
+  PAYMENT_DB_USER: postgres
+  PAYMENT_DB_NAME: payment_db
+
+  # JWT (durées ; les secrets sont dans le Secret)
+  JWT_ACCESS_EXPIRES_IN: 15m
+  JWT_REFRESH_EXPIRES_IN: 7d
+
+  # MinIO
+  MINIO_ENDPOINT: minio
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  MINIO_BUCKET: {{ .Values.minio.bucket }}
+  MINIO_PUBLIC_URL: http://{{ include "goosee.host" . }}
+
+  # SMTP (Mailhog)
+  SMTP_HOST: mailhog
+  SMTP_PORT: "1025"
+  SMTP_SECURE: "false"
+  SMTP_USER: ""
+  SMTP_PASSWORD: ""
+  SMTP_FROM: no-reply@{{ include "goosee.host" . }}
+
+  # URLs publiques (dérivées du domaine du tenant)
+  NEXT_PUBLIC_API_URL: http://{{ include "goosee.apiHost" . }}
+  NEXT_PUBLIC_WEB_URL: http://{{ include "goosee.host" . }}

@@ -1,0 +1,74 @@
+# Valeurs par défaut du chart d'un tenant. L'orchestrateur surcharge `tenant.*` et
+# `secrets.*` par tenant (secrets générés, jamais les valeurs par défaut interdites en prod).
+tenant:
+  slug: demo
+  # host du site = <slug>.<domain> ; API = api.<slug>.<domain>
+  domain: 127.0.0.1.nip.io
+
+image:
+  # Préfixe de registre optionnel (ex. registry k3d). Vide = images importées dans le cluster.
+  registry: ''
+  tag: local
+  pullPolicy: IfNotPresent
+
+# Secrets du tenant (générés par l'orchestrateur ; valeurs de démo NON utilisables en prod).
+secrets:
+  dbPassword: changeme-db
+  jwtSecret: changeme-jwt
+  jwtAccessSecret: changeme-jwt-access
+  jwtRefreshSecret: changeme-jwt-refresh
+  internalApiToken: changeme-internal
+  minioRootUser: gooseeminio
+  minioRootPassword: changeme-minio
+  stripeSecretKey: ''
+  stripeWebhookSecret: ''
+
+# Gateway HTTP (seule porte d'entrée API) et front Next.js.
+gateway:
+  name: gateway
+  image: goosee/api-gateway
+  port: 3001
+front:
+  name: front
+  image: goosee/front
+  port: 3000
+
+# Microservices HTTP internes (Deployment + Service ClusterIP). Chacun a sa base dédiée.
+backendServices:
+  - { name: auth, image: goosee/auth-service, port: 3003 }
+  - { name: user, image: goosee/user-service, port: 3002 }
+  - { name: page, image: goosee/page-service, port: 3004 }
+  - { name: log, image: goosee/log-service, port: 3005 }
+  - { name: product, image: goosee/product-service, port: 3006 }
+  - { name: order, image: goosee/order-service, port: 3007 }
+  - { name: cart, image: goosee/cart-service, port: 3008 }
+  - { name: payment, image: goosee/payment-service, port: 3009 }
+
+# Notifier : RMQ uniquement, pas de port HTTP ni de base.
+notifier:
+  name: notifier
+  image: goosee/notifier-service
+
+# Une base PostgreSQL dédiée par service (database-per-service).
+databases:
+  - { name: auth-db, db: auth_db }
+  - { name: user-db, db: user_db }
+  - { name: page-db, db: page_db }
+  - { name: log-db, db: log_db }
+  - { name: product-db, db: product_db }
+  - { name: order-db, db: order_db }
+  - { name: cart-db, db: cart_db }
+  - { name: payment-db, db: payment_db }
+
+postgres:
+  image: postgres:16-alpine
+  storage: 1Gi
+rabbitmq:
+  image: rabbitmq:management
+  storage: 1Gi
+minio:
+  image: minio/minio:latest
+  storage: 2Gi
+  bucket: goosee-uploads
+mailhog:
+  image: mailhog/mailhog:v1.0.1

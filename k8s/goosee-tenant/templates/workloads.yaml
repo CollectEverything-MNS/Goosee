@@ -1,0 +1,125 @@
+# Workloads applicatifs : gateway, microservices internes, notifier et front.
+# Tous (sauf le front) consomment l'env partagé via envFrom (ConfigMap + Secret).
+{{- $envFrom := list (dict "configMapRef" (dict "name" "goosee-env")) (dict "secretRef" (dict "name" "goosee-secrets")) }}
+
+# ----- Gateway (seule porte d'entrée HTTP) + microservices internes -----
+{{- range concat (list .Values.gateway) .Values.backendServices }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "goosee.labels" $ | nindent 4 }}
+    app.kubernetes.io/name: {{ .name }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .name }}
+  ports:
+    - port: {{ .port }}
+      targetPort: {{ .port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "goosee.labels" $ | nindent 4 }}
+    app.kubernetes.io/name: {{ .name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .name }}
+  template:
+    metadata:
+      labels:
+        {{- include "goosee.labels" $ | nindent 8 }}
+        app.kubernetes.io/name: {{ .name }}
+    spec:
+      containers:
+        - name: {{ .name }}
+          image: {{ include "goosee.image" (dict "repo" .image "root" $) }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .port }}
+          envFrom:
+            - configMapRef:
+                name: goosee-env
+            - secretRef:
+                name: goosee-secrets
+{{- end }}
+
+# ----- Notifier (RMQ uniquement, pas de Service ni de port HTTP) -----
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.notifier.name }}
+  labels:
+    {{- include "goosee.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Values.notifier.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.notifier.name }}
+  template:
+    metadata:
+      labels:
+        {{- include "goosee.labels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ .Values.notifier.name }}
+    spec:
+      containers:
+        - name: {{ .Values.notifier.name }}
+          image: {{ include "goosee.image" (dict "repo" .Values.notifier.image "root" .) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: goosee-env
+            - secretRef:
+                name: goosee-secrets
+
+# ----- Front Next.js (NODE_ENV uniquement : l'URL API est dérivée du host au runtime) -----
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.front.name }}
+  labels:
+    {{- include "goosee.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Values.front.name }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Values.front.name }}
+  ports:
+    - port: {{ .Values.front.port }}
+      targetPort: {{ .Values.front.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.front.name }}
+  labels:
+    {{- include "goosee.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Values.front.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.front.name }}
+  template:
+    metadata:
+      labels:
+        {{- include "goosee.labels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ .Values.front.name }}
+    spec:
+      containers:
+        - name: {{ .Values.front.name }}
+          image: {{ include "goosee.image" (dict "repo" .Values.front.image "root" .) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.front.port }}
+          env:
+            - name: NODE_ENV
+              value: production
