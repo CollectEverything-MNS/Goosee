@@ -733,6 +733,33 @@ sera validé quand la stack vitrine tourne.
 **Reste Lot 7 :** 7.2 Prometheus + agrégation métriques/KPI par tenant, 7.3 allocation K8s
 manuelle, 7.4 allocation intelligente.
 
+---
+
+## 2026-06-17 — Lot 7.2 : agrégation des KPI métier par tenant (goosee-vitrine)
+
+**Fait (repo `goosee-vitrine`) :**
+- **Orchestrateur** : `SupervisionService.getSupervision(tenant)` agrège **à la demande** les
+  KPI métier réels d'un tenant en appelant sa gateway `GET /internal/kpi` avec le jeton
+  interne du tenant (lu depuis son fichier d'env `secretsRef`). Renvoie `{ reachable, kpi }`
+  (KPI = users/customers/products/categories/orders/paidOrders/revenueCents). Endpoint
+  `GET /tenants/:id/kpi`.
+- **API vitrine** : `GET /superadmin/tenants/:id/kpi` (protégé SUPERADMIN) qui relaie
+  l'orchestrateur via `SupervisionClient.getTenantKpi`.
+- **Web** : dans la supervision, chaque ligne tenant a un bouton **KPI** qui déplie un
+  panneau chargé à la demande (`useTenantKpi`) — CA, commandes, commandes payées, clients,
+  produits, catégories. Affiche « injoignable » si le tenant est arrêté.
+
+**Choix POC :** pas de Prometheus central (scrape permanent de `/metrics` + kube-state) — trop
+lourd et fragile en local. On fait du **pull direct à la demande** des KPI métier (qui sont
+la donnée de supervision la plus parlante). Les métriques infra temps réel (CPU/mémoire par
+pod) restent à brancher (kubectl top / metrics-server) si besoin ultérieur.
+
+**Testé :** orchestrateur, API et web compilent. Le flux live (KPI réels) nécessite un tenant
+actif provisionné par l'orchestrateur (gateway `/internal/kpi` joignable + jeton).
+
+**Reste Lot 7 :** 7.3 allocation K8s manuelle (requests/limits/HPA), 7.4 allocation
+intelligente (recommandation heuristique).
+
 
 
 
