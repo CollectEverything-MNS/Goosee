@@ -300,6 +300,30 @@ l'orchestrateur devra **recharger Traefik** (restart ou SIGHUP). À implémenter
 manuel : génère l'env/secrets, `compose up`, écrit la route Traefik + recharge Traefik
 (caveat fsnotify), seed owner, scale-to-zero, registre des tenants (table dédiée).
 
+---
+
+## 2026-06-17 — Lot 3.1→3.5 : orchestrateur + provisioning Docker (goosee-vitrine)
+
+**Fait :**
+- Scaffold `apps/orchestrator` (NestJS) + base **dédiée** (`ORCH_DB_*`) + entité `Tenant`
+  (registre) + migration `InitTenants`. (commit `feat(orchestrator): scaffold…`)
+- `ProvisioningService` : génération env/secrets aléatoires, `docker compose up/stop/
+  start/down` (shell-out), écriture route Traefik + rechargement. `TenantService` :
+  cycle de vie. API `POST /tenants`, `/stop`, `/start`, `DELETE`. (commit `feat(orchestrator):
+  provisionne…`)
+- **Testé end-to-end via l'API** : `POST /tenants {slug:shop1}` → tenant isolé déployé,
+  `ACTIVE`, `api.shop1.127.0.0.1.nip.io/health` 200, front 200 ; `stop` → 0 conteneur ;
+  `delete` → registre vidé + route supprimée.
+- Côté Goosee : `docker/tenant/envs/` gitignoré (env de tenant = secrets).
+
+**Correctif CI (SEC-7) :** workflow `discord-commit.yml` des deux repos réparé — payload
+construit avec `jq` (le message multi-ligne cassait le JSON, Discord 50109) et envoi
+conditionnel (le webhook général vide faisait échouer le job). Testé : jq produit un JSON
+valide même avec guillemets/backticks/retours ligne.
+
+**Reste Lot 3 :** 3.4 suivi SSE, 3.6 seed owner + e-mail creds, et le câblage
+vitrine → orchestrateur (déclencher le provisioning après inscription/paiement).
+
 
 
 

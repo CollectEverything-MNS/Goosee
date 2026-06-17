@@ -119,12 +119,12 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 
 | # | Tâche | Estim. | Statut |
 |---|---|---|---|
-| 3.1 | Scaffold `apps/orchestrator` (NestJS) + DB registre des tenants | 1–2 j | ⬜ |
-| 3.2 | Génération des secrets/env par tenant (JWT, mots de passe DB, noms de bases, slug) | 1 j | ⬜ |
-| 3.3 | Provisioning Docker : `docker compose -p tenant-<id> up`, build images prod | 2–3 j | ⬜ |
+| 3.1 | Scaffold `apps/orchestrator` (NestJS) + DB registre des tenants | 1–2 j | ✅ |
+| 3.2 | Génération des secrets/env par tenant (JWT, mots de passe DB, noms de bases, slug) | 1 j | ✅ |
+| 3.3 | Provisioning Docker : `docker compose -p tenant-<id> up` + route Traefik | 2–3 j | ✅ |
 | 3.4 | Suivi d'avancement temps réel (SSE) `BUILDING → MIGRATED → SEEDED → HEALTHY` | 1–2 j | ⬜ |
-| 3.5 | Scale-to-zero (`start`/`stop`) + dé-provisioning | 1–2 j | ⬜ |
-| 3.6 | Hook de fin : seed owner + e-mail creds (Mailhog) + statut `ACTIVE` | 1 j | ⬜ |
+| 3.5 | Scale-to-zero (`start`/`stop`) + dé-provisioning | 1–2 j | ✅ |
+| 3.6 | Hook de fin : seed owner + e-mail creds (Mailhog) + statut `ACTIVE` | 1 j | 🟡 statut ACTIVE fait ; seed owner + e-mail à faire |
 
 **Exemple :** un endpoint `POST /tenants` qui, à partir d'un `Project`, génère `env/tenant-<id>.env` puis lance la pile isolée et renvoie un flux SSE de progression.
 
