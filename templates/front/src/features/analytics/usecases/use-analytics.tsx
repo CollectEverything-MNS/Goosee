@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react';
 
-import { MOCK_ORDERS } from '@/features/orders/data/orders.mock';
 import { ORDER_STATUSES, OrderStatus } from '@/features/orders/data/order.types';
+import { useListOrders } from '@/features/orders/usecases/use-list-orders';
 import { useListCategories } from '@/features/products/usecases/use-list-categories';
 import { useListProducts } from '@/features/products/usecases/use-list-products';
 import { useListCustomers } from '@/features/users/usecases/use-list-customers';
@@ -54,6 +54,7 @@ export interface Analytics {
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export function useAnalytics(range: DateRange = {}): Analytics {
+  const ordersQuery = useListOrders();
   const customers = useListCustomers();
   const products = useListProducts();
   const categories = useListCategories();
@@ -61,9 +62,11 @@ export function useAnalytics(range: DateRange = {}): Analytics {
   const fromTime = range.from?.getTime();
   const toTime = range.to?.getTime();
 
+  const allOrders = ordersQuery.data;
+
   return useMemo<Analytics>(() => {
-    // Filtre les commandes sur la plage de dates sélectionnée.
-    const orders = MOCK_ORDERS.filter((o) => {
+    // Filtre les commandes (réelles, via order-service) sur la plage sélectionnée.
+    const orders = (allOrders ?? []).filter((o) => {
       const created = new Date(o.createdAt).getTime();
       if (fromTime !== undefined && created < fromTime) return false;
       if (toTime !== undefined && created > toTime) return false;
@@ -145,11 +148,17 @@ export function useAnalytics(range: DateRange = {}): Analytics {
       ordersByStatus,
       topProducts,
       productsByCategory,
-      isLoading: customers.isLoading || products.isLoading || categories.isLoading,
+      isLoading:
+        ordersQuery.isLoading ||
+        customers.isLoading ||
+        products.isLoading ||
+        categories.isLoading,
     };
   }, [
     fromTime,
     toTime,
+    allOrders,
+    ordersQuery.isLoading,
     customers.data,
     customers.isLoading,
     products.data,

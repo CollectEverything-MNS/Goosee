@@ -1,5 +1,3 @@
-import { MOCK_ORDERS } from '@/features/orders/data/orders.mock';
-
 export type AnalyticsPeriod = 'all' | 'last7' | 'last30' | 'month' | 'custom';
 
 export const ANALYTICS_PERIODS: AnalyticsPeriod[] = [
@@ -30,14 +28,12 @@ function endOfDay(d: Date): Date {
 }
 
 /**
- * Les périodes relatives sont ancrées sur la commande la plus récente du jeu de
- * données (et non sur "aujourd'hui"), afin que les presets restent pertinents
- * sur les données de démonstration. Avec de vraies commandes, la dernière
- * commande est proche d'aujourd'hui, donc le comportement reste naturel.
+ * Les périodes relatives (7/30 jours, mois en cours) sont ancrées sur aujourd'hui :
+ * les commandes provenant désormais de order-service, la date de référence est
+ * naturellement le présent.
  */
 export function latestOrderDate(): Date {
-  const times = MOCK_ORDERS.map((o) => new Date(o.createdAt).getTime());
-  return new Date(times.length ? Math.max(...times) : Date.now());
+  return new Date();
 }
 
 export function resolvePeriodRange(

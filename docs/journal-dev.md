@@ -517,6 +517,29 @@ en standalone (5.2).
 **Reste (hors POC immédiat) :** UI de changement de statut dans le détail admin (le back
 expose déjà `PATCH /orders/:id/status`), et bascule de l'analytics sur données réelles.
 
+---
+
+## 2026-06-17 — Analytics admin sur données réelles
+
+**Fait (front, back-office) :**
+- **`use-analytics.tsx`** consomme désormais `useListOrders()` (commandes réelles de
+  `order-service`) au lieu de `MOCK_ORDERS`. Tous les indicateurs en découlent : CA, panier
+  moyen, articles vendus, taux d'annulation, CA par jour, répartition par statut et top
+  ventes. Le catalogue par catégorie était déjà sur données réelles. `isLoading` intègre la
+  requête commandes.
+- **`period.ts`** : les périodes relatives (7/30 j, mois) sont ancrées sur aujourd'hui
+  (`latestOrderDate()` renvoie `new Date()`), les commandes venant maintenant du back.
+- **Suppression de `orders.mock.ts`** (devenu orphelin : plus aucun import après le passage
+  de la liste admin puis de l'analytics aux données réelles).
+
+**Pourquoi :** le dashboard analytics reflète l'activité réelle du tenant (mêmes commandes
+que le back-office et les KPI superadmin), plus aucune donnée fictive côté commandes.
+
+**Testé :** `tsc` clean, `next build` OK (route admin/analytics). 
+
+**Note :** le mock client `account/my-orders.mock.ts` (espace « mes commandes » côté
+storefront) reste, distinct — il faudra plus tard retrouver les commandes par `customerId`.
+
 
 
 
