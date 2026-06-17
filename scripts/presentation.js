@@ -44,8 +44,10 @@ const IMAGES = [
   'product-service', 'order-service', 'cart-service', 'payment-service', 'notifier-service',
 ].map((n) => `goosee/${n}:local`);
 
-// Sous-ensemble réellement déployé + peuplé (le reste des sites de Bob reste registre/STOPPED).
-const DOCKER_SITES = [
+// Sous-ensemble réellement déployé + peuplé (le reste reste registre/STOPPED, démarrable
+// à la demande). Défaut allégé : 1 site Docker + 1 site K8s.
+const DOCKER_COUNT = Math.min(Number(process.env.PRESENTATION_DOCKER_COUNT || 1), 2);
+const ALL_DOCKER = [
   { slug: 'atelier-alice', owner: 'alice@goosee.dev' },
   { slug: 'resto-bob', owner: 'bob@goosee.dev' },
 ];
@@ -55,6 +57,7 @@ const ALL_K8S = [
   { slug: 'deco-bob', owner: 'bob@goosee.dev' },
   { slug: 'sport-bob', owner: 'bob@goosee.dev' },
 ];
+const DOCKER_SITES = ALL_DOCKER.slice(0, DOCKER_COUNT);
 const K8S_SITES = ALL_K8S.slice(0, K8S_COUNT);
 
 const rand = (n = 24) => crypto.randomBytes(n).toString('hex');
@@ -413,7 +416,7 @@ function activate(slug, infra, secretsRef) {
 
 function down() {
   log('Démontage');
-  for (const s of DOCKER_SITES) {
+  for (const s of ALL_DOCKER) {
     run(`docker compose -p tenant-${s.slug} down -v`, { capture: true });
     fs.rmSync(path.join(DYNAMIC_DIR, `${s.slug}.yml`), { force: true });
     fs.rmSync(path.join(TARGETS_DIR, `${s.slug}.json`), { force: true });
