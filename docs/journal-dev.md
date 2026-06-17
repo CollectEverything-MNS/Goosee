@@ -874,6 +874,28 @@ présentation (`yarn presentation`, plusieurs clients enterprise). Prérequis ru
 **Reste demandé :** métriques infra live (kubectl top), `my-orders` par `customerId`,
 Prometheus central, READMEs + script `yarn presentation`, alignement docs/architecture.
 
+---
+
+## 2026-06-17 — Métriques infra live dans la supervision (goosee-vitrine)
+
+**Fait (repo `goosee-vitrine`) :**
+- `SupervisionService.getInfra(tenant)` (best-effort) ajoute la conso réelle :
+  - **k8s** : `kubectl top pods -n tenant-<slug>` (metrics-server) → pods, CPU (millicores),
+    mémoire (Mi) agrégés.
+  - **docker** : nombre de conteneurs du projet (`docker compose -p tenant-<slug> ps -q`).
+  - `TenantSupervision.infra` propagé à l'API vitrine et au web.
+- **Web** : le panneau de supervision affiche une section « Infra live » (pods, CPU, mémoire)
+  en plus des KPI métier. L'infra s'affiche même si la gateway est injoignable (tenant arrêté).
+
+**Pourquoi :** compléter la supervision temps réel avec les signaux d'infrastructure
+(consommation), socle de l'allocation/recommandation (7.3/7.4).
+
+**Testé :** orchestrateur + api + web compilent. Les métriques k8s nécessitent le bon contexte
+kubectl (k3d-goosee) et metrics-server (fourni par k3s).
+
+**Reste demandé :** `my-orders` par `customerId`, Prometheus central, READMEs + script
+`yarn presentation`, alignement docs/architecture.
+
 
 
 
