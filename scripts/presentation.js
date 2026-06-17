@@ -207,10 +207,25 @@ async function api(method, base, route, token, body) {
   return res.status === 204 ? {} : res.json();
 }
 
+// Attend que l'API du tenant soit prête (gateway + auth-service up) puis renvoie un token.
+// Les services jouent leurs migrations au boot : un 503/refus est normal au début.
+async function loginWithRetry(base, email, password) {
+  for (let i = 1; i <= 60; i += 1) {
+    try {
+      const r = await api('POST', base, '/auth/login', null, { email, password });
+      if (r.accessToken) return r.accessToken;
+    } catch (e) {
+      if (!/(\b50[234]\b|fetch failed|ECONNREFUSED|ENOTFOUND|EAI_AGAIN)/i.test(e.message)) throw e;
+    }
+    process.stdout.write(`  … API du tenant pas prête (${i}/60)\r`);
+    await sleep(3000);
+  }
+  throw new Error('API du tenant non prête (login en échec après ~3 min)');
+}
+
 // Peuple un site : clients, catégorie, produits, commandes (dont payées) → KPI non nuls.
 async function seedTenantData(base, ownerEmail, ownerPassword) {
-  const login = await api('POST', base, '/auth/login', null, { email: ownerEmail, password: ownerPassword });
-  const token = login.accessToken;
+  const token = await loginWithRetry(base, ownerEmail, ownerPassword);
 
   // Clients (s'inscrivent sur le site)
   const customers = [
