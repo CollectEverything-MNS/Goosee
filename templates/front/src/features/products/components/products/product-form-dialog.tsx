@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
-import { ArrowRight, Loader2, Package } from 'lucide-react';
+import { ArrowRight, Check, Loader2, Package } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,7 +55,7 @@ const formSchema = z.object({
   sizeValue: z.number().min(0).optional().nullable(),
   sizeUnit: z.string().optional().or(z.literal('')),
   isAvailable: z.boolean(),
-  categoryId: z.string().uuid({ message: 'Catégorie requise' }),
+  categoryIds: z.array(z.string().uuid()).min(1, { message: 'Au moins une catégorie' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -81,7 +81,7 @@ export function ProductFormDialog() {
       sizeValue: null,
       sizeUnit: '',
       isAvailable: true,
-      categoryId: '',
+      categoryIds: [],
     },
   });
 
@@ -96,7 +96,11 @@ export function ProductFormDialog() {
         sizeValue: currentRow.sizeValue != null ? Number(currentRow.sizeValue) : null,
         sizeUnit: currentRow.sizeUnit ?? '',
         isAvailable: currentRow.isAvailable ?? true,
-        categoryId: currentRow.categoryId ?? '',
+        categoryIds: currentRow.categoryIds?.length
+          ? currentRow.categoryIds
+          : currentRow.categoryId
+            ? [currentRow.categoryId]
+            : [],
       });
     } else if (open === 'create') {
       form.reset({
@@ -108,7 +112,7 @@ export function ProductFormDialog() {
         sizeValue: null,
         sizeUnit: '',
         isAvailable: true,
-        categoryId: '',
+        categoryIds: [],
       });
     }
   }, [open, currentRow, isEditing, form]);
@@ -129,7 +133,7 @@ export function ProductFormDialog() {
         sizeValue: values.sizeValue ?? undefined,
         sizeUnit: values.sizeUnit || undefined,
         isAvailable: values.isAvailable,
-        categoryId: values.categoryId,
+        categoryIds: values.categoryIds,
       };
       if (isEditing) {
         await updateMutation.mutateAsync({ id: currentRow.id, data: payload });
@@ -213,32 +217,48 @@ export function ProductFormDialog() {
                 />
                 <FormField
                   control={form.control}
-                  name="categoryId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-medium">{t('form.category')}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-10">
-                            <SelectValue placeholder={t('form.categoryPlaceholder')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categories.length === 0 && (
-                            <div className="px-2 py-3 text-xs text-muted-foreground">
-                              {t('form.noCategories')}
-                            </div>
-                          )}
-                          {categories.map((c: any) => (
-                            <SelectItem key={c.id} value={c.id}>
-                              {c.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  name="categoryIds"
+                  render={({ field }) => {
+                    const selected = field.value ?? [];
+                    const toggle = (id: string) =>
+                      field.onChange(
+                        selected.includes(id)
+                          ? selected.filter((v) => v !== id)
+                          : [...selected, id],
+                      );
+                    return (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium">
+                          {t('form.category')} <span className="text-muted-foreground">(plusieurs possibles)</span>
+                        </FormLabel>
+                        {categories.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">{t('form.noCategories')}</p>
+                        ) : (
+                          <div className="flex flex-wrap gap-2">
+                            {categories.map((c: any) => {
+                              const active = selected.includes(c.id);
+                              return (
+                                <button
+                                  key={c.id}
+                                  type="button"
+                                  onClick={() => toggle(c.id)}
+                                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                                    active
+                                      ? 'border-primary bg-primary text-primary-foreground'
+                                      : 'border-border bg-background hover:bg-accent'
+                                  }`}
+                                >
+                                  {active && <Check className="h-3 w-3" />}
+                                  {c.name}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </section>
 

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IProductRepository } from '../../repositories/product.repository';
 import { ICategoryRepository } from '../../repositories/category.repository';
 import { UpdateProductDto } from './update-product.dto';
@@ -22,11 +22,17 @@ export class UpdateProductUseCase {
       throw new NotFoundException('Product not found');
     }
 
-    if (dto.categoryId && dto.categoryId !== product.categoryId) {
-      const category = await this.categoryRepo.findById(dto.categoryId);
-      if (!category) {
-        throw new NotFoundException(`Category not found : ${dto.categoryId}`);
-      }
+    const currentIds = product.categoryIds?.length
+      ? product.categoryIds
+      : product.categoryId
+        ? [product.categoryId]
+        : [];
+
+    let nextCategoryIds = currentIds;
+    if (dto.categoryIds?.length) {
+      nextCategoryIds = await this.resolveCategoryIds(dto.categoryIds);
+    } else if (dto.categoryId) {
+      nextCategoryIds = await this.resolveCategoryIds([dto.categoryId]);
     }
 
     const newStock = dto.stock ?? product.stock;
@@ -46,7 +52,8 @@ export class UpdateProductUseCase {
       sizeValue: dto.sizeValue ?? product.sizeValue,
       sizeUnit: dto.sizeUnit ?? product.sizeUnit,
       isAvailable: newIsAvailable,
-      categoryId: dto.categoryId ?? product.categoryId,
+      categoryId: nextCategoryIds[0] ?? product.categoryId,
+      categoryIds: nextCategoryIds,
     };
 
     const saved = await this.productRepo.save(updated);
@@ -59,5 +66,22 @@ export class UpdateProductUseCase {
       message: 'Product updated successfully',
       product: saved,
     };
+  }
+
+  private async resolveCategoryIds(categoryIds: string[]): Promise<string[]> {
+    const ids = Array.from(new Set(categoryIds.filter(Boolean)));
+
+    if (!ids.length) {
+      throw new BadRequestException('At least one category is required');
+    }
+
+    for (const id of ids) {
+      const category = await this.categoryRepo.findById(id);
+      if (!category) {
+        throw new NotFoundException(`Category not found : ${id}`);
+      }
+    }
+
+    return ids;
   }
 }

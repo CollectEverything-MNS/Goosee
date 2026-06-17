@@ -312,6 +312,7 @@ export class ProductSeederService implements OnApplicationBootstrap {
             sizeUnit: seed.sizeUnit,
             isAvailable: true,
             categoryId: category.id,
+            categoryIds: [category.id],
           }),
         );
         existingNames.add(seed.name);

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IProductRepository } from '../../repositories/product.repository';
 import { ICategoryRepository } from '../../repositories/category.repository';
 import { CreateProductDto } from './create-product.dto';
@@ -14,13 +14,7 @@ export class CreateProductUseCase {
   ) {}
 
   async execute(dto: CreateProductDto) {
-    const category = await this.categoryRepo.findById(dto.categoryId);
-    if (!category) {
-      this.logClient.warning({
-        message: `Tentative de création d'un produit avec une catégorie inexistante : ${dto.categoryId}`,
-      });
-      throw new NotFoundException(`Category not found : ${dto.categoryId}`);
-    }
+    const categoryIds = await this.resolveCategoryIds(dto.categoryIds, dto.categoryId);
 
     const product = new Product({
       name: dto.name,
@@ -31,7 +25,8 @@ export class CreateProductUseCase {
       sizeValue: dto.sizeValue,
       sizeUnit: dto.sizeUnit,
       isAvailable: dto.stock === 0 ? false : (dto.isAvailable ?? true),
-      categoryId: dto.categoryId,
+      categoryId: categoryIds[0],
+      categoryIds,
     });
 
     const saved = await this.productRepo.save(product);
@@ -44,5 +39,30 @@ export class CreateProductUseCase {
       message: 'Product created successfully',
       product: saved,
     };
+  }
+
+  private async resolveCategoryIds(
+    categoryIds?: string[],
+    categoryId?: string,
+  ): Promise<string[]> {
+    const ids = Array.from(
+      new Set((categoryIds?.length ? categoryIds : categoryId ? [categoryId] : []).filter(Boolean)),
+    );
+
+    if (!ids.length) {
+      throw new BadRequestException('At least one category is required');
+    }
+
+    for (const id of ids) {
+      const category = await this.categoryRepo.findById(id);
+      if (!category) {
+        this.logClient.warning({
+          message: `Tentative de création d'un produit avec une catégorie inexistante : ${id}`,
+        });
+        throw new NotFoundException(`Category not found : ${id}`);
+      }
+    }
+
+    return ids;
   }
 }

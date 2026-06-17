@@ -41,8 +41,13 @@ export class Product {
   @Column({ default: true })
   isAvailable: boolean;
 
+  // Categorie principale (1ere cochee) - conservee pour la retrocompat des filtres
   @Column()
   categoryId: string;
+
+  // Toutes les categories du produit (multi-categories)
+  @Column('text', { array: true, default: [] })
+  categoryIds: string[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -185,7 +185,10 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <RelatedProducts currentId={product.id} categoryId={product.categoryId} />
+        <RelatedProducts
+          currentId={product.id}
+          categoryIds={product.categoryIds?.length ? product.categoryIds : [product.categoryId]}
+        />
       </div>
     </main>
   );
