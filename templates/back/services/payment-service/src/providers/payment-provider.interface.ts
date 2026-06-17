@@ -21,5 +21,9 @@ export abstract class IPaymentProvider {
   abstract createIntent(payment: Payment): Promise<PaymentIntentResult>;
 
   // Vérifie l'authenticité du webhook puis le normalise en événement métier.
-  abstract parseWebhookEvent(rawBody: Buffer | string, signature?: string): PaymentWebhookEvent;
+  // Renvoie null pour un événement non pertinent (à acquitter sans action).
+  abstract parseWebhookEvent(
+    rawBody: Buffer | string,
+    signature?: string
+  ): PaymentWebhookEvent | null;
 }

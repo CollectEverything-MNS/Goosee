@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
 import { Payment, PaymentStatus } from '../../entities/payment.entity';
 import {
   IPaymentProvider,
@@ -8,33 +9,30 @@ import {
 } from '../payment-provider.interface';
 
 /**
- * SCAFFOLD Stripe — à compléter par Florent.
- *
- * Le service tourne sans Stripe (mode mock) pour pouvoir tester le flux de bout en
- * bout. Pour activer le vrai paiement :
- *   1. `yarn add stripe` dans ce service.
- *   2. instancier le SDK avec STRIPE_SECRET_KEY (voir le constructeur).
- *   3. remplacer les blocs `TODO(Florent)` ci-dessous par les appels Stripe réels.
- * Tant que STRIPE_SECRET_KEY est absent, on reste en mock (utile en dev/CI).
+ * Provider Stripe (mode test). Sans STRIPE_SECRET_KEY, retombe en mode mock pour ne pas
+ * bloquer le dev/CI (intention simulée + webhook piloté par un corps JSON). Avec la clé,
+ * utilise le vrai SDK : PaymentIntent (confirmé côté front via Stripe Elements) et
+ * vérification de signature du webhook.
  */
 @Injectable()
 export class StripePaymentProvider implements IPaymentProvider {
   private readonly logger = new Logger(StripePaymentProvider.name);
   private readonly secretKey?: string;
   private readonly webhookSecret?: string;
-  // private readonly stripe?: Stripe; // TODO(Florent): décommenter après `yarn add stripe`
+  private readonly stripe?: Stripe;
 
   constructor(private readonly config: ConfigService) {
     this.secretKey = this.config.get<string>('STRIPE_SECRET_KEY');
     this.webhookSecret = this.config.get<string>('STRIPE_WEBHOOK_SECRET');
-    // TODO(Florent): if (this.secretKey) this.stripe = new Stripe(this.secretKey);
-    if (!this.secretKey) {
+    if (this.secretKey) {
+      this.stripe = new Stripe(this.secretKey);
+    } else {
       this.logger.warn('STRIPE_SECRET_KEY absent : provider en mode mock (aucun paiement réel).');
     }
   }
 
   private get isMock(): boolean {
-    return !this.secretKey;
+    return !this.stripe;
   }
 
   async createIntent(payment: Payment): Promise<PaymentIntentResult> {
@@ -46,20 +44,20 @@ export class StripePaymentProvider implements IPaymentProvider {
       };
     }
 
-    // TODO(Florent): paiement réel
-    // const intent = await this.stripe.paymentIntents.create({
-    //   amount: payment.amountCents,
-    //   currency: payment.currency,
-    //   metadata: { paymentId: payment.id, orderId: payment.orderId },
-    // });
-    // return { providerRef: intent.id, clientSecret: intent.client_secret! };
-    throw new Error('Stripe non câblé : implémenter createIntent (TODO Florent).');
+    const intent = await this.stripe!.paymentIntents.create({
+      amount: payment.amountCents,
+      currency: payment.currency,
+      // Méthodes de paiement automatiques (carte en test) ; pas de redirection forcée.
+      automatic_payment_methods: { enabled: true },
+      metadata: { paymentId: payment.id, orderId: payment.orderId },
+    });
+
+    return { providerRef: intent.id, clientSecret: intent.client_secret! };
   }
 
-  parseWebhookEvent(rawBody: Buffer | string, signature?: string): PaymentWebhookEvent {
+  parseWebhookEvent(rawBody: Buffer | string, signature?: string): PaymentWebhookEvent | null {
     if (this.isMock) {
-      // Mode mock : on accepte un corps JSON { providerRef, status } pour piloter le
-      // statut manuellement (tests). En prod Stripe, ce chemin n'est jamais pris.
+      // Mode mock : corps JSON { providerRef, status } pour piloter le statut (tests).
       let body: { providerRef?: string; status?: string };
       try {
         body = JSON.parse(rawBody.toString());
@@ -72,19 +70,34 @@ export class StripePaymentProvider implements IPaymentProvider {
       };
     }
 
-    // TODO(Florent): vérifier la signature et mapper l'événement Stripe
-    // const event = this.stripe.webhooks.constructEvent(rawBody, signature!, this.webhookSecret!);
-    // switch (event.type) {
-    //   case 'payment_intent.succeeded':
-    //     return { providerRef: event.data.object.id, status: 'succeeded' };
-    //   case 'payment_intent.payment_failed':
-    //     return { providerRef: event.data.object.id, status: 'failed' };
-    //   case 'charge.refunded':
-    //     return { providerRef: event.data.object.payment_intent, status: 'refunded' };
-    // }
-    void signature;
-    void this.webhookSecret;
-    throw new Error('Stripe non câblé : implémenter parseWebhookEvent (TODO Florent).');
+    if (!this.webhookSecret) {
+      throw new BadRequestException('STRIPE_WEBHOOK_SECRET manquant pour vérifier le webhook.');
+    }
+    if (!signature) {
+      throw new BadRequestException('Signature Stripe absente.');
+    }
+
+    let event: Stripe.Event;
+    try {
+      event = this.stripe!.webhooks.constructEvent(rawBody, signature, this.webhookSecret);
+    } catch (err) {
+      throw new BadRequestException(`Signature Stripe invalide : ${(err as Error).message}`);
+    }
+
+    switch (event.type) {
+      case 'payment_intent.succeeded':
+        return { providerRef: (event.data.object as Stripe.PaymentIntent).id, status: 'succeeded' };
+      case 'payment_intent.payment_failed':
+        return { providerRef: (event.data.object as Stripe.PaymentIntent).id, status: 'failed' };
+      case 'charge.refunded': {
+        const charge = event.data.object as Stripe.Charge;
+        const ref = typeof charge.payment_intent === 'string' ? charge.payment_intent : '';
+        return ref ? { providerRef: ref, status: 'refunded' } : null;
+      }
+      default:
+        // Événement non pertinent : on l'acquitte sans rien changer.
+        return null;
+    }
   }
 
   private normalizeStatus(status: string): PaymentStatus {

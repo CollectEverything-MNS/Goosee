@@ -815,6 +815,36 @@ temps réel, allocation ressources manuelle **et** recommandation intelligente.
 **🏁 Jalon 2 atteint** (lots 5→7) : forfait scalable (k8s) + supervision temps réel
 opérationnels → **POC fonctionnellement complet**. Reste le Lot 8 (UI/UX).
 
+---
+
+## 2026-06-17 — Stripe (mode test) câblé sur le storefront (Lot 5.3 finalisé)
+
+**Fait (repo `Goosee`) :**
+- **payment-service** : provider Stripe réel (`stripe` SDK). `createIntent` → vrai
+  `PaymentIntent` (`automatic_payment_methods`, métadonnées paymentId/orderId), renvoie le
+  `client_secret`. `parseWebhookEvent` → `constructEvent` (vérification de **signature**) +
+  mapping `payment_intent.succeeded|payment_failed` et `charge.refunded` → statut ; les
+  autres événements sont acquittés sans action (retour `null`). Repli mock conservé si
+  `STRIPE_SECRET_KEY` absent.
+- **Storefront** : page checkout en 2 temps — e-mail → création commande + intention de
+  paiement, puis **Stripe Payment Element** (`@stripe/react-stripe-js`) + `confirmPayment`
+  avec `return_url` vers la page succès (qui vide le panier). Clé publique via
+  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (inlinée au build).
+- Variables : `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` ajoutée à `.env.example` + `turbo.json` ;
+  clés **de test** réelles placées uniquement dans `env/.env.dev` (gitignoré, jamais commité).
+
+**Testé :** clé secrète de test validée en direct contre l'API Stripe (PaymentIntent créé,
+`client_secret` présent). payment-service et front compilent.
+
+**À noter :** pour que le webhook marque la commande `paid`, renseigner `STRIPE_WEBHOOK_SECRET`
+via `stripe listen --forward-to localhost:3009/payments/webhook` (sera intégré au script de
+présentation). Le webhook doit viser **directement** payment-service (le corps brut est requis
+pour la vérification de signature) — cohérent avec « le paiement parle en HTTP direct ».
+
+**Reste demandé :** provisioning K8s dans l'orchestrateur, métriques infra live (kubectl top),
+espace client `my-orders` par `customerId`, Prometheus central, READMEs + script de
+présentation `yarn presentation`, alignement docs/architecture.
+
 
 
 

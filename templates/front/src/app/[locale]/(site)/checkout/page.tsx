@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { Loader2, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { stripePromise } from '@/lib/stripe';
 import { useCartContext } from '@/features/cart/context/cart-provider';
 import { useCreateOrder } from '@/features/cart/usecases/use-create-order';
 import { useCreatePayment } from '@/features/cart/usecases/use-create-payment';
@@ -25,25 +26,78 @@ function formatPrice(cents: number, locale: string) {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Étape paiement : formulaire carte Stripe (Payment Element) + confirmation.
+function PaymentStep({
+  orderId,
+  totalCents,
+  locale,
+}: {
+  orderId: string;
+  totalCents: number;
+  locale: string;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [submitting, setSubmitting] = useState(false);
+
+  const handlePay = async () => {
+    if (!stripe || !elements) return;
+    setSubmitting(true);
+    // Confirme le paiement ; Stripe redirige vers return_url en cas de succès.
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/${locale}/checkout/success?order=${orderId}`,
+      },
+    });
+    if (error) {
+      toast.error(error.message ?? 'Le paiement a été refusé.');
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <section className="rounded-xl border bg-white p-6">
+      <h2 className="text-lg font-semibold">Paiement</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Mode test — carte : 4242 4242 4242 4242, date future, CVC quelconque.
+      </p>
+      <div className="mt-4">
+        <PaymentElement />
+      </div>
+      <Button
+        className="mt-6 w-full gap-2"
+        size="lg"
+        onClick={handlePay}
+        disabled={!stripe || submitting}
+      >
+        {submitting && <Loader2 className="h-5 w-5 animate-spin" />}
+        Payer {formatPrice(totalCents, locale)}
+      </Button>
+    </section>
+  );
+}
+
 export default function CheckoutPage() {
   const locale = useLocale();
-  const router = useRouter();
   const cart = useCartContext();
   const [email, setEmail] = useState('');
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderTotal, setOrderTotal] = useState(0);
 
   const createOrder = useCreateOrder();
   const createPayment = useCreatePayment();
-  const isSubmitting = createOrder.isPending || createPayment.isPending;
+  const isPreparing = createOrder.isPending || createPayment.isPending;
 
   const items = cart?.items ?? [];
   const totalCents = cart?.totalCents ?? 0;
 
-  if (items.length === 0) {
+  if (items.length === 0 && !clientSecret) {
     return (
       <main className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center gap-4 px-4 text-center">
         <ShoppingCart className="h-12 w-12 text-muted-foreground" />
         <h1 className="text-2xl font-bold">Votre panier est vide</h1>
-        <p className="text-muted-foreground">Ajoutez des articles avant de passer commande.</p>
         <Button asChild variant="outline">
           <Link href={`/${locale}`}>Retour à la boutique</Link>
         </Button>
@@ -51,30 +105,28 @@ export default function CheckoutPage() {
     );
   }
 
-  const handleSubmit = async () => {
+  const startPayment = async () => {
     if (!EMAIL_REGEX.test(email)) {
       toast.error('Veuillez saisir une adresse e-mail valide.');
       return;
     }
-
     try {
-      // 1. Crée la commande (le total est recalculé côté serveur).
       const order = await createOrder.mutateAsync({
         customerEmail: email,
-        items: items.map((item) => ({
-          productId: item.productId,
-          name: item.name,
-          unitPriceCents: item.unitPriceCents,
-          quantity: item.quantity,
+        items: items.map((i) => ({
+          productId: i.productId,
+          name: i.name,
+          unitPriceCents: i.unitPriceCents,
+          quantity: i.quantity,
         })),
       });
-
-      // 2. Crée l'intention de paiement rattachée à la commande.
-      await createPayment.mutateAsync({ orderId: order.id, amountCents: order.totalCents });
-
-      // 3. Vide le panier et redirige vers la confirmation.
-      cart?.clear();
-      router.push(`/${locale}/checkout/success?order=${order.id}`);
+      const payment = await createPayment.mutateAsync({
+        orderId: order.id,
+        amountCents: order.totalCents,
+      });
+      setOrderId(order.id);
+      setOrderTotal(order.totalCents);
+      setClientSecret(payment.clientSecret);
     } catch {
       toast.error("Le paiement n'a pas pu être initié. Réessayez.");
     }
@@ -103,31 +155,41 @@ export default function CheckoutPage() {
             <Separator className="my-4" />
             <div className="flex items-center justify-between text-base font-semibold">
               <span>Total</span>
-              <span>{formatPrice(totalCents, locale)}</span>
+              <span>{formatPrice(clientSecret ? orderTotal : totalCents, locale)}</span>
             </div>
           </section>
 
-          <section className="rounded-xl border bg-white p-6">
-            <h2 className="text-lg font-semibold">Vos coordonnées</h2>
-            <div className="mt-4 space-y-2">
-              <Label htmlFor="email">Adresse e-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="vous@exemple.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                La confirmation de commande sera envoyée à cette adresse.
-              </p>
-            </div>
-          </section>
-
-          <Button className="w-full gap-2" size="lg" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="h-5 w-5 animate-spin" />}
-            Payer {formatPrice(totalCents, locale)}
-          </Button>
+          {!clientSecret ? (
+            <>
+              <section className="rounded-xl border bg-white p-6">
+                <h2 className="text-lg font-semibold">Vos coordonnées</h2>
+                <div className="mt-4 space-y-2">
+                  <Label htmlFor="email">Adresse e-mail</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="vous@exemple.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+              </section>
+              {!stripePromise ? (
+                <p className="text-sm text-red-600">
+                  Stripe n&apos;est pas configuré (clé publique manquante).
+                </p>
+              ) : (
+                <Button className="w-full gap-2" size="lg" onClick={startPayment} disabled={isPreparing}>
+                  {isPreparing && <Loader2 className="h-5 w-5 animate-spin" />}
+                  Continuer vers le paiement
+                </Button>
+              )}
+            </>
+          ) : (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <PaymentStep orderId={orderId!} totalCents={orderTotal} locale={locale} />
+            </Elements>
+          )}
         </div>
       </div>
     </main>

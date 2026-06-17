@@ -15,6 +15,11 @@ export class HandleWebhookUseCase {
     // Le provider vérifie l'authenticité (signature Stripe) puis normalise l'événement.
     const event = this.paymentProvider.parseWebhookEvent(rawBody, signature);
 
+    // Événement non pertinent (autre type Stripe) : on acquitte sans rien faire.
+    if (!event) {
+      return { received: true, ignored: true };
+    }
+
     const payment = await this.paymentRepo.findByProviderRef(event.providerRef);
     if (!payment) {
       // On le signale sans faire échouer le webhook (Stripe attend un 2xx).

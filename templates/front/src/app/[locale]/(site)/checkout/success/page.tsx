@@ -1,17 +1,28 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { CheckCircle2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { useCartContext } from '@/features/cart/context/cart-provider';
 
 function CheckoutSuccess() {
   const locale = useLocale();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order');
+  const cart = useCartContext();
+
+  // Paiement confirmé (retour Stripe) : on vide le panier une seule fois.
+  const cleared = useRef(false);
+  useEffect(() => {
+    if (cart && !cleared.current) {
+      cleared.current = true;
+      cart.clear();
+    }
+  }, [cart]);
 
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center gap-5 px-4 py-12 text-center">
