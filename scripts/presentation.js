@@ -177,6 +177,9 @@ function startVitrine() {
   run('corepack yarn install', { cwd: VITRINE, capture: true });
   run('corepack yarn workspace api migration:run', { cwd: VITRINE, capture: true });
   run('corepack yarn workspace orchestrator migration:run', { cwd: VITRINE, capture: true });
+  // Purge le cache de build du front : un `.next` issu d'un `next build` (prod) casse
+  // `next dev` (chunks vendor manquants, ex. @formatjs). On repart propre.
+  fs.rmSync(path.join(VITRINE, 'apps', 'web', '.next'), { recursive: true, force: true });
   const logsDir = path.join(VITRINE, '.presentation-logs');
   fs.mkdirSync(logsDir, { recursive: true });
   for (const app of ['orchestrator', 'api', 'web']) {
