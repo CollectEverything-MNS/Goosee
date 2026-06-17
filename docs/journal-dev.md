@@ -650,6 +650,33 @@ cert-manager + un `tls:` sur l'Ingress.
 
 **Reste Lot 6 :** 6.4 Jobs migration/seed, 6.5 NetworkPolicy + ResourceQuota.
 
+---
+
+## 2026-06-17 — Lot 6.4 : Job de seed OWNER au déploiement
+
+**Fait :**
+- **`templates/seed-owner-job.yaml`** : Job Helm (hook `post-install,post-upgrade`,
+  `hook-delete-policy: before-hook-creation,hook-succeeded`) qui crée l'utilisateur OWNER
+  dans `auth_db` (table `auth`) puis `user_db` (table `user`), via `psql` (image postgres),
+  upsert idempotent (`ON CONFLICT`). Boucle de reprise (60×5 s) le temps que les migrations
+  au boot créent le schéma. **Le mot de passe en clair n'entre jamais dans le cluster** :
+  l'orchestrateur calcule le hash bcrypt et ne passe que `owner.passwordHash` (Secret) ;
+  hash vide ⇒ pas de seed.
+- Valeurs `owner.email` / `owner.passwordHash`, secret `OWNER_EMAIL` / `OWNER_PASSWORD_HASH`.
+- SQL envoyé sur **stdin** (et non `-c`) : psql n'interpole `:'var'` que via stdin/fichier
+  (même approche que l'orchestrateur Compose).
+
+**Migrations :** jouées au boot par chaque microservice (`migrationsRun` en prod, TypeORM
+idempotent), comme côté Compose — schéma et données de démo présents sans Job dédié. Un Job
+de migration séparé nécessiterait un flag `RUN_MIGRATIONS` dans les services (durcissement
+futur, utile quand l'HPA monte plusieurs replicas).
+
+**Testé en réel** : `helm upgrade` avec `owner.passwordHash` → hook Job **succès**, lignes
+OWNER présentes (`auth` role `{OWNER}` verified, `user` Admin), et **login via l'ingress
+gateway** (`POST /auth/login`) renvoie un JWT `roles:[OWNER]`. Tenant k8s connectable.
+
+**Reste Lot 6 :** 6.5 NetworkPolicy + ResourceQuota.
+
 
 
 

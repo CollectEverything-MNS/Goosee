@@ -1,0 +1,53 @@
+# Job de seed de l'utilisateur OWNER, exécuté après (dé)ploiement (hook Helm).
+# Les microservices jouent leurs migrations TypeORM au boot ; le Job attend donc que les
+# tables auth/user existent (boucle de reprise), puis fait un upsert idempotent.
+# Le mot de passe en clair n'entre jamais dans le cluster : seul le hash bcrypt est fourni.
+{{- if .Values.owner.passwordHash }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed-owner
+  labels:
+    {{- include "goosee.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        {{- include "goosee.labels" . | nindent 8 }}
+        app.kubernetes.io/name: seed-owner
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: seed
+          image: {{ .Values.postgres.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: goosee-secrets
+          command: ['/bin/sh', '-c']
+          args:
+            - |
+              AUTH_SQL="INSERT INTO auth (email, password, role, \"isVerified\", \"verifiedAt\") VALUES (:'email', :'hash', '{OWNER}', true, now()) ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, role = EXCLUDED.role, \"isVerified\" = true, \"verifiedAt\" = now() RETURNING id;"
+              USER_SQL="INSERT INTO \"user\" (\"authId\", email, \"firstName\", \"lastName\", role) VALUES (:'authId', :'email', 'Admin', 'Goosee', '{OWNER}') ON CONFLICT (email) DO UPDATE SET \"authId\" = EXCLUDED.\"authId\", role = EXCLUDED.role;"
+              i=0
+              while [ $i -lt 60 ]; do
+                i=$((i+1))
+                AUTH_ID=$(printf '%s' "$AUTH_SQL" | PGPASSWORD="$DB_PASSWORD" psql -h auth-db -U postgres -d auth_db -tA -v ON_ERROR_STOP=1 -v email="$OWNER_EMAIL" -v hash="$OWNER_PASSWORD_HASH" 2>/dev/null) || true
+                if [ -n "$AUTH_ID" ]; then
+                  if printf '%s' "$USER_SQL" | PGPASSWORD="$DB_PASSWORD" psql -h user-db -U postgres -d user_db -v ON_ERROR_STOP=1 -v authId="$AUTH_ID" -v email="$OWNER_EMAIL" 2>/dev/null; then
+                    echo "Seed OWNER OK (authId=$AUTH_ID)"
+                    exit 0
+                  fi
+                fi
+                echo "Schema auth/user pas encore pret, tentative $i/60..."
+                sleep 5
+              done
+              echo "Seed OWNER echoue : schema jamais pret" >&2
+              exit 1
+{{- end }}

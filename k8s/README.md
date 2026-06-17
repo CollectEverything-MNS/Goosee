@@ -53,8 +53,14 @@ helm install <slug> k8s/goosee-tenant -n tenant-<slug> --create-namespace \
   --set secrets.jwtRefreshSecret=$(openssl rand -hex 16) \
   --set secrets.internalApiToken=$(openssl rand -hex 16) \
   --set secrets.minioRootUser=goosee-$(openssl rand -hex 4) \
-  --set secrets.minioRootPassword=$(openssl rand -hex 16)
+  --set secrets.minioRootPassword=$(openssl rand -hex 16) \
+  --set owner.email=client@example.com \
+  --set-string owner.passwordHash='<hash bcrypt généré par le control plane>'
 ```
+
+Si `owner.passwordHash` est fourni, un **Job de seed** (hook Helm) crée l'utilisateur OWNER
+dans les bases `auth`/`user` après le déploiement (upsert idempotent). Le mot de passe en
+clair reste côté orchestrateur ; seul le hash bcrypt entre dans le cluster.
 
 Les microservices jouent leurs migrations TypeORM au démarrage (`migrationsRun` en prod) et
 attendent leur base ; le premier boot peut donc redémarrer une fois avant d'être `Running`.

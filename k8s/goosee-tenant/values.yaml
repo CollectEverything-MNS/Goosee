@@ -18,6 +18,12 @@ ingress:
   enabled: true
   className: traefik
 
+# Utilisateur OWNER seedé au déploiement (Job Helm). L'orchestrateur calcule le hash bcrypt
+# (le mot de passe en clair ne rentre jamais dans le cluster) ; hash vide => pas de seed.
+owner:
+  email: admin@goosee.dev
+  passwordHash: ''
+
 # Secrets du tenant (générés par l'orchestrateur ; valeurs de démo NON utilisables en prod).
 secrets:
   dbPassword: changeme-db
