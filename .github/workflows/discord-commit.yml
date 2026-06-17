@@ -41,22 +41,19 @@ jobs:
                     *) WEBHOOK=$GENERAL_WEBHOOK; COLOR=10181046 ;;             
                   esac
 
-                  PAYLOAD="{
-                    \"embeds\": [{
-                      \"title\": \"📦 Nouveau commit sur $BRANCH\",
-                      \"description\": \"**Auteur :** [$AUTHOR](https://github.com/$AUTHOR)\n**Message :** $MESSAGE\n[🔗 Voir le commit]($URL)\",
-                      \"color\": $COLOR
-                    }]
-                  }"
+                  PAYLOAD=$(jq -n \
+                    --arg title "📦 Nouveau commit sur $BRANCH" \
+                    --arg author "$AUTHOR" \
+                    --arg message "$MESSAGE" \
+                    --arg url "$URL" \
+                    --argjson color "${COLOR:-10181046}" \
+                    '{embeds: [{title: $title, description: ("**Auteur :** [" + $author + "](https://github.com/" + $author + ")\n**Message :** " + $message + "\n[🔗 Voir le commit](" + $url + ")"), color: $color}]}')
+
+                  send() {
+                    [ -n "$1" ] || return 0
+                    curl -sS -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$1" || true
+                  }
 
                   echo "➡️ Envoi du message Discord..."
-
-                  curl -H "Content-Type: application/json" \
-                    -X POST \
-                    -d "$PAYLOAD" \
-                    $WEBHOOK
-
-                  curl -H "Content-Type: application/json" \
-                    -X POST \
-                    -d "$PAYLOAD" \
-                    $GENERAL_WEBHOOK
+                  send "$WEBHOOK"
+                  if [ "$GENERAL_WEBHOOK" != "$WEBHOOK" ]; then send "$GENERAL_WEBHOOK"; fi
