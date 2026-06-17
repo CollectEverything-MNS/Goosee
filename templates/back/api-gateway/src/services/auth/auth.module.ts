@@ -10,6 +10,7 @@ import { ForgetPasswordRequestController } from './usecases/forget-password-requ
 import { ForgetPasswordConfirmController } from './usecases/forget-password-confirm/forget-password-confirm.controller';
 import { VerifyEmailController } from './usecases/verify-email/verify-email.controller';
 import { ResendVerificationEmailController } from './usecases/resend-verification-email/resend-verification-email.controller';
+import { SsoController } from './usecases/sso/sso.controller';
 import { HttpProxyService } from '../../shared/services/http-proxy.service';
 
 @Module({
@@ -24,6 +25,7 @@ import { HttpProxyService } from '../../shared/services/http-proxy.service';
     ForgetPasswordConfirmController,
     VerifyEmailController,
     ResendVerificationEmailController,
+    SsoController,
   ],
   providers: [
     HttpProxyService,

@@ -11,6 +11,8 @@ import { IAuthTokenRepository } from './repositories/auth-token.repository';
 import { TypeOrmAuthRepository } from './repositories/implements/auth.impl.repository';
 import { TypeOrmAuthTokenRepository } from './repositories/implements/auth-token.impl.repository';
 import { LoginUseCase } from './usecases/login/login.usecase';
+import { IssueSessionUseCase } from './usecases/issue-session/issue-session.usecase';
+import { IssueSessionController } from './usecases/issue-session/issue-session.controller';
 import { RegisterUseCase } from './usecases/register/register.usecase';
 import { RegisterController } from './usecases/register/register.controller';
 import { LoginController } from './usecases/login/login.controller';
@@ -90,6 +92,7 @@ import { GetTokenVersionUseCase } from './usecases/get-token-version/get-token-v
     MetricsController,
     RegisterController,
     LoginController,
+    IssueSessionController,
     RevokeTokenController,
     RefreshTokenController,
     ChangePasswordController,
@@ -112,6 +115,7 @@ import { GetTokenVersionUseCase } from './usecases/get-token-version/get-token-v
     },
     RegisterUseCase,
     LoginUseCase,
+    IssueSessionUseCase,
     RevokeTokenUseCase,
     RefreshTokenUseCase,
     ChangePasswordUseCase,

@@ -66,6 +66,8 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      # Pour valider l'endpoint interne /internal/issue-session (auto-connexion SSO).
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
       NEXT_PUBLIC_API_URL: 'http://api.${TENANT_SLUG}.127.0.0.1.nip.io'
     depends_on: [auth-db, rabbitmq]
     networks: [tenant_net]
