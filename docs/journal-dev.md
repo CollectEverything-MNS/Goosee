@@ -460,6 +460,39 @@ maintenant des vraies commandes et du vrai chiffre d'affaires par tenant.
 
 **Reste Lot 5 :** 5.5 storefront panier/checkout + branchement au page builder.
 
+---
+
+## 2026-06-17 — Lot 5.5 : storefront panier + passage de commande
+
+**Fait (front, `templates/front`) :**
+- **Panier serveur côté storefront** : `lib/cart-session.ts` génère un `sessionKey` stable
+  (localStorage) — le panier marche pour les visiteurs non connectés (le back identifie le
+  panier par cette clé). `features/cart/` : hooks React Query (use-cart + add/update/remove/
+  clear) sur les routes gateway `/cart/:sessionKey`, et un `CartProvider` (état du tiroir +
+  actions + total/itemCount) monté dans le layout `(site)`.
+- **Tiroir panier** (`cart-sheet.tsx`) : liste, steppers de quantité, suppression, total,
+  bouton « Passer commande ». Le bouton panier du `header-block` ouvre le tiroir et affiche
+  un badge de quantité (branché via `useCartContext`, défensif hors provider = aperçu builder).
+- **Ajout au panier** câblé sur la page produit (`/produits/[id]`) — remplace l'ancien toast
+  mock ; le bloc page-builder `featured-products` (déjà sur données réelles) y mène.
+- **Checkout** (`/checkout`) : récap commande + e-mail invité → crée la commande
+  (`POST /orders`, total recalculé serveur) puis l'intention de paiement
+  (`POST /payments`), vide le panier et redirige vers `/checkout/success` (n° de commande).
+
+**Pourquoi :** offrir le parcours d'achat complet du site généré (catalogue → fiche →
+panier → commande), branché sur les microservices cart/order/payment via la gateway.
+
+**Testé :** `tsc` sans erreur sur les fichiers cart/checkout (le reste = dette pré-existante,
+`ignoreBuildErrors`), `next build` OK avec les routes `/checkout` et `/checkout/success`.
+Les back cart/order/payment ont été validés en standalone (lots 5.1–5.3).
+
+**Note :** Stripe en mode mock → le paiement reste `pending` ; la commande passe à `paid`
+quand l'admin la valide (back-office) ou quand Florent branche Stripe (5.3). Le câblage de
+la liste admin des commandes sur `order-service` (remplacer `orders.mock.ts`) reste à faire.
+
+**Lot 5 terminé** (5.1, 5.2, 5.4, 5.5 ✅ ; 5.3 = scaffold). Reste : Lot 6 (K8s),
+Lot 7 (superadmin), Lot 8 (UI/UX).
+
 
 
 

@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { ArrowLeft, Loader2, Minus, Package, Plus, ShoppingCart } from 'lucide-react';
-import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useGetProduct } from '@/features/products/usecases/use-get-product';
 import { RelatedProducts } from '@/features/products/components/related-products';
+import { useCartContext } from '@/features/cart/context/cart-provider';
 
 function formatPrice(value: number, locale: string) {
   return new Intl.NumberFormat(locale, {
@@ -25,6 +25,7 @@ export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const locale = useLocale();
   const { data: product, isLoading, isError } = useGetProduct(params.id);
+  const cart = useCartContext();
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
@@ -57,7 +58,15 @@ export default function ProductDetailPage() {
   const outOfStock = !product.isAvailable || product.stock <= 0;
 
   const handleAddToCart = () => {
-    toast.success(`${quantity} × ${product.name} ajouté${quantity > 1 ? 's' : ''} au panier`);
+    cart?.addItem(
+      {
+        productId: product.id,
+        name: product.name,
+        unitPriceCents: Math.round(Number(product.price) * 100),
+        quantity,
+      },
+      { openDrawer: true }
+    );
   };
 
   return (

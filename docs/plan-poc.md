@@ -150,7 +150,7 @@ mécanismes du POC (Stripe, orchestrateur, multi-sites, superadmin).
 | 5.2 | `order-service` (commandes) : microservice dédié + DB + usecases (remplace le mock front) | 3–5 j | ✅ |
 | 5.3 | `payment-service` (paiement boutique, Stripe) : microservice dédié + webhook | 3–4 j | 🟡 scaffold (Stripe à brancher par Florent) |
 | 5.4 | Brancher `/internal/kpi` sur les données réelles (clients, produits, commandes) | 0.5 j | ✅ |
-| 5.5 | Storefront : panier + passage de commande (logique, hors fioritures UI) | 2–3 j | ⬜ |
+| 5.5 | Storefront : panier + passage de commande (logique, hors fioritures UI) | 2–3 j | ✅ |
 
 ### Lot 6 — Forfait scalable Kubernetes (k3d + Helm) — 10–16 j
 

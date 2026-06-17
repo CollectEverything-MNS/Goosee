@@ -13,6 +13,7 @@ import { MenuItem } from './header/header-menu-item';
 import { MobileMenu } from './header/header-mobile-menu';
 import { HeaderUserMenu } from './header/header-user-menu';
 import { HeaderLogo } from './header/header-logo';
+import { useCartContext } from '@/features/cart/context/cart-provider';
 
 export function HeaderBlock({
   logoPosition = 'left',
@@ -27,6 +28,7 @@ export function HeaderBlock({
   const { data: settings, dataUpdatedAt } = useSettings();
   const { data: menus = [] } = useMenus();
   const { data: pagesData } = usePages();
+  const cart = useCartContext();
   const isPreview = context?.mode === 'preview';
   const logoSrc = settings?.logoUrl
     ? `${settings.logoUrl}${settings.logoUrl.includes('?') ? '&' : '?'}v=${dataUpdatedAt}`
@@ -74,8 +76,19 @@ export function HeaderBlock({
 
         {!isPreview && (
           <div className="flex shrink-0 items-center gap-1 ml-4">
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              onClick={() => cart?.setOpen(true)}
+              aria-label="Ouvrir le panier"
+            >
               <ShoppingCart className="h-5 w-5" style={{ color: textColor }} />
+              {cart && cart.itemCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                  {cart.itemCount}
+                </span>
+              )}
             </Button>
             <div className="hidden md:flex">
               <HeaderUserMenu textColor={textColor} />
