@@ -845,6 +845,35 @@ pour la vérification de signature) — cohérent avec « le paiement parle en H
 espace client `my-orders` par `customerId`, Prometheus central, READMEs + script de
 présentation `yarn presentation`, alignement docs/architecture.
 
+---
+
+## 2026-06-17 — Provisioning Kubernetes dans l'orchestrateur (goosee-vitrine)
+
+**Fait (repo `goosee-vitrine`) :**
+- L'orchestrateur déploie désormais réellement sur **Kubernetes** pour le forfait
+  `enterprise` (`planInfra` → `k8s`), via le chart Helm du Lot 6 :
+  - `ProvisioningService.helmInstall(slug, owner)` : génère les secrets, les conserve dans
+    l'env file (lu par la supervision pour le jeton interne), puis
+    `helm upgrade --install -n tenant-<slug> --create-namespace --wait` avec les `--set`
+    secrets + `owner.email`/`owner.passwordHash` (le **Job de seed du chart** crée l'OWNER).
+  - `helmUninstall`, `k8sScale` (scale-to-zero via `kubectl scale`), URLs k8s
+    (`<slug>.<domain>:8081`, ingress Traefik k3s).
+  - Exécution helm/kubectl via `spawn` (args en tableau) pour passer le **hash bcrypt** sans
+    interprétation (`$`), `shell:true` pour la résolution Windows.
+- `TenantService` branche `provision/stop/start/remove` sur `infra` : k8s → helm/kubectl,
+  docker → compose (chemin existant inchangé). Le mot de passe OWNER (clair) est généré par
+  l'orchestrateur et renvoyé au client ; seul le hash entre dans le cluster.
+
+**Pourquoi :** câbler le forfait scalable de bout en bout — la vitrine déclenche un vrai
+déploiement K8s isolé (avant : Docker pour tous, avec un simple warn).
+
+**Testé :** orchestrateur compile. Le déploiement k8s réel sera exercé par le script de
+présentation (`yarn presentation`, plusieurs clients enterprise). Prérequis runtime :
+`helm` + `kubectl` sur le PATH du process, images `goosee/*:local` importées dans le cluster.
+
+**Reste demandé :** métriques infra live (kubectl top), `my-orders` par `customerId`,
+Prometheus central, READMEs + script `yarn presentation`, alignement docs/architecture.
+
 
 
 
