@@ -92,7 +92,12 @@ function useFeaturedItems(productsJson: unknown, filters: FeaturedFilters): Prod
   return useMemo(() => {
     if (Array.isArray(data) && data.length > 0) {
       let filtered = data as any[];
-      if (categoryId) filtered = filtered.filter((p) => p.categoryId === categoryId);
+      if (categoryId) {
+        filtered = filtered.filter((p) => {
+          const ids = p.categoryIds?.length ? p.categoryIds : [p.categoryId];
+          return ids.includes(categoryId);
+        });
+      }
       if (availableOnly) filtered = filtered.filter((p) => p.isAvailable && Number(p.stock) > 0);
 
       const sorted = sortProducts(filtered, sort);

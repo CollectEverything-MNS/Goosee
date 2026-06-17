@@ -21,6 +21,7 @@ interface Product {
   stock: number;
   isAvailable: boolean;
   categoryId: string;
+  categoryIds?: string[];
   preparationTime?: number;
   sizeValue?: number;
   sizeUnit?: string;
@@ -113,12 +114,29 @@ export function useProductsColumns({ categoriesById }: UseColumnsArgs): ColumnDe
     {
       id: 'category',
       header: t('category'),
-      accessorFn: (row) => categoriesById[row.categoryId] ?? '—',
-      filterFn: (row, _columnId, filterValue) => row.original.categoryId === filterValue,
+      accessorFn: (row) => {
+        const ids = row.categoryIds?.length ? row.categoryIds : [row.categoryId];
+        return ids.map((id) => categoriesById[id]).filter(Boolean).join(', ') || '—';
+      },
+      filterFn: (row, _columnId, filterValue) => {
+        const ids = row.original.categoryIds?.length
+          ? row.original.categoryIds
+          : [row.original.categoryId];
+        return ids.includes(filterValue as string);
+      },
       cell: ({ row }) => {
-        const name = categoriesById[row.original.categoryId];
-        return name ? (
-          <AdminStatusBadge tone="neutral">{name}</AdminStatusBadge>
+        const ids = row.original.categoryIds?.length
+          ? row.original.categoryIds
+          : [row.original.categoryId];
+        const names = ids.map((id) => categoriesById[id]).filter(Boolean);
+        return names.length ? (
+          <div className="flex flex-wrap gap-1">
+            {names.map((name, i) => (
+              <AdminStatusBadge key={i} tone="neutral">
+                {name}
+              </AdminStatusBadge>
+            ))}
+          </div>
         ) : (
           <span className="text-muted-foreground">—</span>
         );

@@ -9,7 +9,7 @@ import { useListProducts } from '../usecases/use-list-products';
 
 interface RelatedProductsProps {
   currentId: string;
-  categoryId?: string;
+  categoryIds?: string[];
   limit?: number;
 }
 
@@ -26,17 +26,23 @@ function mainImage(images?: Array<{ url: string; isMain: boolean }>): string | u
   return (images.find((img) => img.isMain) ?? images[0]).url;
 }
 
-export function RelatedProducts({ currentId, categoryId, limit = 4 }: RelatedProductsProps) {
+export function RelatedProducts({ currentId, categoryIds, limit = 4 }: RelatedProductsProps) {
   const locale = useLocale();
   const { data } = useListProducts();
 
   const suggestions = useMemo(() => {
     const all = (Array.isArray(data) ? data : []).filter((p: any) => p.id !== currentId);
-    // Memes categorie d'abord, puis complete avec les autres produits.
-    const sameCategory = categoryId ? all.filter((p: any) => p.categoryId === categoryId) : [];
+    const wanted = categoryIds ?? [];
+    // Categories en commun d'abord, puis complete avec les autres produits.
+    const sameCategory = wanted.length
+      ? all.filter((p: any) => {
+          const ids = p.categoryIds?.length ? p.categoryIds : [p.categoryId];
+          return ids.some((id: string) => wanted.includes(id));
+        })
+      : [];
     const others = all.filter((p: any) => !sameCategory.includes(p));
     return [...sameCategory, ...others].slice(0, limit);
-  }, [data, currentId, categoryId, limit]);
+  }, [data, currentId, categoryIds, limit]);
 
   if (suggestions.length === 0) return null;
 

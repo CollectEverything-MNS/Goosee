@@ -11,7 +11,8 @@ export interface CreateProductPayload {
   sizeValue?: number;
   sizeUnit?: string;
   isAvailable?: boolean;
-  categoryId: string;
+  categoryId?: string;
+  categoryIds: string[];
 }
 
 export function useCreateProduct() {

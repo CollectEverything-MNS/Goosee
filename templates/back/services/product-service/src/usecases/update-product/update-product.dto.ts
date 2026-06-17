@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString, IsUUID, Length, Min } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsBoolean, IsNumber, IsOptional, IsString, IsUUID, Length, Min } from 'class-validator';
 
 export class UpdateProductDto {
   @ApiPropertyOptional({ example: 'Château Margaux 2019' })
@@ -52,4 +52,11 @@ export class UpdateProductDto {
   @IsOptional()
   @IsUUID()
   categoryId?: string;
+
+  @ApiPropertyOptional({ example: ['uuid-categorie-1', 'uuid-categorie-2'], isArray: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsUUID(undefined, { each: true })
+  categoryIds?: string[];
 }

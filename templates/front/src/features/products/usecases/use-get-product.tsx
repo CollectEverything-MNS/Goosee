@@ -30,6 +30,7 @@ export interface ProductDetail {
   sizeUnit?: string;
   isAvailable: boolean;
   categoryId: string;
+  categoryIds?: string[];
   images: ProductImage[];
   tags: ProductTag[];
   attributes: ProductAttribute[];
