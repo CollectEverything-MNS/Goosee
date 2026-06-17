@@ -438,6 +438,28 @@ compilent.
 **Reste Lot 5 :** 5.4 `/internal/kpi` réel (clients/produits/commandes/CA), 5.5 storefront
 panier/checkout + branchement au page builder. (5.1, 5.2 faits ; 5.3 = scaffold.)
 
+---
+
+## 2026-06-17 — Lot 5.4 : KPI commandes/CA réels dans `/internal/kpi`
+
+**Fait :**
+- **`order-service /internal/kpi`** (protégé par `InternalTokenGuard`, jeton partagé
+  `x-internal-token`) : expose `orders` (total), `paidOrders` (statuts `paid`+`shipped`) et
+  `revenueCents` (somme des `totalCents` des commandes honorées, via QueryBuilder `SUM`).
+- **Gateway `/internal/kpi`** : agrège désormais user + product + **order** en un seul
+  objet (contrat control plane), comme pour les autres services.
+- `INTERNAL_API_TOKEN` passé à `order-service` dans les compose dev/prod et le template
+  tenant isolé (le guard lit `process.env`).
+
+**Pourquoi :** la supervision superadmin affichait des KPI métier mockés ; elle dispose
+maintenant des vraies commandes et du vrai chiffre d'affaires par tenant.
+
+**Testé** (Postgres jetable, 3 commandes : 1 pending, 1 paid, 1 shipped) : agrégat
+`orders=3, paidOrders=2, revenueCents=8000`, 401 sans jeton. `order-service` et
+`api-gateway` compilent.
+
+**Reste Lot 5 :** 5.5 storefront panier/checkout + branchement au page builder.
+
 
 
 

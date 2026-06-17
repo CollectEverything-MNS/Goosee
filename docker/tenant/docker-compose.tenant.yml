@@ -157,6 +157,7 @@ services:
       ORDER_DB_USER: postgres
       ORDER_DB_PASSWORD: ${DB_PASSWORD}
       ORDER_DB_NAME: order_db
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     depends_on: [order-db]
     networks: [tenant_net]
 

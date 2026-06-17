@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { HealthController } from './health/health.controller';
 import { MetricsController } from './metrics/metrics.controller';
+import { InternalKpiController } from './internal/internal-kpi.controller';
 
 import { Order } from './entities/order.entity';
 
@@ -45,6 +46,7 @@ import { UpdateOrderStatusUseCase } from './usecases/update-order-status/update-
   controllers: [
     HealthController,
     MetricsController,
+    InternalKpiController,
     CreateOrderController,
     ListOrdersController,
     GetOrderController,

@@ -18,11 +18,12 @@ export class InternalKpiController {
     const urls = serviceUrl(this.config);
     const headers = { 'x-internal-token': this.config.get<string>('INTERNAL_API_TOKEN') };
 
-    const [user, product] = await Promise.all([
+    const [user, product, order] = await Promise.all([
       firstValueFrom(this.http.get(`${urls.user}/internal/kpi`, { headers })),
       firstValueFrom(this.http.get(`${urls.product}/internal/kpi`, { headers })),
+      firstValueFrom(this.http.get(`${urls.order}/internal/kpi`, { headers })),
     ]);
 
-    return { ...user.data, ...product.data };
+    return { ...user.data, ...product.data, ...order.data };
   }
 }

@@ -337,6 +337,7 @@ services:
       ORDER_DB_USER: ${ORDER_DB_USER}
       ORDER_DB_PASSWORD: ${ORDER_DB_PASSWORD}
       ORDER_DB_NAME: ${ORDER_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${ORDER_SERVICE_PORT}"
     depends_on:
