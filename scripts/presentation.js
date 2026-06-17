@@ -47,16 +47,23 @@ const IMAGES = [
 // Sous-ensemble réellement déployé + peuplé (le reste reste registre/STOPPED, démarrable
 // à la demande). Défaut allégé : 1 site Docker + 1 site K8s.
 const DOCKER_COUNT = Math.min(Number(process.env.PRESENTATION_DOCKER_COUNT || 1), 2);
+// Nom réel du propriétaire de chaque site (seedé comme OWNER dans le site généré → l'admin
+// affiche « Alice Martin »/« Bob Durand » et non un générique « Admin Goosee »).
+const OWNERS = {
+  'alice@goosee.dev': { firstName: 'Alice', lastName: 'Martin' },
+  'bob@goosee.dev': { firstName: 'Bob', lastName: 'Durand' },
+};
+const withOwner = (s) => ({ ...s, ...(OWNERS[s.owner] ?? { firstName: 'Admin', lastName: 'Goosee' }) });
 const ALL_DOCKER = [
   { slug: 'atelier-alice', owner: 'alice@goosee.dev' },
   { slug: 'resto-bob', owner: 'bob@goosee.dev' },
-];
+].map(withOwner);
 const ALL_K8S = [
   { slug: 'mode-bob', owner: 'bob@goosee.dev' },
   { slug: 'tech-bob', owner: 'bob@goosee.dev' },
   { slug: 'deco-bob', owner: 'bob@goosee.dev' },
   { slug: 'sport-bob', owner: 'bob@goosee.dev' },
-];
+].map(withOwner);
 const DOCKER_SITES = ALL_DOCKER.slice(0, DOCKER_COUNT);
 const K8S_SITES = ALL_K8S.slice(0, K8S_COUNT);
 
@@ -284,7 +291,7 @@ async function seedTenantData(base, ownerEmail, ownerPassword) {
 
 // ---------------------------------------------------------------- Provisioning Docker
 
-async function seedOwnerDocker(slug, email, password) {
+async function seedOwnerDocker(slug, email, password, firstName = 'Admin', lastName = 'Goosee') {
   const project = `tenant-${slug}`;
   const hash = bcrypt.hashSync(password, 12);
   const tmp = path.join(os.tmpdir(), `goosee-owner-${slug}`);
@@ -302,7 +309,7 @@ async function seedOwnerDocker(slug, email, password) {
     if (authId) {
       fs.writeFileSync(
         `${tmp}-user.sql`,
-        `INSERT INTO "user" ("authId", email, "firstName", "lastName", role) VALUES ('${authId}', '${esc(email)}', 'Admin', 'Goosee', '{OWNER}') ON CONFLICT (email) DO UPDATE SET "authId" = EXCLUDED."authId", role = EXCLUDED.role;`,
+        `INSERT INTO "user" ("authId", email, "firstName", "lastName", role) VALUES ('${authId}', '${esc(email)}', '${esc(firstName)}', '${esc(lastName)}', '{OWNER}') ON CONFLICT (email) DO UPDATE SET "authId" = EXCLUDED."authId", "firstName" = EXCLUDED."firstName", "lastName" = EXCLUDED."lastName", role = EXCLUDED.role;`,
         'utf8'
       );
       run(`docker compose -p ${project} exec -T user-db psql -U postgres -d user_db < "${tmp}-user.sql"`, { capture: true });
@@ -315,7 +322,7 @@ async function seedOwnerDocker(slug, email, password) {
 }
 
 async function provisionDocker(site) {
-  const { slug, owner } = site;
+  const { slug, owner, firstName, lastName } = site;
   log(`Site Docker : ${slug}`);
   const project = `tenant-${slug}`;
   const secrets = tenantSecrets(slug);
@@ -344,7 +351,7 @@ async function provisionDocker(site) {
   );
 
   ok('stack démarrée, seed OWNER…');
-  const seeded = await seedOwnerDocker(slug, owner, DEMO_PW);
+  const seeded = await seedOwnerDocker(slug, owner, DEMO_PW, firstName, lastName);
   if (!seeded) { warn('seed OWNER non confirmé'); return { slug, owner, infra: 'docker', url: dockerInstanceUrl(slug), seeded: false }; }
   await seedTenantData(dockerApiUrl(slug), owner, DEMO_PW).catch((e) => warn(`données: ${e.message}`));
   activate(slug, 'docker', envPath);
@@ -388,7 +395,7 @@ function toYaml(obj, indent = 0) {
 }
 
 async function provisionK8s(site) {
-  const { slug, owner } = site;
+  const { slug, owner, firstName, lastName } = site;
   log(`Site Kubernetes : ${slug}`);
   const secrets = tenantSecrets(slug);
   const hash = bcrypt.hashSync(DEMO_PW, 12);
@@ -404,7 +411,7 @@ async function provisionK8s(site) {
       stripeSecretKey: envDevValue('STRIPE_SECRET_KEY') || '',
       stripeWebhookSecret: envDevValue('STRIPE_WEBHOOK_SECRET') || '',
     },
-    owner: { email: owner, passwordHash: hash },
+    owner: { email: owner, passwordHash: hash, firstName, lastName },
   };
   const valuesPath = path.join(os.tmpdir(), `goosee-values-${slug}.yaml`);
   fs.writeFileSync(valuesPath, toYaml(values), 'utf8');

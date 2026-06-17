@@ -36,7 +36,7 @@ spec:
           args:
             - |
               AUTH_SQL="INSERT INTO auth (email, password, role, \"isVerified\", \"verifiedAt\") VALUES (:'email', :'hash', '{OWNER}', true, now()) ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, role = EXCLUDED.role, \"isVerified\" = true, \"verifiedAt\" = now() RETURNING id;"
-              USER_SQL="INSERT INTO \"user\" (\"authId\", email, \"firstName\", \"lastName\", role) VALUES (:'authId', :'email', 'Admin', 'Goosee', '{OWNER}') ON CONFLICT (email) DO UPDATE SET \"authId\" = EXCLUDED.\"authId\", role = EXCLUDED.role;"
+              USER_SQL="INSERT INTO \"user\" (\"authId\", email, \"firstName\", \"lastName\", role) VALUES (:'authId', :'email', :'fname', :'lname', '{OWNER}') ON CONFLICT (email) DO UPDATE SET \"authId\" = EXCLUDED.\"authId\", \"firstName\" = EXCLUDED.\"firstName\", \"lastName\" = EXCLUDED.\"lastName\", role = EXCLUDED.role;"
               i=0
               while [ $i -lt 60 ]; do
                 i=$((i+1))
@@ -44,7 +44,7 @@ spec:
                 # sinon il atterrit dans user.authId et /users/me (lookup par authId) renvoie 404.
                 AUTH_ID=$(printf '%s' "$AUTH_SQL" | PGPASSWORD="$DB_PASSWORD" psql -h auth-db -U postgres -d auth_db -tA -v ON_ERROR_STOP=1 -v email="$OWNER_EMAIL" -v hash="$OWNER_PASSWORD_HASH" 2>/dev/null | grep -Eio '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' | head -n1) || true
                 if [ -n "$AUTH_ID" ]; then
-                  if printf '%s' "$USER_SQL" | PGPASSWORD="$DB_PASSWORD" psql -h user-db -U postgres -d user_db -v ON_ERROR_STOP=1 -v authId="$AUTH_ID" -v email="$OWNER_EMAIL" 2>/dev/null; then
+                  if printf '%s' "$USER_SQL" | PGPASSWORD="$DB_PASSWORD" psql -h user-db -U postgres -d user_db -v ON_ERROR_STOP=1 -v authId="$AUTH_ID" -v email="$OWNER_EMAIL" -v fname="$OWNER_FIRST_NAME" -v lname="$OWNER_LAST_NAME" 2>/dev/null; then
                     echo "Seed OWNER OK (authId=$AUTH_ID)"
                     exit 0
                   fi

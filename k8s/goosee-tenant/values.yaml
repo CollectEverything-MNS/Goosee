@@ -23,6 +23,8 @@ ingress:
 owner:
   email: admin@goosee.dev
   passwordHash: ''
+  firstName: Admin
+  lastName: Goosee
 
 # Secrets du tenant (générés par l'orchestrateur ; valeurs de démo NON utilisables en prod).
 secrets:
