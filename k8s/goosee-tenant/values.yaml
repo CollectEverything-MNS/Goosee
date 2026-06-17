@@ -51,22 +51,25 @@ front:
   port: 3000
 
 # Ressources (requests/limits) et autoscaling. requests.cpu est requis pour l'HPA.
+# Requests/limits dimensionnés pour tenir plusieurs tenants K8s sur un portable 16 Go
+# (requests = ce qui est réservé au scheduling ; limits = plafond pour éviter l'OOM hôte).
 resources:
   app:
-    requests: { cpu: 50m, memory: 128Mi }
-    limits: { cpu: 500m, memory: 512Mi }
+    requests: { cpu: 25m, memory: 96Mi }
+    limits: { cpu: 400m, memory: 320Mi }
   db:
-    requests: { cpu: 50m, memory: 128Mi }
-    limits: { cpu: 500m, memory: 256Mi }
+    requests: { cpu: 25m, memory: 64Mi }
+    limits: { cpu: 400m, memory: 256Mi }
   infra:
-    requests: { cpu: 50m, memory: 128Mi }
-    limits: { cpu: 500m, memory: 512Mi }
+    requests: { cpu: 25m, memory: 96Mi }
+    limits: { cpu: 400m, memory: 384Mi }
 
 # Autoscaling horizontal (gateway + microservices + front), sur l'usage CPU.
+# maxReplicas plafonné à 2 pour limiter l'empreinte mémoire sur un portable.
 hpa:
   enabled: true
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 2
   targetCPUPercent: 80
 
 # Isolation réseau : refuse l'ingress venant des autres tenants (namespaces), n'autorise
@@ -78,12 +81,12 @@ networkPolicy:
 # obligatoires sur chaque pod — d'où les resources sur tous les workloads et le Job de seed).
 resourceQuota:
   enabled: true
-  # Dimensionné pour le socle (~22 pods) + la marge d'autoscaling (HPA jusqu'à x3).
-  requestsCpu: '6'
-  requestsMemory: 8Gi
-  limitsCpu: '24'
-  limitsMemory: 24Gi
-  pods: '80'
+  # Dimensionné pour le socle (~22 pods) + la marge d'autoscaling, version allégée 16 Go.
+  requestsCpu: '3'
+  requestsMemory: 3Gi
+  limitsCpu: '16'
+  limitsMemory: 12Gi
+  pods: '60'
 
 # Microservices HTTP internes (Deployment + Service ClusterIP). Chacun a sa base dédiée.
 backendServices:
