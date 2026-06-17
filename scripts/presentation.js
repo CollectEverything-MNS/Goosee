@@ -115,16 +115,41 @@ const k8sApiUrl = (slug) => `http://api.${slug}.${BASE_DOMAIN}:${K8S_PORT}`;
 
 function preflight() {
   log('Préflight');
-  for (const t of ['docker', 'k3d', 'helm', 'kubectl']) {
-    if (!cap(`${t} version`)) throw new Error(`${t} introuvable sur le PATH.`);
+  // Commandes de version SANS connectivité (le cluster n'existe pas encore).
+  const tools = {
+    docker: 'docker --version',
+    k3d: 'k3d version',
+    helm: 'helm version',
+    kubectl: 'kubectl version --client',
+  };
+  for (const [t, cmd] of Object.entries(tools)) {
+    if (!cap(cmd)) throw new Error(`${t} introuvable sur le PATH.`);
     ok(`${t} disponible`);
   }
 }
+const BUILD = [
+  ['api-gateway', 'templates/back/api-gateway/Dockerfile'],
+  ['auth-service', 'templates/back/services/auth-service/Dockerfile'],
+  ['user-service', 'templates/back/services/user-service/Dockerfile'],
+  ['page-service', 'templates/back/services/page-service/Dockerfile'],
+  ['log-service', 'templates/back/services/log-service/Dockerfile'],
+  ['product-service', 'templates/back/services/product-service/Dockerfile'],
+  ['order-service', 'templates/back/services/order-service/Dockerfile'],
+  ['cart-service', 'templates/back/services/cart-service/Dockerfile'],
+  ['payment-service', 'templates/back/services/payment-service/Dockerfile'],
+  ['notifier-service', 'templates/back/services/notifier-service/Dockerfile'],
+  ['front', 'templates/front/Dockerfile'],
+];
+
 function ensureImages() {
   log('Images du site généré (build — cache Docker si inchangé)');
-  // Toujours (re)construire : garantit des images à jour (routes order/cart/payment,
-  // storefront + clé Stripe). Le cache Docker rend l'opération rapide si rien n'a changé.
-  run('bash scripts/build-images.sh');
+  // Build en Node (pas de dépendance à bash) : garantit des images à jour (routes
+  // order/cart/payment, storefront + clé Stripe). Cache Docker → rapide si inchangé.
+  const stripePk = envDevValue('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY');
+  for (const [name, dockerfile] of BUILD) {
+    const arg = name === 'front' ? `--build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${stripePk}` : '';
+    run(`docker build ${arg} -f "${dockerfile}" -t "goosee/${name}:local" .`);
+  }
   ok('images goosee/*:local à jour');
 }
 function ensureCluster() {
