@@ -35,7 +35,7 @@ export class RegisterUseCase {
 
     if (existingAuth) {
       if (existingAuth.isVerified) {
-        throw new ConflictException('Email already exists');
+        throw new ConflictException('Un compte existe déjà avec cet email');
       }
 
       const verificationToken = await this.generateAndPersistVerificationToken(existingAuth.id);
@@ -55,7 +55,17 @@ export class RegisterUseCase {
       password: hashedPassword,
     });
 
-    const savedAuth = await this.authRepo.save(auth);
+    let savedAuth: Auth;
+    try {
+      savedAuth = await this.authRepo.save(auth);
+    } catch (error) {
+      // Une ligne (potentiellement soft-deleted, donc invisible pour findByEmail)
+      // existe déjà avec cet email : la contrainte unique Postgres remonte le code 23505.
+      if ((error as { code?: string })?.code === '23505') {
+        throw new ConflictException('Un compte existe déjà avec cet email');
+      }
+      throw error;
+    }
 
     const verificationToken = await this.generateAndPersistVerificationToken(savedAuth.id);
     await this.sendVerificationEmail(savedAuth.email, verificationToken, baseUrl);
