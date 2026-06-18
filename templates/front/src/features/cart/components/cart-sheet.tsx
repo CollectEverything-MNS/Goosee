@@ -1,8 +1,9 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
-import { Loader2, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { Loader2, Minus, Package, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,6 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { useListProducts } from '@/features/products/usecases/use-list-products';
 import { useCartContext } from '../context/cart-provider';
 
 function formatPrice(cents: number, locale: string) {
@@ -27,6 +29,17 @@ function formatPrice(cents: number, locale: string) {
 export function CartSheet() {
   const locale = useLocale();
   const cart = useCartContext();
+  const { data: products } = useListProducts();
+
+  const imageOf = useMemo(() => {
+    const map = new Map<string, string>();
+    (Array.isArray(products) ? products : []).forEach((p: any) => {
+      const main = p.images?.find((i: any) => i.isMain) ?? p.images?.[0];
+      if (main?.url) map.set(p.id, main.url);
+    });
+    return (productId: string) => map.get(productId);
+  }, [products]);
+
   if (!cart) return null;
 
   const { open, setOpen, items, totalCents, updateItem, removeItem, isMutating } = cart;
@@ -50,10 +63,31 @@ export function CartSheet() {
           <>
             <ScrollArea className="-mx-6 flex-1 px-6">
               <ul className="divide-y">
-                {items.map((item) => (
+                {items.map((item) => {
+                  const image = imageOf(item.productId);
+                  return (
                   <li key={item.productId} className="flex gap-3 py-4">
+                    <Link
+                      href={`/${locale}/produits/${item.productId}`}
+                      onClick={() => setOpen(false)}
+                      className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-gray-50 transition-opacity hover:opacity-80"
+                    >
+                      {image ? (
+                        <img src={image} alt={item.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <Package className="h-6 w-6 text-gray-300" />
+                        </div>
+                      )}
+                    </Link>
                     <div className="flex-1">
-                      <p className="text-sm font-medium leading-tight">{item.name}</p>
+                      <Link
+                        href={`/${locale}/produits/${item.productId}`}
+                        onClick={() => setOpen(false)}
+                        className="text-sm font-medium leading-tight hover:underline"
+                      >
+                        {item.name}
+                      </Link>
                       <p className="mt-1 text-sm text-muted-foreground">
                         {formatPrice(item.unitPriceCents, locale)}
                       </p>
@@ -94,7 +128,8 @@ export function CartSheet() {
                       {formatPrice(item.unitPriceCents * item.quantity, locale)}
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </ScrollArea>
 
