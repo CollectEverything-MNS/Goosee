@@ -6,6 +6,10 @@ interface CreateUserDto {
   firstName: string;
   lastName: string;
   phone?: string;
+  address?: string;
+  postaleCode?: string;
+  city?: string;
+  country?: string;
   role: string[];
 }
 

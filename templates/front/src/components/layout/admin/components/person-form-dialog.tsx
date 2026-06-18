@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
 import { ArrowRight, Loader2, LucideIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -42,10 +42,27 @@ export const personFormSchema = z.object({
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
   phone: z.string().min(6).max(20).optional().or(z.literal('')),
+  address: z.string().min(2).max(120).optional().or(z.literal('')),
+  postaleCode: z.string().min(2).max(12).optional().or(z.literal('')),
+  city: z.string().min(2).max(60).optional().or(z.literal('')),
+  country: z.string().min(2).max(60).optional().or(z.literal('')),
   role: z.string().min(1),
 });
 
 export type PersonFormValues = z.infer<typeof personFormSchema>;
+
+function formatDateTime(value: string | Date | undefined, locale: string): string {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '—';
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(d);
+}
 
 export interface PersonFormDialogProps {
   isOpen: boolean;
@@ -80,12 +97,25 @@ export function PersonFormDialog({
   emailPlaceholder = 'user@mail.com',
 }: PersonFormDialogProps) {
   const t = useTranslations(translationsNamespace);
+  const locale = useLocale();
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
 
+  const emptyValues: PersonFormValues = {
+    email: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    address: '',
+    postaleCode: '',
+    city: '',
+    country: '',
+    role: defaultRole,
+  };
+
   const form = useForm<PersonFormValues>({
     resolver: zodResolver(personFormSchema),
-    defaultValues: { email: '', firstName: '', lastName: '', phone: '', role: defaultRole },
+    defaultValues: emptyValues,
   });
 
   useEffect(() => {
@@ -95,11 +125,16 @@ export function PersonFormDialog({
         firstName: currentRow.firstName ?? '',
         lastName: currentRow.lastName ?? '',
         phone: currentRow.phone ?? '',
+        address: currentRow.address ?? '',
+        postaleCode: currentRow.postaleCode ?? '',
+        city: currentRow.city ?? '',
+        country: currentRow.country ?? '',
         role: currentRow.role?.[0] ?? defaultRole,
       });
     } else if (isOpen && !isEditing) {
-      form.reset({ email: '', firstName: '', lastName: '', phone: '', role: defaultRole });
+      form.reset(emptyValues);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, currentRow, isEditing, defaultRole, form]);
 
   const onSubmit = async (values: PersonFormValues) => {
@@ -109,6 +144,10 @@ export function PersonFormDialog({
         firstName: values.firstName,
         lastName: values.lastName,
         phone: values.phone || undefined,
+        address: values.address || undefined,
+        postaleCode: values.postaleCode || undefined,
+        city: values.city || undefined,
+        country: values.country || undefined,
         role: [values.role],
       };
       if (isEditing) {
@@ -249,6 +288,94 @@ export function PersonFormDialog({
                   )}
                 />
               </section>
+
+              <section className="space-y-3">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t('form.sections.address')}
+                </h3>
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">{t('form.address')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('form.addressPlaceholder')}
+                          className="h-10"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <FormField
+                    control={form.control}
+                    name="postaleCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium">
+                          {t('form.postaleCode')}
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="57000" className="h-10" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem className="sm:col-span-2">
+                        <FormLabel className="text-xs font-medium">{t('form.city')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Metz" className="h-10" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">{t('form.country')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="France" className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </section>
+
+              {isEditing && currentRow && (
+                <section className="space-y-3">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {t('form.sections.meta')}
+                  </h3>
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-lg border border-border bg-muted/20 p-4">
+                    <div className="space-y-0.5">
+                      <dt className="text-[11px] text-muted-foreground">{t('form.meta.createdAt')}</dt>
+                      <dd className="text-sm font-medium">{formatDateTime(currentRow.createdAt, locale)}</dd>
+                    </div>
+                    <div className="space-y-0.5">
+                      <dt className="text-[11px] text-muted-foreground">{t('form.meta.updatedAt')}</dt>
+                      <dd className="text-sm font-medium">{formatDateTime(currentRow.updatedAt, locale)}</dd>
+                    </div>
+                    <div className="col-span-2 space-y-0.5">
+                      <dt className="text-[11px] text-muted-foreground">{t('form.meta.id')}</dt>
+                      <dd className="font-mono text-xs text-foreground/80">{currentRow.id ?? '—'}</dd>
+                    </div>
+                  </dl>
+                </section>
+              )}
 
               {showRoleSelect && (
                 <section className="space-y-3">
