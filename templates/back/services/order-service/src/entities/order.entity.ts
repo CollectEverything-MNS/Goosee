@@ -6,13 +6,21 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'cancelled';
+export type OrderStatus = 'pending' | 'paid' | 'prepared' | 'shipped' | 'cancelled';
 
 export interface OrderItem {
   productId: string;
   name: string;
   unitPriceCents: number;
   quantity: number;
+}
+
+export interface BillingAddress {
+  fullName: string;
+  line1: string;
+  postalCode: string;
+  city: string;
+  country: string;
 }
 
 @Entity('orders')
@@ -32,6 +40,9 @@ export class Order {
 
   @Column('int')
   totalCents: number;
+
+  @Column('jsonb', { nullable: true })
+  billingAddress?: BillingAddress;
 
   @Column({ default: 'pending' })
   status: OrderStatus;

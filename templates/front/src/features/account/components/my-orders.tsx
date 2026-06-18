@@ -1,10 +1,13 @@
 'use client';
 
+import Link from 'next/link';
 import { useLocale } from 'next-intl';
-import { Package, ShoppingBag } from 'lucide-react';
+import { FileText, Package, ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { routes } from '@/config/routes.config';
 import { Order, OrderStatus } from '@/features/orders/data/order.types';
 import { useGetMe } from '../usecases/use-get-me';
 import { useMyOrders } from '../usecases/use-my-orders';
@@ -12,13 +15,15 @@ import { useMyOrders } from '../usecases/use-my-orders';
 const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: 'En attente',
   paid: 'Payée',
-  shipped: 'Expédiée',
+  prepared: 'Préparée',
+  shipped: 'Livrée',
   cancelled: 'Annulée',
 };
 
 const STATUS_CLASSES: Record<OrderStatus, string> = {
   pending: 'bg-amber-100 text-amber-700 hover:bg-amber-100',
   paid: 'bg-blue-100 text-blue-700 hover:bg-blue-100',
+  prepared: 'bg-violet-100 text-violet-700 hover:bg-violet-100',
   shipped: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100',
   cancelled: 'bg-red-100 text-red-700 hover:bg-red-100',
 };
@@ -77,6 +82,15 @@ function OrderCard({ order, locale }: { order: Order; locale: string }) {
             {itemsCount} article{itemsCount > 1 ? 's' : ''}
           </span>
           <span className="text-base font-semibold">{formatPrice(order.total, locale)}</span>
+        </div>
+
+        <div className="mt-4 flex justify-end">
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link href={routes.public.invoice.getHref(locale, order.id)} target="_blank">
+              <FileText className="h-4 w-4" />
+              Facture
+            </Link>
+          </Button>
         </div>
       </CardContent>
     </Card>

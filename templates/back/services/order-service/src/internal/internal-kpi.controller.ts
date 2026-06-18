@@ -5,7 +5,7 @@ import { Order } from '../entities/order.entity';
 import { InternalTokenGuard } from '../shared/internal-token.guard';
 
 // Statuts qui comptent comme chiffre d'affaires réel (commande honorée).
-const REVENUE_STATUSES = ['paid', 'shipped'];
+const REVENUE_STATUSES = ['paid', 'prepared', 'shipped'];
 
 @Controller('internal/kpi')
 @UseGuards(InternalTokenGuard)

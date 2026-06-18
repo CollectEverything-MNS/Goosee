@@ -19,6 +19,7 @@ import { GetOrderController } from './usecases/get-order/get-order.controller';
 import { GetOrderUseCase } from './usecases/get-order/get-order.usecase';
 import { UpdateOrderStatusController } from './usecases/update-order-status/update-order-status.controller';
 import { UpdateOrderStatusUseCase } from './usecases/update-order-status/update-order-status.usecase';
+import { ProductClient } from './shared/product-client.service';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { UpdateOrderStatusUseCase } from './usecases/update-order-status/update-
     ListOrdersUseCase,
     GetOrderUseCase,
     UpdateOrderStatusUseCase,
+    ProductClient,
   ],
 })
 export class AppModule {}

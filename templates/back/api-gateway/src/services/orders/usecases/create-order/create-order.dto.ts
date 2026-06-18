@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Length,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -34,6 +35,33 @@ export class OrderItemDto {
   quantity: number;
 }
 
+export class BillingAddressDto {
+  @ApiProperty({ example: 'Jean Dupont' })
+  @IsString()
+  @Length(2, 120)
+  fullName: string;
+
+  @ApiProperty({ example: '10 rue de la Paix' })
+  @IsString()
+  @Length(2, 160)
+  line1: string;
+
+  @ApiProperty({ example: '57000' })
+  @IsString()
+  @Length(2, 20)
+  postalCode: string;
+
+  @ApiProperty({ example: 'Metz' })
+  @IsString()
+  @Length(2, 80)
+  city: string;
+
+  @ApiProperty({ example: 'France' })
+  @IsString()
+  @Length(2, 80)
+  country: string;
+}
+
 export class CreateOrderDto {
   @ApiPropertyOptional({ example: 'uuid-client' })
   @IsOptional()
@@ -50,4 +78,10 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items: OrderItemDto[];
+
+  @ApiPropertyOptional({ type: BillingAddressDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => BillingAddressDto)
+  billingAddress?: BillingAddressDto;
 }

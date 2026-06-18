@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, ShoppingBag } from 'lucide-react';
+import { Loader2, Pencil, ShoppingBag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
@@ -28,6 +28,7 @@ import { useUpdateOrderStatus } from '../../usecases/use-update-order-status';
 const STATUS_TONE: Record<OrderStatus, AdminStatusTone> = {
   pending: 'warning',
   paid: 'info',
+  prepared: 'accent',
   shipped: 'success',
   cancelled: 'danger',
 };
@@ -189,34 +190,47 @@ export function OrderDetailDialog() {
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/20 px-6 py-4">
+        <div className="space-y-3 border-t border-border bg-muted/30 px-6 py-5">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">
-              {t('detail.statusLabel')}
+            <Pencil className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-foreground">
+              {t('detail.statusSection')}
             </span>
-            <Select
-              value={order.status}
-              onValueChange={(v) => handleStatusChange(v as OrderStatus)}
-              disabled={updateStatus.isPending}
-            >
-              <SelectTrigger className="h-9 w-44">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ORDER_STATUSES.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {tStatus(status)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {updateStatus.isPending && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            )}
           </div>
-          <Button type="button" variant="ghost" onClick={handleClose}>
-            {t('detail.close')}
-          </Button>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">
+                {t('detail.statusLabel')}
+              </label>
+              <div className="flex items-center gap-2">
+                <Select
+                  value={order.status}
+                  onValueChange={(v) => handleStatusChange(v as OrderStatus)}
+                  disabled={updateStatus.isPending}
+                >
+                  <SelectTrigger className="h-10 w-56 border-primary/40 bg-background font-medium shadow-sm hover:border-primary focus:ring-primary/30">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ORDER_STATUSES.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {tStatus(status)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {updateStatus.isPending && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">{t('detail.statusHint')}</p>
+            </div>
+
+            <Button type="button" variant="ghost" onClick={handleClose}>
+              {t('detail.close')}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

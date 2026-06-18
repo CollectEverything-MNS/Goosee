@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Length,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -29,6 +30,28 @@ export class OrderItemDto {
   quantity: number;
 }
 
+export class BillingAddressDto {
+  @IsString()
+  @Length(2, 120)
+  fullName: string;
+
+  @IsString()
+  @Length(2, 160)
+  line1: string;
+
+  @IsString()
+  @Length(2, 20)
+  postalCode: string;
+
+  @IsString()
+  @Length(2, 80)
+  city: string;
+
+  @IsString()
+  @Length(2, 80)
+  country: string;
+}
+
 export class CreateOrderDto {
   // Client connecté facultatif : une commande peut être passée en invité.
   @IsOptional()
@@ -43,4 +66,9 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items: OrderItemDto[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => BillingAddressDto)
+  billingAddress?: BillingAddressDto;
 }

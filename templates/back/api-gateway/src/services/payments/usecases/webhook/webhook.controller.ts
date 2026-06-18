@@ -1,4 +1,5 @@
-import { Body, Controller, Headers, Post } from '@nestjs/common';
+import { Controller, Headers, Post, RawBodyRequest, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { HttpProxyService } from 'src/shared/services/http-proxy.service';
@@ -17,17 +18,26 @@ export class WebhookController {
     this.services = serviceUrl(this.config);
   }
 
-  // Endpoint appelé par Stripe (pas le front). On relaie le corps et la signature.
-  // TODO(Florent): pour la vraie vérif de signature Stripe, faire transiter le corps
-  // BRUT (rawBody) sans re-sérialisation — sinon constructEvent échouera.
+  // Endpoint appelé par Stripe (pas le front). On relaie le corps BRUT (rawBody) tel quel,
+  // sans re-sérialisation : la vérif de signature Stripe (constructEvent) compare la
+  // signature aux octets exacts reçus. rawBody est activé via NestFactory.create({ rawBody: true }).
   @Post(routesConfig.payment.webhook.path)
   @ApiExcludeEndpoint()
-  async webhook(@Body() body: unknown, @Headers('stripe-signature') signature?: string) {
+  async webhook(
+    @Req() req: RawBodyRequest<Request>,
+    @Headers('stripe-signature') signature?: string
+  ) {
     const url = routesConfig.payment.webhook.link(this.services.payment);
+    const rawBody = req.rawBody ?? Buffer.from(JSON.stringify(req.body ?? {}));
     return this.httpProxy.postWithConfig(
       url,
-      body,
-      { headers: signature ? { 'stripe-signature': signature } : {} },
+      rawBody,
+      {
+        headers: {
+          'content-type': 'application/json',
+          ...(signature ? { 'stripe-signature': signature } : {}),
+        },
+      },
       'Payment webhook failed'
     );
   }

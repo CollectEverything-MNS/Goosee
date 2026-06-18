@@ -8,6 +8,8 @@ interface BackendOrder {
   id: string;
   customerId?: string | null;
   customerEmail: string;
+  // Renseignée au checkout : on s'en sert pour afficher le vrai nom du client.
+  billingAddress?: { fullName?: string } | null;
   items: { productId: string; name: string; unitPriceCents: number; quantity: number }[];
   totalCents: number;
   status: OrderStatus;
@@ -20,13 +22,17 @@ interface ListOrdersResponse {
 }
 
 function toAdminOrder(order: BackendOrder): Order {
+  // Nom réel saisi au checkout (billingAddress.fullName) ; à défaut, préfixe de l'email.
+  const fullName = order.billingAddress?.fullName?.trim() || order.customerEmail.split('@')[0];
+  const [firstName, ...rest] = fullName.split(/\s+/);
+
   return {
     id: order.id,
     // Pas de référence côté back : on en dérive une lisible depuis l'UUID.
     reference: `CMD-${order.id.slice(0, 8).toUpperCase()}`,
     customer: {
-      firstName: order.customerEmail.split('@')[0],
-      lastName: '',
+      firstName,
+      lastName: rest.join(' '),
       email: order.customerEmail,
     },
     status: order.status,
