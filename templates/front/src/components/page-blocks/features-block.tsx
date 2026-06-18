@@ -191,13 +191,13 @@ function BakeryFeatures({
       <div className="mx-auto max-w-5xl">
         {title && (
           <h2
-            className="mb-10 text-center text-3xl font-semibold italic md:text-4xl"
+            className="mb-10 text-center text-2xl font-semibold italic sm:text-3xl md:text-4xl"
             style={{ color: textColor }}
           >
             {title}
           </h2>
         )}
-        <div className="grid gap-px overflow-hidden rounded-2xl bg-amber-200/40 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-amber-200/40 sm:grid-cols-2">
           {features.map((feature, i) => {
             const Icon = ICON_MAP[feature.icon] || Shield;
             return (
@@ -232,6 +232,16 @@ function RestaurantFeatures({
 }: BlockPropsWithContext<FeaturesBlockProps>) {
   const features = parseFeatures(featuresJson);
 
+  // Le nombre de colonnes suit le nombre d'éléments (max 4) pour rester centré.
+  const lgCols =
+    features.length >= 4
+      ? 'lg:grid-cols-4'
+      : features.length === 3
+        ? 'lg:grid-cols-3'
+        : features.length === 2
+          ? 'lg:grid-cols-2'
+          : 'lg:grid-cols-1';
+
   return (
     <section
       className={cn(
@@ -258,7 +268,12 @@ function RestaurantFeatures({
             </h2>
           </div>
         )}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          className={cn(
+            'mx-auto grid grid-cols-1 justify-center gap-10 sm:grid-cols-2',
+            lgCols,
+          )}
+        >
           {features.map((feature, i) => {
             const Icon = ICON_MAP[feature.icon] || Shield;
             return (
@@ -318,7 +333,7 @@ function BeautyFeatures({
             </h2>
           </div>
         )}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, i) => {
             const Icon = ICON_MAP[feature.icon] || Shield;
             return (

@@ -13,11 +13,17 @@ interface GridBlockComponentProps extends GridBlockProps {
 export function GridBlock({
   columns = 2,
   gap = 'md',
+  alignment = 'left',
   backgroundColor,
   padding = 'md',
   gridChildren = [],
   context,
 }: GridBlockComponentProps) {
+  const alignmentClasses = {
+    left: 'justify-items-start text-left',
+    center: 'justify-items-center text-center',
+    right: 'justify-items-end text-right',
+  };
   const gapClasses = {
     sm: 'gap-2',
     md: 'gap-4',
@@ -48,6 +54,7 @@ export function GridBlock({
         columnClasses[columns],
         gapClasses[gap],
         paddingClasses[padding],
+        alignmentClasses[alignment],
         context?.mode === 'preview' && context?.isSelected && 'ring-2 ring-primary'
       )}
       style={{

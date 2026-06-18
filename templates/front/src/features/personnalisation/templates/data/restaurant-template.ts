@@ -362,6 +362,63 @@ export const RESTAURANT_TEMPLATE: TemplateDefinition = {
         },
       ],
     },
+    {
+      title: 'Réserver',
+      slug: 'contact',
+      type: 'contact',
+      status: 'published',
+      metaTitle: 'Réserver une table.',
+      metaDescription:
+        'Réservez votre table ou contactez-nous. Service du mardi au samedi, midi et soir. 32 couverts uniquement.',
+      components: [
+        {
+          id: 'hero-contact',
+          type: 'hero',
+          order: 0,
+          props: {
+            title: 'Réserver.',
+            subtitle:
+              'Une table, une question, un événement privé ? Écrivez-nous, nous répondons sous 24h.',
+            alignment: 'center',
+            overlay: true,
+            height: 'md',
+            backgroundType: 'image',
+            backgroundImage: IMAGES.heroAbout,
+            backgroundColor: COLORS.dark,
+            textColor: COLORS.textLight,
+          },
+        },
+        {
+          id: 'contact-form',
+          type: 'contact',
+          order: 1,
+          props: {
+            title: '',
+            subtitle: '',
+            email: 'reservation@maison-berthier.fr',
+            phone: '03 87 00 00 00',
+            address: '12 place de la Comédie, 57000 Metz',
+            backgroundColor: COLORS.light,
+            textColor: COLORS.textDark,
+          },
+        },
+        {
+          id: 'banner-contact',
+          type: 'banner',
+          order: 2,
+          props: {
+            title: 'Les horaires.',
+            subtitle:
+              'Déjeuner : 12h–14h. Dîner : 19h30–22h. Fermé dimanche et lundi. Dernière commande 30 min avant la fermeture.',
+            buttonText: '',
+            buttonLink: '',
+            backgroundColor: COLORS.dark,
+            textColor: COLORS.textLight,
+            alignment: 'center',
+          },
+        },
+      ],
+    },
   ],
   menus: [
     { label: 'Accueil', slug: 'accueil', order: 0 },

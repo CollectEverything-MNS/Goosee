@@ -8,6 +8,7 @@ import { PageRenderer } from '@/components/page-blocks';
 import { PageComponent } from '../../types/page.types';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { PreviewFrame } from './preview-frame';
 
 interface PageBuilderPreviewProps {
   components: PageComponent[];
@@ -70,7 +71,7 @@ export function PageBuilderPreview({
         <div className="flex min-h-full justify-center p-4">
           <div
             className={cn(
-              'min-h-full bg-background transition-all duration-300',
+              'min-h-full overflow-hidden bg-background transition-all duration-300',
               viewport !== 'desktop' && 'rounded-lg border shadow-lg'
             )}
             style={{
@@ -88,12 +89,16 @@ export function PageBuilderPreview({
                 </div>
               </div>
             ) : (
-              <PageRenderer
-                components={components}
-                context={{ mode: 'preview' }}
-                selectedComponentId={selectedComponentId}
-                onSelectComponent={onSelectComponent}
-              />
+              // L'iframe garantit que les breakpoints Tailwind suivent la largeur
+              // du device simulé (et non celle du navigateur).
+              <PreviewFrame width="100%">
+                <PageRenderer
+                  components={components}
+                  context={{ mode: 'preview' }}
+                  selectedComponentId={selectedComponentId}
+                  onSelectComponent={onSelectComponent}
+                />
+              </PreviewFrame>
             )}
           </div>
         </div>

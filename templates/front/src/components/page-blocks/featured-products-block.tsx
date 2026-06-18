@@ -18,6 +18,7 @@ interface Product {
   price: string;
   image?: string;
   link?: string;
+  soldOut?: boolean;
 }
 
 type LayoutProps = BlockPropsWithContext<FeaturedProductsBlockProps> & {
@@ -53,9 +54,9 @@ function sortProducts(products: any[], sort?: SortOption): any[] {
 }
 
 const COLUMNS_CLASSES = {
-  2: 'md:grid-cols-2',
-  3: 'md:grid-cols-3',
-  4: 'md:grid-cols-2 lg:grid-cols-4',
+  2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
 };
 
 function parseProducts(raw: unknown): Product[] {
@@ -109,6 +110,7 @@ function useFeaturedItems(productsJson: unknown, filters: FeaturedFilters): Prod
         price: formatPrice(Number(p.price)),
         image: mainImageUrl(p.images),
         link: `/${locale}/produits/${p.id}`,
+        soldOut: !p.isAvailable || Number(p.stock) <= 0,
       }));
     }
     return parseProducts(productsJson);
@@ -135,6 +137,16 @@ function CardWrap({
     );
   }
   return <div className={className}>{children}</div>;
+}
+
+function SoldOutBadge() {
+  return (
+    <span className="absolute inset-0 z-10 flex items-center justify-center bg-white/55">
+      <span className="rounded-full bg-foreground/85 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-background">
+        Épuisé
+      </span>
+    </span>
+  );
 }
 
 export function FeaturedProductsBlock(props: BlockPropsWithContext<FeaturedProductsBlockProps>) {
@@ -191,6 +203,7 @@ function DefaultLayout({
               className="block-card group block border bg-white shadow-sm transition-shadow hover:shadow-md overflow-hidden"
             >
               <div className="relative aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden">
+                {product.soldOut && <SoldOutBadge />}
                 {product.image ? (
                   <img
                     src={product.image}
@@ -269,6 +282,7 @@ function DriveLayout({
                 Promo
               </div>
               <div className="relative aspect-square overflow-hidden bg-slate-100">
+                {product.soldOut && <SoldOutBadge />}
                 {product.image ? (
                   <img
                     src={product.image}
@@ -309,7 +323,7 @@ function BakeryLayout({
   context,
 }: LayoutProps) {
   const isPreview = context?.mode === 'preview';
-  const cols = columns === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3';
+  const cols = columns === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';
 
   return (
     <section
@@ -353,6 +367,7 @@ function BakeryLayout({
               className="block-card group block overflow-hidden bg-white shadow-sm"
             >
               <div className="relative aspect-[4/5] overflow-hidden bg-amber-50">
+                {product.soldOut && <SoldOutBadge />}
                 {product.image ? (
                   <img
                     src={product.image}
@@ -467,6 +482,11 @@ function ProductRow({ product, textColor }: { product: Product; textColor: strin
         <div className="flex items-baseline gap-3">
           <span className="text-base font-medium italic" style={{ color: textColor }}>
             {product.name}
+            {product.soldOut && (
+              <span className="ml-2 align-middle text-[10px] font-semibold uppercase not-italic tracking-wider opacity-60">
+                · épuisé
+              </span>
+            )}
           </span>
           <span
             className="flex-1 border-b border-dotted opacity-40"
@@ -536,6 +556,7 @@ function BeautyLayout({
               className="block-card group block overflow-hidden bg-white shadow-md transition-transform hover:-translate-y-1"
             >
               <div className="relative aspect-square overflow-hidden bg-pink-50">
+                {product.soldOut && <SoldOutBadge />}
                 {product.image ? (
                   <img
                     src={product.image}

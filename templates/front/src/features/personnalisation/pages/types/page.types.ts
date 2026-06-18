@@ -51,7 +51,8 @@ export type ComponentType =
   | 'featured-products'
   | 'testimonials'
   | 'banner'
-  | 'features';
+  | 'features'
+  | 'contact';
 
 export type ComponentCategory = 'basic' | 'layout' | 'ecommerce';
 

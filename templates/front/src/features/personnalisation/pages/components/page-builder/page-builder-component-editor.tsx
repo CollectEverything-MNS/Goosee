@@ -567,7 +567,6 @@ export function PageBuilderComponentEditor({
   propsEntries.forEach(([key, value]) => {
     if (Array.isArray(value) || (typeof value === 'object' && value !== null)) return
 
-    if (key === 'backgroundColor' && currentBackgroundType === 'image') return
     if (key === 'backgroundImage' && currentBackgroundType !== 'image') return
 
     // Style props: colors, alignment, background

@@ -72,4 +72,19 @@ export const CATEGORY_ECOMMERCE_COMPONENTS: ComponentDefinition[] = [
       textColor: '#000000',
     },
   },
+  {
+    type: 'contact',
+    label: 'Contact',
+    icon: 'mail',
+    category: 'ecommerce',
+    defaultProps: {
+      title: 'Contactez-nous',
+      subtitle: 'Une question, une suggestion ? Notre équipe vous répond sous 24h.',
+      email: 'contact@votresite.com',
+      phone: '01 23 45 67 89',
+      address: '123 Rue du Commerce, 57000 Metz',
+      backgroundColor: '#ffffff',
+      textColor: '#ffffff',
+    },
+  },
 ];

@@ -31,7 +31,7 @@ export function BannerBlock({
     >
       <div className={cn('mx-auto flex max-w-4xl flex-col gap-4', ALIGNMENT_CLASSES[alignment])}>
         {title && (
-          <h2 className="text-2xl font-bold md:text-3xl" style={{ color: textColor }}>
+          <h2 className="text-xl font-bold sm:text-2xl md:text-3xl" style={{ color: textColor }}>
             {title}
           </h2>
         )}

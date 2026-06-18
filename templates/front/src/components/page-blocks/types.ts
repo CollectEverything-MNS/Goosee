@@ -79,6 +79,7 @@ export interface VideoBlockProps {
 export interface GridBlockProps {
   columns: 1 | 2 | 3 | 4
   gap: 'sm' | 'md' | 'lg' | 'xl'
+  alignment?: 'left' | 'center' | 'right'
   backgroundColor?: string
   padding: 'none' | 'sm' | 'md' | 'lg'
 }
@@ -127,6 +128,16 @@ export interface FeaturesBlockProps {
   title?: string
   features: string
   columns: 2 | 3 | 4
+  backgroundColor?: string
+  textColor?: string
+}
+
+export interface ContactBlockProps {
+  title?: string
+  subtitle?: string
+  email?: string
+  phone?: string
+  address?: string
   backgroundColor?: string
   textColor?: string
 }

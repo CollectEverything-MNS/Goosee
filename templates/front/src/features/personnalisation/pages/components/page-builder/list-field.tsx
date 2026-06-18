@@ -171,7 +171,7 @@ function ItemCard({
   const title = (item[schema.titleKey] as string | undefined)?.trim() || `${schema.fallback} ${index + 1}`;
 
   return (
-    <Collapsible defaultOpen={false} className="overflow-hidden rounded-md border border-border bg-card">
+    <Collapsible defaultOpen={index === 0} className="overflow-hidden rounded-md border border-border bg-card">
       <CollapsibleTrigger className="group/item flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-muted/40">
         <GripVertical className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         <span className="flex-1 truncate text-sm font-medium">{title}</span>

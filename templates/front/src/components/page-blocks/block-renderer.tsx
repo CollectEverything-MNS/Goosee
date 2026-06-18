@@ -19,6 +19,7 @@ import { FeaturedProductsBlock } from './featured-products-block';
 import { TestimonialsBlock } from './testimonials-block';
 import { BannerBlock } from './banner-block';
 import { FeaturesBlock } from './features-block';
+import { ContactBlock } from './contact-block';
 
 const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   hero: HeroBlock,
@@ -37,6 +38,7 @@ const BLOCK_COMPONENTS: Record<string, ComponentType<any>> = {
   testimonials: TestimonialsBlock,
   banner: BannerBlock,
   features: FeaturesBlock,
+  contact: ContactBlock,
 };
 
 interface BlockRendererProps {

@@ -244,7 +244,7 @@ function BakeryHero({
           <span className="h-px w-10 bg-current" />
         </div>
         <h1
-          className="text-4xl font-semibold italic leading-tight md:text-5xl lg:text-6xl"
+          className="text-3xl font-semibold italic leading-tight sm:text-4xl md:text-5xl lg:text-6xl"
           style={{ color: textColor }}
         >
           {title || 'Votre titre principal'}
@@ -318,7 +318,7 @@ function RestaurantHero({
             <span className="opacity-70">Signature</span>
           </div>
           <h1
-            className="text-4xl font-medium italic leading-[1.1] md:text-6xl lg:text-7xl"
+            className="text-3xl font-medium italic leading-[1.1] sm:text-4xl md:text-6xl lg:text-7xl"
             style={{ color: textColor }}
           >
             {title || 'Votre titre principal'}
@@ -416,7 +416,7 @@ function BeautyHero({
             <span>✦</span>
           </div>
           <h1
-            className="text-4xl font-light italic leading-tight md:text-5xl lg:text-6xl"
+            className="text-3xl font-light italic leading-tight sm:text-4xl md:text-5xl lg:text-6xl"
             style={{ color: textColor }}
           >
             {title || 'Votre titre principal'}

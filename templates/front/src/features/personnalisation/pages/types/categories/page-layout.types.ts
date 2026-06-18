@@ -64,6 +64,7 @@ export const CATEGORY_LAYOUT_COMPONENTS: ComponentDefinition[] = [
     defaultProps: {
       columns: 2,
       gap: 'md',
+      alignment: 'left',
       backgroundColor: '',
       padding: 'md',
     },

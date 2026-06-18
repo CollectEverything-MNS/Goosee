@@ -56,26 +56,16 @@ export const DEFAULT_PAGES: Partial<Page>[] = [
     metaDescription: 'Une question ? Contactez notre équipe',
     components: [
       {
-        id: 'hero-contact',
-        type: 'hero',
+        id: 'contact-main',
+        type: 'contact',
         order: 0,
         props: {
           title: 'Contactez-nous',
-          subtitle: 'Notre équipe est là pour vous aider',
-          backgroundImage: '',
-          buttonText: '',
-          buttonLink: '',
-          alignment: 'center',
-        },
-      },
-      {
-        id: 'text-contact',
-        type: 'text',
-        order: 1,
-        props: {
-          content:
-            "<p>Vous avez une question ? N'hésitez pas à nous contacter via le formulaire ci-dessous ou par email à contact@votresite.com</p>",
-          alignment: 'center',
+          subtitle:
+            'Une question, une suggestion ? Notre équipe vous répond sous 24h.',
+          email: 'contact@votresite.com',
+          phone: '01 23 45 67 89',
+          address: '123 Rue du Commerce, 57000 Metz',
         },
       },
     ],
