@@ -124,6 +124,18 @@
   letter-spacing: var(--block-heading-tracking);
 }
 
+/* Pages applicatives (compte, checkout, produit...) : police UI neutre,
+   jamais la police serif/italique d'un template marketing. */
+.site-themed .app-surface,
+.site-themed .app-surface h1,
+.site-themed .app-surface h2,
+.site-themed .app-surface h3,
+.site-themed .app-surface h4 {
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-style: normal;
+  letter-spacing: normal;
+}
+
 .site-themed .block-button {
   border-radius: var(--block-button-radius);
   font-weight: var(--block-button-weight);
@@ -163,18 +175,18 @@
   --block-overline-tracking: 0.3em;
 }
 
-/* RESTAURANT — élégant, serif anguleux, raffinement bistronomique */
+/* RESTAURANT — épuré, sans-serif, raffinement bistronomique anguleux */
 [data-site-template='restaurant'] {
-  --block-font-body: 'Georgia', 'Times New Roman', serif;
-  --block-font-heading: 'Playfair Display', 'Times New Roman', serif;
-  --block-heading-weight: 500;
-  --block-heading-style: italic;
-  --block-heading-tracking: -0.01em;
+  --block-font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --block-font-heading: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --block-heading-weight: 700;
+  --block-heading-style: normal;
+  --block-heading-tracking: -0.02em;
   --block-radius: 0;
   --block-button-radius: 0;
-  --block-button-weight: 500;
+  --block-button-weight: 600;
   --block-button-uppercase: uppercase;
-  --block-button-tracking: 0.15em;
+  --block-button-tracking: 0.12em;
   --block-section-padding-y: 5rem;
   --block-overline-tracking: 0.4em;
 }
