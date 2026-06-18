@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
-import { LogOut, ShoppingBag, User } from 'lucide-react';
+import { ChevronDown, LogOut, ShoppingBag, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -69,10 +69,14 @@ export function HeaderUserMenu({ textColor }: { textColor?: string }) {
   return (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-            <span>
+          <button className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2.5 transition-colors hover:bg-black/5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
               {initials}
             </span>
+            <span className="hidden text-sm font-medium lg:block" style={{ color: textColor }}>
+              {user.firstName} {user.lastName}
+            </span>
+            <ChevronDown className="hidden h-4 w-4 opacity-60 lg:block" style={{ color: textColor }} />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">

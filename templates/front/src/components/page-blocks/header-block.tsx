@@ -53,7 +53,7 @@ export function HeaderBlock({
       className={cn(
         'w-full px-6 md:px-12 lg:px-20',
         HEIGHT_CLASSES[height],
-        sticky && 'sticky top-0 z-50',
+        !isPreview && 'sticky top-0 z-50 border-b border-black/5 backdrop-blur supports-[backdrop-filter]:bg-opacity-80',
         context?.isSelected && 'ring-2 ring-primary ring-offset-2',
       )}
       style={{ backgroundColor }}
@@ -70,29 +70,34 @@ export function HeaderBlock({
                 <MenuItem key={item.id} item={item} textColor={textColor} isPreview={isPreview} slugMap={slugMap} />
               ))}
             </nav>
-            <MobileMenu menus={menus} textColor={textColor} isPreview={isPreview} slugMap={slugMap} />
+            <MobileMenu
+              menus={menus}
+              textColor={textColor}
+              isPreview={isPreview}
+              slugMap={slugMap}
+              siteName={siteName}
+              cart={isPreview ? undefined : cart}
+            />
           </>
         )}
 
+        {/* Actions desktop uniquement — sur mobile, panier et compte vivent dans la sidebar. */}
         {!isPreview && (
-          <div className="flex shrink-0 items-center gap-1 ml-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
+          <div className="hidden shrink-0 items-center gap-2 ml-6 pl-6 border-l border-black/10 md:flex">
+            <HeaderUserMenu textColor={textColor} />
+            <button
+              type="button"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-black/5"
               onClick={() => cart?.setOpen(true)}
               aria-label="Ouvrir le panier"
             >
-              <ShoppingCart className="h-5 w-5" style={{ color: textColor }} />
+              <ShoppingCart className="h-[1.15rem] w-[1.15rem]" style={{ color: textColor }} />
               {cart && cart.itemCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground ring-2 ring-white">
                   {cart.itemCount}
                 </span>
               )}
-            </Button>
-            <div className="hidden md:flex">
-              <HeaderUserMenu textColor={textColor} />
-            </div>
+            </button>
           </div>
         )}
 
