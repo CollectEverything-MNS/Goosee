@@ -44,7 +44,7 @@ export default function ProductDetailPage() {
 
   if (isError || !product) {
     return (
-      <main className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center gap-4 px-4 text-center">
+      <main className="app-surface mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center gap-4 px-4 text-center">
         <Package className="h-12 w-12 text-muted-foreground" />
         <h1 className="text-2xl font-bold">Produit introuvable</h1>
         <p className="text-muted-foreground">Ce produit n&apos;existe pas ou n&apos;est plus disponible.</p>
@@ -70,7 +70,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <main className="bg-gray-50">
+    <main className="app-surface bg-gray-50">
       <div className="mx-auto max-w-6xl px-4 py-8">
         <Button asChild variant="ghost" size="sm" className="mb-6 gap-2 text-muted-foreground">
           <Link href={`/${locale}`}>

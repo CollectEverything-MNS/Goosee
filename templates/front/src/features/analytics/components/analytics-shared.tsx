@@ -6,6 +6,7 @@ import type { OrderStatus } from '@/features/orders/data/order.types';
 export const STATUS_COLOR: Record<OrderStatus, string> = {
   pending: '#f59e0b', // amber-500
   paid: '#0ea5e9', // sky-500
+  prepared: '#8b5cf6', // violet-500
   shipped: '#10b981', // emerald-500
   cancelled: '#f43f5e', // rose-500
 };
