@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Palette, PencilLine, RotateCcw, Save, Sparkles } from 'lucide-react';
+import { Building2, Loader2, Palette, PencilLine, RotateCcw, Save, Sparkles } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
@@ -35,6 +35,14 @@ const formSchema = z.object({
   logoUrl: z.string().url().optional().or(z.literal('')),
   faviconUrl: z.string().url().optional().or(z.literal('')),
   primaryColor: z.string().optional(),
+  companyAddress: z.string().optional(),
+  companyPostalCode: z.string().optional(),
+  companyCity: z.string().optional(),
+  companyCountry: z.string().optional(),
+  companyEmail: z.string().email().optional().or(z.literal('')),
+  companyPhone: z.string().optional(),
+  companySiret: z.string().optional(),
+  companyVat: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -52,6 +60,7 @@ export function SettingsForm() {
     return uploadMutation.mutateAsync({ file, folder });
   };
 
+  const company = settings?.metadata?.company;
   const initialValues = useMemo<FormValues>(
     () => ({
       title: settings?.title || '',
@@ -59,8 +68,16 @@ export function SettingsForm() {
       logoUrl: settings?.logoUrl || '',
       faviconUrl: settings?.faviconUrl || '',
       primaryColor: settings?.primaryColor || FALLBACK_COLOR,
+      companyAddress: company?.address || '',
+      companyPostalCode: company?.postalCode || '',
+      companyCity: company?.city || '',
+      companyCountry: company?.country || '',
+      companyEmail: company?.email || '',
+      companyPhone: company?.phone || '',
+      companySiret: company?.siret || '',
+      companyVat: company?.vatNumber || '',
     }),
-    [settings],
+    [settings, company],
   );
 
   const form = useForm<FormValues>({
@@ -86,6 +103,20 @@ export function SettingsForm() {
         logoUrl: values.logoUrl ?? undefined,
         faviconUrl: values.faviconUrl ?? undefined,
         primaryColor: values.primaryColor || undefined,
+        // Fusion : on préserve le reste de metadata, on ne touche qu'à `company`.
+        metadata: {
+          ...(settings?.metadata ?? {}),
+          company: {
+            address: values.companyAddress || undefined,
+            postalCode: values.companyPostalCode || undefined,
+            city: values.companyCity || undefined,
+            country: values.companyCountry || undefined,
+            email: values.companyEmail || undefined,
+            phone: values.companyPhone || undefined,
+            siret: values.companySiret || undefined,
+            vatNumber: values.companyVat || undefined,
+          },
+        },
       });
       toast.success(t('form.saveSuccess'));
       form.reset(values);
@@ -284,6 +315,132 @@ export function SettingsForm() {
                   </FormItem>
                 )}
               />
+            </section>
+
+            <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t('sections.company')}
+                </h3>
+              </div>
+              <p className="text-[11px] text-muted-foreground">{t('form.sectionHelp')}</p>
+
+              <FormField
+                control={form.control}
+                name="companyAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-medium">{t('form.companyAddress')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t('form.companyAddressPlaceholder')}
+                        className="h-10"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="companyPostalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">
+                        {t('form.companyPostalCode')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companyCity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">{t('form.companyCity')}</FormLabel>
+                      <FormControl>
+                        <Input className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companyCountry"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">
+                        {t('form.companyCountry')}
+                      </FormLabel>
+                      <FormControl>
+                        <Input className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companyPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">{t('form.companyPhone')}</FormLabel>
+                      <FormControl>
+                        <Input className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companyEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">{t('form.companyEmail')}</FormLabel>
+                      <FormControl>
+                        <Input type="email" className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companySiret"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">{t('form.companySiret')}</FormLabel>
+                      <FormControl>
+                        <Input className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companyVat"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel className="text-xs font-medium">{t('form.companyVat')}</FormLabel>
+                      <FormControl>
+                        <Input className="h-10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </section>
           </div>
 

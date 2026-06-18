@@ -16,7 +16,9 @@ async function bootstrap() {
     }
   }
 
-  const app = await NestFactory.create(AppModule);
+  // rawBody : nécessaire pour relayer le webhook Stripe sans re-sérialiser le corps,
+  // sinon la vérification de signature (constructEvent) échoue côté payment-service.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const configService = app.get(ConfigService);
 
   app.use(helmet());

@@ -13,6 +13,7 @@ export const ROUTE_PAGE_KEY_MAP: Record<string, string> = {
   products: 'products',
   categories: 'categories',
   orders: 'orders',
+  caisse: 'orders',
   'sales-history': 'sales-history',
   pages: 'pages',
   menu: 'menu',

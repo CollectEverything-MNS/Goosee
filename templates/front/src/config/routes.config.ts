@@ -6,6 +6,9 @@ export const routes = {
     account: {
       getHref: (locale: string) => `/${locale}/compte`,
     },
+    invoice: {
+      getHref: (locale: string, id: string) => `/${locale}/facture/${id}`,
+    },
   },
   gooseeAdmin: {
     login: {
@@ -28,6 +31,9 @@ export const routes = {
     },
     orders: {
       getHref: (locale: string) => `/${locale}/goosee-admin/orders`,
+    },
+    counter: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/caisse`,
     },
     returnClient: {
       getHref: (locale: string) => `/${locale}/goosee-admin/return-clients`,
