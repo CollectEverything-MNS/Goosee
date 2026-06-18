@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { ChevronDown, LogOut, ShoppingBag, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -149,31 +148,45 @@ export function MobileUserMenu() {
     window.location.reload();
   };
 
+  const initials =
+    `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() ||
+    user.email[0].toUpperCase();
+
   return (
-    <div className="space-y-1">
-      <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
-      <p className="text-xs text-muted-foreground">{user.email}</p>
-      <Link
-        href={routes.public.account.getHref(locale)}
-        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
-      >
-        <User className="h-4 w-4" />
-        Mon profil
-      </Link>
-      <Link
-        href={`${routes.public.account.getHref(locale)}?tab=orders`}
-        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
-      >
-        <ShoppingBag className="h-4 w-4" />
-        Mes commandes
-      </Link>
-      <button
-        onClick={handleLogout}
-        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-accent"
-      >
-        <LogOut className="h-4 w-4" />
-        Déconnexion
-      </button>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex w-full items-center gap-3 rounded-xl border bg-card px-4 py-3 text-left transition-colors hover:bg-accent">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+            {initials}
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-sm font-medium">
+              {user.firstName} {user.lastName}
+            </span>
+            <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+          </span>
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[var(--radix-dropdown-menu-trigger-width)]">
+        <DropdownMenuItem asChild>
+          <Link href={routes.public.account.getHref(locale)}>
+            <User className="mr-2 h-4 w-4" />
+            Mon profil
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={`${routes.public.account.getHref(locale)}?tab=orders`}>
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            Mes commandes
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={handleLogout} className="text-red-600 focus:text-red-600">
+          <LogOut className="mr-2 h-4 w-4" />
+          Déconnexion
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

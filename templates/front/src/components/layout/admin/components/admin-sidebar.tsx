@@ -44,13 +44,13 @@ export function AdminSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r-sidebar-border">
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
-        <Link href={routes.gooseeAdmin.dashboard.getHref(locale)} className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent">
+      <SidebarHeader className="border-b border-sidebar-border px-4 py-4 group-data-[collapsible=icon]:px-0">
+        <Link href={routes.gooseeAdmin.dashboard.getHref(locale)} className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8">
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin text-sidebar-foreground" />
             ) : logoSrc ? (
-              <img src={logoSrc} alt={settings?.title || 'Logo'} className="h-7 w-7 object-contain" />
+              <img src={logoSrc} alt={settings?.title || 'Logo'} className="h-7 w-7 object-contain group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5" />
             ) : (
               <span className="text-lg font-bold text-sidebar-primary">
                 G<span className="text-[hsl(var(--admin-accent))]">.</span>
@@ -68,7 +68,7 @@ export function AdminSidebar() {
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className="px-2 py-4 group-data-[collapsible=icon]:px-0">
         {filteredMenu.map((section) => (
           <SidebarGroup key={section.section}>
             <SidebarGroupLabel className="px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-sidebar-foreground/40">
