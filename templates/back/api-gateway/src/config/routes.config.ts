@@ -9,6 +9,7 @@ const tagsBasePath = '/tags';
 const ordersBasePath = '/orders';
 const cartBasePath = '/cart';
 const paymentsBasePath = '/payments';
+const ticketsBasePath = '/tickets';
 
 export const routesConfig = {
   upload: {
@@ -117,6 +118,37 @@ export const routesConfig = {
     deleteRole: {
       path: `${rolesBasePath}/:id`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${rolesBasePath}/${id}`,
+    },
+  },
+
+  ticket: {
+    createTicket: {
+      path: `${ticketsBasePath}`,
+      link: (serviceUrl: string) => `${serviceUrl}${ticketsBasePath}`,
+    },
+    listTickets: {
+      path: `${ticketsBasePath}`,
+      link: (serviceUrl: string) => `${serviceUrl}${ticketsBasePath}`,
+    },
+    assignTicket: {
+      path: `${ticketsBasePath}/:id/assign`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${ticketsBasePath}/${id}/assign`,
+    },
+    updateTicketStatus: {
+      path: `${ticketsBasePath}/:id/status`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${ticketsBasePath}/${id}/status`,
+    },
+    closeTicket: {
+      path: `${ticketsBasePath}/:id/close`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${ticketsBasePath}/${id}/close`,
+    },
+    deleteTicket: {
+      path: `${ticketsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${ticketsBasePath}/${id}`,
+    },
+    getTicket: {
+      path: `${ticketsBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${ticketsBasePath}/${id}`,
     },
   },
 

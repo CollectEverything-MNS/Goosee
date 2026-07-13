@@ -17,6 +17,7 @@ import { CartModule } from './services/cart/cart.module';
 import { PaymentsModule } from './services/payments/payments.module';
 import { TagsModule } from './services/tags/tags.module';
 import { LogsModule } from './services/logs/logs.module';
+import { TicketsModule } from './services/tickets/tickets.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { LogsModule } from './services/logs/logs.module';
     TagsModule,
     LogsModule,
     InternalModule,
+    TicketsModule,
   ],
   controllers: [HealthController, MetricsController],
   providers: [],
