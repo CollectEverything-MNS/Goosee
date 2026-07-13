@@ -159,6 +159,26 @@ services:
     networks:
       - goosee_net
 
+  goosee-ticket-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-ticket-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${TICKET_DB_USER}
+      POSTGRES_PASSWORD: ${TICKET_DB_PASSWORD}
+      POSTGRES_DB: ${TICKET_DB_NAME}
+    ports:
+      - "${TICKET_DB_HOST_PORT:-5438}:5432"
+    volumes:
+      - ticket_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${TICKET_DB_USER} -d ${TICKET_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
 networks:
   goosee_net:
     name: goosee_net
@@ -172,3 +192,4 @@ volumes:
   page_db_data:
   log_db_data:
   product_db_data:
+  ticket_db_data:

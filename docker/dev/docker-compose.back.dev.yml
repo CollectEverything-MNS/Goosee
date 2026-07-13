@@ -22,6 +22,8 @@ services:
       LOG_SERVICE_PORT: ${LOG_SERVICE_PORT}
       PRODUCT_SERVICE_HOST: goosee-product-service-dev
       PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      TICKET_SERVICE_HOST: goosee-ticket-service-dev
+      TICKET_SERVICE_PORT: ${TICKET_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -220,6 +222,37 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${PRODUCT_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-ticket-service-dev:
+    container_name: goosee-ticket-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/ticket-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
+      TICKET_SERVICE_PORT: ${TICKET_SERVICE_PORT}
+      TICKET_DB_HOST: goosee-ticket-db-dev
+      TICKET_DB_PORT: 5432
+      TICKET_DB_USER: ${TICKET_DB_USER}
+      TICKET_DB_PASSWORD: ${TICKET_DB_PASSWORD}
+      TICKET_DB_NAME: ${TICKET_DB_NAME}
+    expose:
+      - "${TICKET_SERVICE_PORT}"
+    depends_on:
+      goosee-ticket-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${TICKET_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10

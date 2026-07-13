@@ -10,6 +10,7 @@ import { CategoriesModule } from './services/categories/categories.module';
 import { ProductsModule } from './services/products/products.module';
 import { TagsModule } from './services/tags/tags.module';
 import { LogsModule } from './services/logs/logs.module';
+import { TicketsModule } from './services/tickets/tickets.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { LogsModule } from './services/logs/logs.module';
     CategoriesModule,
     TagsModule,
     LogsModule,
+    TicketsModule,
   ],
   controllers: [],
   providers: [],
