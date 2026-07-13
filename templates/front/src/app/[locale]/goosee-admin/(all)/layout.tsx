@@ -19,7 +19,14 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
     if (isLoading) return;
 
     if (!isAuthenticated) {
-      router.replace(routes.gooseeAdmin.login.getHref(locale));
+      // Reload complet (et pas router.replace) : purge l'etat en memoire et evite
+      // l'ecran blanc observe lors d'une expiration de session.
+      const loginHref = routes.gooseeAdmin.login.getHref(locale);
+      if (typeof window !== 'undefined') {
+        window.location.replace(loginHref);
+      } else {
+        router.replace(loginHref);
+      }
       return;
     }
 

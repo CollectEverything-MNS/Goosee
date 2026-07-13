@@ -40,6 +40,9 @@ apiClient.interceptors.response.use(
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         Cookies.remove('access_token');
+        // Previent l'app (ex: AuthProvider) qu'on n'est plus authentifie,
+        // pour declencher la redirection sans attendre une navigation.
+        window.dispatchEvent(new Event('auth:unauthorized'));
       }
     }
     return Promise.reject(error);

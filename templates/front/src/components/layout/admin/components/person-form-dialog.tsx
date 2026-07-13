@@ -175,7 +175,7 @@ export function PersonFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[560px]">
+      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[760px]">
         <DialogHeader className="space-y-3 border-b border-border bg-muted/30 px-6 py-5">
           <div className="flex items-center gap-3">
             {isEditing ? (
@@ -204,9 +204,9 @@ export function PersonFormDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="space-y-6 px-6 py-6">
-              <section className="space-y-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
+            <div className="grid min-h-0 flex-1 grid-cols-1 items-start gap-x-6 gap-y-6 overflow-y-auto px-6 py-6 md:grid-cols-2">
+              <section className="space-y-3 md:col-span-2">
                 <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {t('form.sections.identity')}
                 </h3>

@@ -85,6 +85,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, [fetchUserProfile]);
 
+  // Un 401 (session expiree) emis par l'api-client invalide l'utilisateur courant ;
+  // le layout admin protege se chargera alors de rediriger vers le login.
+  useEffect(() => {
+    const handleUnauthorized = () => setUser(null);
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
+  }, []);
+
   const login = useCallback(async (email: string, password: string) => {
     const res = await api.post<LoginResponse>('/auth/login', { email, password });
     localStorage.setItem('access_token', res.accessToken);
@@ -94,7 +102,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const profile = await fetchUserProfile();
     if (!profile) throw new Error('Failed to fetch user profile');
     setUser(profile);
-    router.push(routes.gooseeAdmin.dashboard.getHref(locale));
+    // Reload complet (et pas router.push) : evite l'ecran blanc sur le login
+    // lors de la transition vers le dashboard apres connexion.
+    const dashboardHref = routes.gooseeAdmin.dashboard.getHref(locale);
+    if (typeof window !== 'undefined') {
+      window.location.assign(dashboardHref);
+    } else {
+      router.push(dashboardHref);
+    }
   }, [fetchUserProfile, router, locale]);
 
   const logout = useCallback(async () => {

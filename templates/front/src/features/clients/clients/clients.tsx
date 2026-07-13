@@ -13,11 +13,14 @@ import { ClientDeleteDialog } from './components/client-delete-dialog';
 import { ClientFormDialog } from './components/client-form-dialog';
 import { ClientsListingToolbar } from './components/clients-listing-toolbar';
 import { getClientsColumns } from './components/clients-columns';
+import { useDetailUrlSync } from '@/hooks/use-detail-url-sync';
 
 function ClientsContent() {
   const t = useTranslations();
-  const { setOpen } = useClient();
+  const { open, setOpen, currentRow, setCurrentRow } = useClient();
   const { data: customers = [] } = useListCustomers();
+
+  useDetailUrlSync({ items: customers, open, currentRow, setCurrentRow, setOpen, dialog: 'edit' });
 
   return (
     <div className="space-y-6">

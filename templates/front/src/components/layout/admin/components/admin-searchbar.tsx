@@ -35,6 +35,7 @@ import { useListProducts } from '@/features/products/usecases/use-list-products'
 import { useListRoles } from '@/features/roles/usecases/use-list-roles';
 import { useListAdmins } from '@/features/users/usecases/use-list-admins';
 import { useListCustomers } from '@/features/users/usecases/use-list-customers';
+import { useListOrders } from '@/features/orders/usecases/use-list-orders';
 import { usePages } from '@/features/personnalisation/pages/usecases/list-pages/use-list-pages';
 import { useAuth } from '@/providers/auth-provider';
 
@@ -52,6 +53,7 @@ export function AdminSearchbar() {
   const { data: categories = [] } = useListCategories();
   const { data: admins = [] } = useListAdmins();
   const { data: customers = [] } = useListCustomers();
+  const { data: orders = [] } = useListOrders();
   const { data: rolesData = [] } = useListRoles();
   const { data: pagesData } = usePages();
   const pages = Array.isArray(pagesData) ? pagesData : [];
@@ -77,6 +79,12 @@ export function AdminSearchbar() {
       router.push(href);
     },
     [router]
+  );
+
+  // Ouvre la modale de détail d'une entité via un paramètre d'URL sur sa page liste.
+  const goDetail = React.useCallback(
+    (href: string, id: string) => go(`${href}?detailId=${id}`),
+    [go]
   );
 
   const navigation = React.useMemo(
@@ -173,7 +181,7 @@ export function AdminSearchbar() {
                   <CommandItem
                     key={`product-${p.id}`}
                     value={`product ${p.name}`}
-                    onSelect={() => go(routes.gooseeAdmin.products.getHref(locale))}
+                    onSelect={() => goDetail(routes.gooseeAdmin.products.getHref(locale), p.id)}
                     className="gap-3"
                   >
                     <Package className="h-4 w-4 text-muted-foreground" />
@@ -222,7 +230,7 @@ export function AdminSearchbar() {
                     <CommandItem
                       key={`admin-${u.id}`}
                       value={`user ${name} ${u.email}`}
-                      onSelect={() => go(routes.gooseeAdmin.users.getHref(locale))}
+                      onSelect={() => goDetail(routes.gooseeAdmin.users.getHref(locale), u.id)}
                       className="gap-3"
                     >
                       <Users className="h-4 w-4 text-muted-foreground" />
@@ -247,7 +255,7 @@ export function AdminSearchbar() {
                     <CommandItem
                       key={`customer-${c.id}`}
                       value={`client ${name} ${c.email}`}
-                      onSelect={() => go(routes.gooseeAdmin.clients.getHref(locale))}
+                      onSelect={() => goDetail(routes.gooseeAdmin.clients.getHref(locale), c.id)}
                       className="gap-3"
                     >
                       <Users className="h-4 w-4 text-muted-foreground" />
@@ -255,6 +263,45 @@ export function AdminSearchbar() {
                       <span className="hidden text-xs text-muted-foreground sm:block">
                         {c.email}
                       </span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </>
+          )}
+
+          {orders.length > 0 && (
+            <>
+              <CommandSeparator />
+              <CommandGroup heading={t('admin.search.groups.orders')}>
+                {orders.slice(0, 5).map((o: any) => {
+                  const customer = o.customer
+                    ? `${o.customer.firstName ?? ''} ${o.customer.lastName ?? ''}`.trim() ||
+                      o.customer.email
+                    : '';
+                  return (
+                    <CommandItem
+                      key={`order-${o.id}`}
+                      value={`order ${o.reference} ${customer}`}
+                      onSelect={() => goDetail(routes.gooseeAdmin.orders.getHref(locale), o.id)}
+                      className="gap-3"
+                    >
+                      <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex-1 truncate">
+                        {o.reference}
+                        {customer && (
+                          <span className="text-muted-foreground"> · {customer}</span>
+                        )}
+                      </span>
+                      {typeof o.total === 'number' && (
+                        <span className="text-xs text-muted-foreground">
+                          {new Intl.NumberFormat(locale, {
+                            style: 'currency',
+                            currency: 'EUR',
+                            maximumFractionDigits: 2,
+                          }).format(o.total)}
+                        </span>
+                      )}
                     </CommandItem>
                   );
                 })}

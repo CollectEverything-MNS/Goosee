@@ -18,7 +18,12 @@ export default function Page() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace(routes.gooseeAdmin.dashboard.getHref(locale));
+      const dashboardHref = routes.gooseeAdmin.dashboard.getHref(locale);
+      if (typeof window !== 'undefined') {
+        window.location.replace(dashboardHref);
+      } else {
+        router.replace(dashboardHref);
+      }
     }
   }, [isLoading, isAuthenticated, router, locale]);
 

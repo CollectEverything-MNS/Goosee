@@ -15,12 +15,15 @@ import { ProductFormDialog } from './components/products/product-form-dialog';
 import ProductsProvider, { useProduct } from './context/products-provider';
 import { useListCategories } from './usecases/use-list-categories';
 import { useListProducts } from './usecases/use-list-products';
+import { useDetailUrlSync } from '@/hooks/use-detail-url-sync';
 
 function ProductsContent() {
   const t = useTranslations();
-  const { setOpen } = useProduct();
+  const { open, setOpen, currentRow, setCurrentRow } = useProduct();
   const { data: products = [] } = useListProducts();
   const { data: categories = [] } = useListCategories();
+
+  useDetailUrlSync({ items: products, open, currentRow, setCurrentRow, setOpen, dialog: 'edit' });
 
   const categoriesById = useMemo(() => {
     const map: Record<string, string> = {};

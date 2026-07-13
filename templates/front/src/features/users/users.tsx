@@ -13,11 +13,14 @@ import { useListAdmins } from '@/features/users/usecases/use-list-admins';
 import { UserDeleteDialog } from './components/user-delete-dialog';
 import { UserFormDialog } from './components/user-form-dialog';
 import { UsersListingToolbar } from './components/users-listing-toolbar';
+import { useDetailUrlSync } from '@/hooks/use-detail-url-sync';
 
 function UsersContent() {
   const t = useTranslations();
-  const { setOpen } = useUser();
+  const { open, setOpen, currentRow, setCurrentRow } = useUser();
   const { data: admins = [] } = useListAdmins();
+
+  useDetailUrlSync({ items: admins, open, currentRow, setCurrentRow, setOpen, dialog: 'edit' });
 
   return (
     <div className="space-y-6">
