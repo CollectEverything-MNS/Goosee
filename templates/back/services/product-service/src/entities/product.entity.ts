@@ -27,9 +27,6 @@ export class Product {
   price: number;
 
   @Column({ default: 0 })
-  stock: number;
-
-  @Column({ default: 0 })
   preparationTime: number;
 
   @Column({ nullable: true, type: 'float' })

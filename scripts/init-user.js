@@ -12,9 +12,8 @@
  *   yarn init:user                       # admin@goosee.dev / goosee
  *   INIT_USER_EMAIL=... INIT_USER_PASSWORD=... yarn init:user
  *
- * Pré-requis : la stack doit avoir tourné au moins une fois (yarn start:dev)
- * pour que TypeORM ait créé les tables. Les bases doivent être accessibles
- * (yarn infra ou yarn start:dev).
+ * Pré-requis : la stack doit avoir tourné au moins une fois (yarn infra + yarn dev)
+ * pour que TypeORM ait créé les tables. Les bases doivent être accessibles (yarn infra).
  */
 const { Client } = require('pg');
 const bcrypt = require('bcryptjs');
@@ -53,7 +52,7 @@ async function connect(config, label) {
     if (err.code === 'ECONNREFUSED') {
       throw new Error(
         `Impossible de joindre la base ${label} (${config.host}:${config.port}). ` +
-          'Démarre l\'infra avec `yarn infra` ou la stack avec `yarn start:dev`.'
+          'Démarre l\'infra avec `yarn infra`.'
       );
     }
     throw err;
@@ -65,7 +64,7 @@ function handleMissingTable(err, label) {
   if (err.code === '42P01') {
     throw new Error(
       `La table "${label}" n'existe pas encore. Lance la stack au moins une fois ` +
-        '(`yarn start:dev`) pour que TypeORM crée le schéma, puis relance `yarn init:user`.'
+        '(`yarn infra` + `yarn dev`) pour que TypeORM crée le schéma, puis relance `yarn init:user`.'
     );
   }
   throw err;

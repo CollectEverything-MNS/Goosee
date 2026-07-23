@@ -20,11 +20,10 @@ export class CreateProductUseCase {
       name: dto.name,
       description: dto.description,
       price: dto.price,
-      stock: dto.stock,
       preparationTime: dto.preparationTime ?? 0,
       sizeValue: dto.sizeValue,
       sizeUnit: dto.sizeUnit,
-      isAvailable: dto.stock === 0 ? false : (dto.isAvailable ?? true),
+      isAvailable: dto.isAvailable ?? true,
       categoryId: categoryIds[0],
       categoryIds,
     });

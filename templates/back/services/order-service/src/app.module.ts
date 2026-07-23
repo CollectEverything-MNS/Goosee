@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { HealthController } from './health/health.controller';
 import { MetricsController } from './metrics/metrics.controller';
@@ -20,6 +21,7 @@ import { GetOrderUseCase } from './usecases/get-order/get-order.usecase';
 import { UpdateOrderStatusController } from './usecases/update-order-status/update-order-status.controller';
 import { UpdateOrderStatusUseCase } from './usecases/update-order-status/update-order-status.usecase';
 import { ProductClient } from './shared/product-client.service';
+import { StockClient } from './shared/stock-client.service';
 
 @Module({
   imports: [
@@ -43,6 +45,21 @@ import { ProductClient } from './shared/product-client.service';
       }),
     }),
     TypeOrmModule.forFeature([Order]),
+
+    ClientsModule.registerAsync([
+      {
+        name: 'STOCK_CLIENT',
+        inject: [ConfigService],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [cfg.get<string>('RABBITMQ_URL')!],
+            queue: 'stock_events',
+            queueOptions: { durable: true },
+          },
+        }),
+      },
+    ]),
   ],
   controllers: [
     HealthController,
@@ -63,6 +80,7 @@ import { ProductClient } from './shared/product-client.service';
     GetOrderUseCase,
     UpdateOrderStatusUseCase,
     ProductClient,
+    StockClient,
   ],
 })
 export class AppModule {}

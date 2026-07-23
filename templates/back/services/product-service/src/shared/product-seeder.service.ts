@@ -21,7 +21,6 @@ interface SeedProduct {
   name: string;
   description: string;
   price: number;
-  stock: number;
   preparationTime: number;
   sizeValue?: number;
   sizeUnit?: string;
@@ -47,7 +46,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Baguette tradition',
         description: 'Baguette à la croûte croustillante et la mie alvéolée, façonnée à la main.',
         price: 1.3,
-        stock: 80,
         preparationTime: 0,
         sizeValue: 250,
         sizeUnit: 'g',
@@ -63,7 +61,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Pain de campagne',
         description: 'Pâte au levain naturel, légèrement acidulée, longue conservation.',
         price: 3.2,
-        stock: 40,
         preparationTime: 0,
         sizeValue: 500,
         sizeUnit: 'g',
@@ -79,7 +76,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Pain aux céréales',
         description: 'Mélange de graines de tournesol, lin et sésame pour un pain rustique.',
         price: 3.5,
-        stock: 35,
         preparationTime: 0,
         sizeValue: 400,
         sizeUnit: 'g',
@@ -102,7 +98,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Croissant au beurre',
         description: 'Viennoiserie pur beurre AOP, feuilletée, dorée et fondante.',
         price: 1.2,
-        stock: 100,
         preparationTime: 0,
         imageKeyword: 'croissant',
         attributes: [
@@ -115,7 +110,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Pain au chocolat',
         description: 'Deux barres de chocolat noir enveloppées d\'une pâte feuilletée pur beurre.',
         price: 1.4,
-        stock: 90,
         preparationTime: 0,
         imageKeyword: 'pastry,chocolate',
         attributes: [
@@ -128,7 +122,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Chausson aux pommes',
         description: 'Compote de pommes maison dans un feuilletage croustillant.',
         price: 1.8,
-        stock: 50,
         preparationTime: 0,
         imageKeyword: 'pastry,apple',
         attributes: [
@@ -148,7 +141,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Éclair au chocolat',
         description: 'Pâte à choux garnie de crème pâtissière au chocolat et glaçage brillant.',
         price: 3.5,
-        stock: 30,
         preparationTime: 0,
         imageKeyword: 'eclair,pastry',
         attributes: [
@@ -162,7 +154,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Tarte aux fraises',
         description: 'Pâte sablée, crème d\'amande et fraises fraîches de saison.',
         price: 4.2,
-        stock: 18,
         preparationTime: 0,
         imageKeyword: 'tart,strawberry',
         attributes: [
@@ -176,7 +167,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Flan pâtissier',
         description: 'Appareil à flan vanillé sur fond de pâte, cuit lentement.',
         price: 3.0,
-        stock: 24,
         preparationTime: 0,
         imageKeyword: 'flan,tart',
         attributes: [
@@ -196,7 +186,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Café expresso',
         description: 'Café 100% arabica, torréfaction artisanale, corsé et aromatique.',
         price: 1.8,
-        stock: 200,
         preparationTime: 2,
         sizeValue: 5,
         sizeUnit: 'cl',
@@ -211,7 +200,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Jus d\'orange pressé',
         description: 'Oranges pressées minute, sans sucre ajouté.',
         price: 3.5,
-        stock: 40,
         preparationTime: 3,
         sizeValue: 25,
         sizeUnit: 'cl',
@@ -226,7 +214,6 @@ const SEED_CATALOG: SeedCategory[] = [
         name: 'Chocolat chaud',
         description: 'Chocolat noir fondu et lait entier mousseux.',
         price: 3.2,
-        stock: 60,
         preparationTime: 4,
         sizeValue: 25,
         sizeUnit: 'cl',
@@ -306,7 +293,6 @@ export class ProductSeederService implements OnApplicationBootstrap {
             name: seed.name,
             description: seed.description,
             price: seed.price,
-            stock: seed.stock,
             preparationTime: seed.preparationTime,
             sizeValue: seed.sizeValue,
             sizeUnit: seed.sizeUnit,

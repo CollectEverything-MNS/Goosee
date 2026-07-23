@@ -18,11 +18,6 @@ export class CreateProductDto {
   @Min(1)
   price: number;
 
-  @ApiProperty({ example: 50 })
-  @IsNumber()
-  @Min(0)
-  stock: number;
-
   @ApiPropertyOptional({ example: 0 })
   @IsOptional()
   @IsNumber()

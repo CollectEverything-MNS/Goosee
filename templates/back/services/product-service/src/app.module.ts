@@ -46,8 +46,6 @@ import { ListProductsByCategoryController } from './usecases/list-products-by-ca
 import { ListProductsByCategoryUseCase } from './usecases/list-products-by-category/list-products-by-category.usecase';
 import { ListProductsController } from './usecases/list-products/list-products.controller';
 import { ListProductsUseCase } from './usecases/list-products/list-products.usecase';
-import { UpdateProductStockController } from './usecases/update-product-stock/update-product-stock.controller';
-import { UpdateProductStockUseCase } from './usecases/update-product-stock/update-product-stock.usecase';
 import { UpdateProductController } from './usecases/update-product/update-product.controller';
 import { UpdateProductUseCase } from './usecases/update-product/update-product.usecase';
 import { StorageService } from './services/storage.service';
@@ -139,7 +137,6 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     GetProductController,
     ListProductsController,
     ListProductsByCategoryController,
-    UpdateProductStockController,
     GetProductImagesController,
     AddProductImageController,
     DeleteProductImageController,
@@ -175,7 +172,6 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     GetProductUseCase,
     ListProductsUseCase,
     ListProductsByCategoryUseCase,
-    UpdateProductStockUseCase,
     StorageService,
     GetProductImagesUseCase,
     AddProductImageUseCase,
