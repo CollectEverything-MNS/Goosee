@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useSiteTemplate } from '@/hooks/use-site-template';
 import { useListProducts } from '@/features/products/usecases/use-list-products';
+import { useListStocks } from '@/features/stock/usecases/use-list-stocks';
 
 import { BlockPropsWithContext, FeaturedProductsBlockProps } from './types';
 
@@ -88,7 +89,14 @@ function mainImageUrl(images?: Array<{ url: string; isMain: boolean; order: numb
 function useFeaturedItems(productsJson: unknown, filters: FeaturedFilters): Product[] {
   const locale = useLocale();
   const { data } = useListProducts();
+  const { data: stocks } = useListStocks();
   const { categoryId, limit, sort, availableOnly } = filters;
+
+  const availableByProductId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const s of stocks ?? []) map.set(s.productId, s.available);
+    return map;
+  }, [stocks]);
 
   return useMemo(() => {
     if (Array.isArray(data) && data.length > 0) {
@@ -99,7 +107,10 @@ function useFeaturedItems(productsJson: unknown, filters: FeaturedFilters): Prod
           return ids.includes(categoryId);
         });
       }
-      if (availableOnly) filtered = filtered.filter((p) => p.isAvailable && Number(p.stock) > 0);
+      if (availableOnly)
+        filtered = filtered.filter(
+          (p) => p.isAvailable && (availableByProductId.get(p.id) ?? 0) > 0
+        );
 
       const sorted = sortProducts(filtered, sort);
       const max = limit && limit > 0 ? limit : DEFAULT_LIMIT;
@@ -110,11 +121,11 @@ function useFeaturedItems(productsJson: unknown, filters: FeaturedFilters): Prod
         price: formatPrice(Number(p.price)),
         image: mainImageUrl(p.images),
         link: `/${locale}/produits/${p.id}`,
-        soldOut: !p.isAvailable || Number(p.stock) <= 0,
+        soldOut: !p.isAvailable || (availableByProductId.get(p.id) ?? 0) <= 0,
       }));
     }
     return parseProducts(productsJson);
-  }, [data, productsJson, categoryId, limit, sort, availableOnly, locale]);
+  }, [data, productsJson, categoryId, limit, sort, availableOnly, locale, availableByProductId]);
 }
 
 /** Rend la carte cliquable vers la page detail (sauf en preview builder). */

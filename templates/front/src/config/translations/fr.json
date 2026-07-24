@@ -187,6 +187,7 @@
         "roles": "Rôles",
         "logs": "Logs"
       },
+      "stock": "Stock",
       "logout": "Déconnexion"
     },
     "create": {
@@ -308,6 +309,7 @@
       "analytics": "Statistiques",
       "products": "Produits",
       "categories": "Catégories",
+      "stock": "Stock",
       "clients": "Clients",
       "returnClients": "Retour clients",
       "users": "Utilisateurs",
@@ -457,13 +459,10 @@
         "product": "Produit",
         "category": "Catégorie",
         "price": "Prix",
-        "stock": "Stock",
         "availability": "Disponibilité",
         "createdAt": "Créé le",
         "available": "Disponible",
-        "unavailable": "Indisponible",
-        "unit": "unité",
-        "units": "unités"
+        "unavailable": "Indisponible"
       },
       "actions": {
         "edit": "Modifier",
@@ -488,7 +487,6 @@
         "categoryPlaceholder": "Sélectionner une catégorie",
         "noCategories": "Aucune catégorie disponible — créez-en une d'abord.",
         "price": "Prix",
-        "stock": "Stock disponible",
         "preparationTime": "Temps de préparation",
         "preparationHint": "Délai estimé avant expédition (0 = immédiat).",
         "minutes": "min",
@@ -511,6 +509,45 @@
         "confirm": "Supprimer",
         "success": "Produit supprimé",
         "error": "Erreur lors de la suppression"
+      }
+    },
+    "stock": {
+      "count": "{count, plural, =0 {Aucun produit en stock} one {# produit en stock} other {# produits en stock}}",
+      "searchPlaceholder": "Rechercher un produit...",
+      "table": {
+        "product": "Produit",
+        "quantity": "Quantité",
+        "available": "Disponible"
+      },
+      "actions": {
+        "adjust": "Ajuster",
+        "history": "Historique"
+      },
+      "adjust": {
+        "title": "Ajuster le stock",
+        "subtitle": "{name}",
+        "deltaLabel": "Ajustement (+/-)",
+        "deltaHint": "Valeur positive pour réassortir, négative pour retirer.",
+        "cancel": "Annuler",
+        "confirm": "Valider",
+        "success": "Stock ajusté avec succès",
+        "error": "Erreur lors de l'ajustement du stock"
+      },
+      "movements": {
+        "title": "Historique des mouvements",
+        "back": "Retour au stock",
+        "empty": "Aucun mouvement enregistré",
+        "columns": {
+          "date": "Date",
+          "delta": "Quantité",
+          "type": "Type",
+          "order": "Commande"
+        },
+        "types": {
+          "sale": "Vente",
+          "restock": "Réassort",
+          "correction": "Correction manuelle"
+        }
       }
     },
     "categories": {

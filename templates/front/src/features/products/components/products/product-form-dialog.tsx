@@ -50,7 +50,6 @@ const formSchema = z.object({
   name: z.string().min(2).max(150),
   description: z.string().optional().or(z.literal('')),
   price: z.number().min(1),
-  stock: z.number().int().min(0),
   preparationTime: z.number().int().min(0),
   sizeValue: z.number().min(0).optional().nullable(),
   sizeUnit: z.string().optional().or(z.literal('')),
@@ -76,7 +75,6 @@ export function ProductFormDialog() {
       name: '',
       description: '',
       price: 1,
-      stock: 0,
       preparationTime: 0,
       sizeValue: null,
       sizeUnit: '',
@@ -91,7 +89,6 @@ export function ProductFormDialog() {
         name: currentRow.name ?? '',
         description: currentRow.description ?? '',
         price: Number(currentRow.price) || 1,
-        stock: Number(currentRow.stock) || 0,
         preparationTime: Number(currentRow.preparationTime) || 0,
         sizeValue: currentRow.sizeValue != null ? Number(currentRow.sizeValue) : null,
         sizeUnit: currentRow.sizeUnit ?? '',
@@ -107,7 +104,6 @@ export function ProductFormDialog() {
         name: '',
         description: '',
         price: 1,
-        stock: 0,
         preparationTime: 0,
         sizeValue: null,
         sizeUnit: '',
@@ -128,7 +124,6 @@ export function ProductFormDialog() {
         name: values.name,
         description: values.description || undefined,
         price: values.price,
-        stock: values.stock,
         preparationTime: values.preparationTime || undefined,
         sizeValue: values.sizeValue ?? undefined,
         sizeUnit: values.sizeUnit || undefined,
@@ -266,58 +261,34 @@ export function ProductFormDialog() {
                 <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {t('form.sections.pricing')}
                 </h3>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-medium">{t('form.price')}</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type="number"
-                              min={1}
-                              step="0.01"
-                              className="h-10 pr-8"
-                              value={field.value ?? 0}
-                              onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                              onBlur={field.onBlur}
-                              name={field.name}
-                              ref={field.ref}
-                            />
-                            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                              €
-                            </span>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="stock"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-medium">{t('form.stock')}</FormLabel>
-                        <FormControl>
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-medium">{t('form.price')}</FormLabel>
+                      <FormControl>
+                        <div className="relative max-w-[240px]">
                           <Input
                             type="number"
-                            min={0}
-                            className="h-10"
+                            min={1}
+                            step="0.01"
+                            className="h-10 pr-8"
                             value={field.value ?? 0}
                             onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                             onBlur={field.onBlur}
                             name={field.name}
                             ref={field.ref}
                           />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                            €
+                          </span>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </section>
 
               <section className="space-y-3">
