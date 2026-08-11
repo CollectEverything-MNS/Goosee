@@ -55,6 +55,7 @@ const formSchema = z.object({
   sizeUnit: z.string().optional().or(z.literal('')),
   isAvailable: z.boolean(),
   categoryIds: z.array(z.string().uuid()).min(1, { message: 'Au moins une catégorie' }),
+  initialStock: z.number().int().min(0).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -80,6 +81,7 @@ export function ProductFormDialog() {
       sizeUnit: '',
       isAvailable: true,
       categoryIds: [],
+      initialStock: 0,
     },
   });
 
@@ -109,6 +111,7 @@ export function ProductFormDialog() {
         sizeUnit: '',
         isAvailable: true,
         categoryIds: [],
+        initialStock: 0,
       });
     }
   }, [open, currentRow, isEditing, form]);
@@ -134,7 +137,7 @@ export function ProductFormDialog() {
         await updateMutation.mutateAsync({ id: currentRow.id, data: payload });
         toast.success(t('form.updateSuccess'));
       } else {
-        await createMutation.mutateAsync(payload);
+        await createMutation.mutateAsync({ ...payload, initialStock: values.initialStock ?? 0 });
         toast.success(t('form.createSuccess'));
       }
       handleClose();
@@ -379,6 +382,35 @@ export function ProductFormDialog() {
                     )}
                   />
                 </div>
+                {!isEditing && (
+                  <FormField
+                    control={form.control}
+                    name="initialStock"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium">
+                          {t('form.initialStock')}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={0}
+                            className="h-10 max-w-[240px]"
+                            value={field.value ?? 0}
+                            onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                            ref={field.ref}
+                          />
+                        </FormControl>
+                        <FormDescription className="text-[11px]">
+                          {t('form.initialStockHint')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </section>
 
               <section className="space-y-3">

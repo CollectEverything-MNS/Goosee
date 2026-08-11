@@ -11,6 +11,7 @@ import { ProductImage } from '../entities/product-image.entity';
 import { Tag } from '../entities/tag.entity';
 import { ProductTag } from '../entities/product-tag.entity';
 import { ProductAttribute } from '../entities/product-attribute.entity';
+import { StockClient } from '../services/stock-client.service';
 
 interface SeedAttribute {
   key: string;
@@ -228,6 +229,9 @@ const SEED_CATALOG: SeedCategory[] = [
   },
 ];
 
+/** Quantité de démo attribuée aux produits seedés, pour pouvoir tester la vitrine sans réajuster le stock à la main. */
+const DEFAULT_SEED_STOCK = 40;
+
 function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -249,6 +253,7 @@ export class ProductSeederService implements OnApplicationBootstrap {
     private readonly tagRepo: ITagRepository,
     private readonly productTagRepo: IProductTagRepository,
     private readonly attributeRepo: IProductAttributeRepository,
+    private readonly stockClient: StockClient,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -303,6 +308,8 @@ export class ProductSeederService implements OnApplicationBootstrap {
         );
         existingNames.add(seed.name);
         created++;
+
+        this.stockClient.productCreated(product.id, DEFAULT_SEED_STOCK);
 
         await this.imageRepo.save(
           new ProductImage({

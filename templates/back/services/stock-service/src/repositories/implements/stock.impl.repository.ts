@@ -48,4 +48,11 @@ export class TypeOrmStockRepository implements IStockRepository {
       return saved;
     });
   }
+
+  async initialize(productId: string, quantity: number): Promise<void> {
+    const existing = await this.repository.findOne({ where: { productId } });
+    if (existing) return;
+
+    await this.repository.save(this.repository.create({ productId, quantity }));
+  }
 }

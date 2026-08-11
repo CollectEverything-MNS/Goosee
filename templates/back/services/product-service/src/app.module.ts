@@ -8,6 +8,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MulterModule } from '@nestjs/platform-express';
 
 import { LogClient } from './services/log-client.service';
+import { StockClient } from './services/stock-client.service';
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
@@ -119,6 +120,18 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
           },
         }),
       },
+      {
+        name: 'STOCK_CLIENT',
+        inject: [ConfigService],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [cfg.get<string>('RABBITMQ_URL')!],
+            queue: 'stock_events',
+            queueOptions: { durable: true },
+          },
+        }),
+      },
     ]),
     MulterModule.register({ storage: undefined }),
   ],
@@ -166,6 +179,7 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     GetCategoryUseCase,
     ListCategoriesUseCase,
     LogClient,
+    StockClient,
     CreateProductUseCase,
     UpdateProductUseCase,
     DeleteProductUseCase,

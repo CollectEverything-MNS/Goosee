@@ -4,13 +4,15 @@ import { ICategoryRepository } from '../../repositories/category.repository';
 import { CreateProductDto } from './create-product.dto';
 import { Product } from '../../entities/product.entity';
 import { LogClient } from '../../services/log-client.service';
+import { StockClient } from '../../services/stock-client.service';
 
 @Injectable()
 export class CreateProductUseCase {
   constructor(
     private readonly productRepo: IProductRepository,
     private readonly categoryRepo: ICategoryRepository,
-    private readonly logClient: LogClient
+    private readonly logClient: LogClient,
+    private readonly stockClient: StockClient
   ) {}
 
   async execute(dto: CreateProductDto) {
@@ -29,6 +31,8 @@ export class CreateProductUseCase {
     });
 
     const saved = await this.productRepo.save(product);
+
+    this.stockClient.productCreated(saved.id, dto.initialStock);
 
     this.logClient.success({
       message: `Produit créé : ${saved.name}`,

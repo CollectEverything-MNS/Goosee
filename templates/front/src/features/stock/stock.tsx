@@ -18,17 +18,28 @@ function StockContent() {
   const { data: stocks = [] } = useListStocks();
   const { data: products = [] } = useListProducts();
 
-  const productsById = useMemo(() => {
-    const map: Record<string, any> = {};
-    for (const p of products) {
-      if (p?.id) map[p.id] = p;
+  const stocksByProductId = useMemo(() => {
+    const map: Record<string, (typeof stocks)[number]> = {};
+    for (const s of stocks) {
+      if (s?.productId) map[s.productId] = s;
     }
     return map;
-  }, [products]);
+  }, [stocks]);
 
+  // On part du catalogue produit (la source de vérité), pas des lignes stock-service :
+  // un produit sans stock initialisé doit quand même apparaître (à 0) pour pouvoir l'ajuster.
   const rows = useMemo(
-    () => stocks.map((s) => ({ ...s, product: productsById[s.productId] })),
-    [stocks, productsById]
+    () =>
+      products.map((p) => {
+        const s = stocksByProductId[p.id];
+        return {
+          productId: p.id,
+          quantity: s?.quantity ?? 0,
+          available: s?.available ?? 0,
+          product: p,
+        };
+      }),
+    [products, stocksByProductId]
   );
 
   const columns = useStockColumns();

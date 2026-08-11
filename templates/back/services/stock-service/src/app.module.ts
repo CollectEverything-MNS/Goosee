@@ -24,6 +24,8 @@ import { ReleaseReservationUseCase } from './usecases/release-reservation/releas
 import { ReleaseReservationEventsListener } from './usecases/release-reservation/release-reservation.event';
 import { AdjustStockUseCase } from './usecases/adjust-stock/adjust-stock.usecase';
 import { AdjustStockController } from './usecases/adjust-stock/adjust-stock.controller';
+import { CreateStockUseCase } from './usecases/create-stock/create-stock.usecase';
+import { CreateStockEventsListener } from './usecases/create-stock/create-stock.event';
 import { GetStockUseCase } from './usecases/get-stock/get-stock.usecase';
 import { GetStockController } from './usecases/get-stock/get-stock.controller';
 import { ListStockUseCase } from './usecases/list-stock/list-stock.usecase';
@@ -69,6 +71,7 @@ const ENTITIES = [Stock, StockReservation, StockMovement];
     GetStockController,
     ListStockController,
     ListStockMovementsController,
+    CreateStockEventsListener,
   ],
   providers: [
     { provide: IStockRepository, useClass: TypeOrmStockRepository },
@@ -81,6 +84,7 @@ const ENTITIES = [Stock, StockReservation, StockMovement];
     GetStockUseCase,
     ListStockUseCase,
     ListStockMovementsUseCase,
+    CreateStockUseCase,
     ReservationSweeperService,
   ],
 })

@@ -494,6 +494,8 @@
         "sizeUnit": "Unité",
         "isAvailable": "Produit disponible à la vente",
         "isAvailableHint": "Désactivez pour le retirer temporairement du catalogue.",
+        "initialStock": "Stock initial",
+        "initialStockHint": "Quantité en stock à la création. Ensuite, ajustez le stock depuis la page Stock.",
         "cancel": "Annuler",
         "create": "Créer le produit",
         "update": "Enregistrer",

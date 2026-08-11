@@ -12,6 +12,7 @@ export interface CreateProductPayload {
   isAvailable?: boolean;
   categoryId?: string;
   categoryIds: string[];
+  initialStock?: number;
 }
 
 export function useCreateProduct() {

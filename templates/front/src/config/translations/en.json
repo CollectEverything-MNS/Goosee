@@ -495,6 +495,8 @@
         "sizeUnit": "Unit",
         "isAvailable": "Available for sale",
         "isAvailableHint": "Disable to temporarily remove from the catalog.",
+        "initialStock": "Initial stock",
+        "initialStockHint": "Quantity in stock at creation. Adjust stock afterwards from the Stock page.",
         "cancel": "Cancel",
         "create": "Create product",
         "update": "Save",
