@@ -3,6 +3,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Stock } from '../../entities/stock.entity';
 import { StockMovement } from '../../entities/stock-movement.entity';
+import { StockReservation } from '../../entities/stock-reservation.entity';
 import { IStockRepository, InsufficientStockError } from '../stock.repository';
 
 @Injectable()
@@ -36,6 +37,28 @@ export class TypeOrmStockRepository implements IStockRepository {
       const newQuantity = stock.quantity + delta;
       if (newQuantity < 0) {
         throw new InsufficientStockError(`Stock insuffisant. Stock actuel : ${stock.quantity}`);
+      }
+
+      // Sur une baisse manuelle, on ne peut pas descendre sous ce qui est déjà
+      // réservé (statut `held`) pour des commandes pas encore confirmées : sinon
+      // `confirmByOrderId` ferait passer la quantité en négatif (survente).
+      // Le lock `pessimistic_write` ci-dessus sérialise cette lecture avec `reserveAll`.
+      if (delta < 0) {
+        const heldRow = await manager
+          .getRepository(StockReservation)
+          .createQueryBuilder('r')
+          .select('COALESCE(SUM(r.quantity), 0)', 'sum')
+          .where('r.productId = :productId', { productId })
+          .andWhere('r.status = :status', { status: 'held' })
+          .getRawOne<{ sum: string }>();
+        const held = Number(heldRow?.sum ?? 0);
+
+        if (newQuantity < held) {
+          throw new InsufficientStockError(
+            `Stock insuffisant : ${held} unité(s) déjà réservée(s) pour des commandes en cours ` +
+              `(stock actuel ${stock.quantity}).`
+          );
+        }
       }
 
       stock.quantity = newQuantity;

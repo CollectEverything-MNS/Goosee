@@ -55,6 +55,19 @@ describe('AdjustStockUseCase', () => {
     );
   });
 
+  it('devrait renvoyer une BadRequestException si le repo refuse à cause des réservations en cours', async () => {
+    stockRepo.adjust.mockRejectedValue(
+      new InsufficientStockError(
+        'Stock insuffisant : 8 unité(s) déjà réservée(s) pour des commandes en cours (stock actuel 10).'
+      )
+    );
+
+    await expect(usecase.execute('product-1', { quantity: -5 })).rejects.toThrow(BadRequestException);
+    await expect(usecase.execute('product-1', { quantity: -5 })).rejects.toThrow(
+      'déjà réservée(s) pour des commandes en cours'
+    );
+  });
+
   it('devrait laisser remonter une erreur inattendue telle quelle', async () => {
     stockRepo.adjust.mockRejectedValue(new Error('DB down'));
 
