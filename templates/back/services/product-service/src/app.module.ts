@@ -8,6 +8,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MulterModule } from '@nestjs/platform-express';
 
 import { LogClient } from './services/log-client.service';
+import { StockClient } from './services/stock-client.service';
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
@@ -46,8 +47,6 @@ import { ListProductsByCategoryController } from './usecases/list-products-by-ca
 import { ListProductsByCategoryUseCase } from './usecases/list-products-by-category/list-products-by-category.usecase';
 import { ListProductsController } from './usecases/list-products/list-products.controller';
 import { ListProductsUseCase } from './usecases/list-products/list-products.usecase';
-import { UpdateProductStockController } from './usecases/update-product-stock/update-product-stock.controller';
-import { UpdateProductStockUseCase } from './usecases/update-product-stock/update-product-stock.usecase';
 import { UpdateProductController } from './usecases/update-product/update-product.controller';
 import { UpdateProductUseCase } from './usecases/update-product/update-product.usecase';
 import { StorageService } from './services/storage.service';
@@ -121,6 +120,18 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
           },
         }),
       },
+      {
+        name: 'STOCK_CLIENT',
+        inject: [ConfigService],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [cfg.get<string>('RABBITMQ_URL')!],
+            queue: 'stock_events',
+            queueOptions: { durable: true },
+          },
+        }),
+      },
     ]),
     MulterModule.register({ storage: undefined }),
   ],
@@ -139,7 +150,6 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     GetProductController,
     ListProductsController,
     ListProductsByCategoryController,
-    UpdateProductStockController,
     GetProductImagesController,
     AddProductImageController,
     DeleteProductImageController,
@@ -169,13 +179,13 @@ const ENTITIES = [Category, Product, ProductImage, Tag, ProductTag, ProductAttri
     GetCategoryUseCase,
     ListCategoriesUseCase,
     LogClient,
+    StockClient,
     CreateProductUseCase,
     UpdateProductUseCase,
     DeleteProductUseCase,
     GetProductUseCase,
     ListProductsUseCase,
     ListProductsByCategoryUseCase,
-    UpdateProductStockUseCase,
     StorageService,
     GetProductImagesUseCase,
     AddProductImageUseCase,

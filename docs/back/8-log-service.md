@@ -178,7 +178,8 @@ LOG_DB_NAME=log_db
 
 1. Démarrer la stack :
 ```bash
-yarn start:dev:build
+yarn infra
+yarn dev
 ```
 
 2. Déclencher une opération qui logge (ex: créer un user via le front).

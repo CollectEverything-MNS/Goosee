@@ -27,6 +27,7 @@ export const ADMIN_PAGE_GROUPS: AdminPageGroup[] = [
     pages: [
       { key: 'products', label: 'Produits' },
       { key: 'categories', label: 'Catégories' },
+      { key: 'stock', label: 'Stock' },
     ],
   },
   {

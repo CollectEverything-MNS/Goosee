@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 export interface RemoteProduct {
   id: string;
   name: string;
-  stock: number;
   isAvailable: boolean;
 }
 
@@ -30,27 +29,10 @@ export class ProductClient {
       const data = (await res.json()) as { product?: RemoteProduct };
       return data.product ?? null;
     } catch (err) {
-      this.logger.warn(`product-service injoignable (getProduct ${id}) : ${(err as Error).message}`);
+      this.logger.warn(
+        `product-service injoignable (getProduct ${id}) : ${(err as Error).message}`
+      );
       return null;
-    }
-  }
-
-  /** Ajuste le stock d'un delta (négatif pour décrémenter). Retourne false en cas d'échec. */
-  async adjustStock(id: string, quantityDelta: number): Promise<boolean> {
-    try {
-      const res = await fetch(`${this.baseUrl}/products/${id}/stock`, {
-        method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ quantity: quantityDelta }),
-      });
-      if (!res.ok) {
-        this.logger.warn(`Ajustement stock échoué pour ${id} (HTTP ${res.status}).`);
-        return false;
-      }
-      return true;
-    } catch (err) {
-      this.logger.warn(`product-service injoignable (adjustStock ${id}) : ${(err as Error).message}`);
-      return false;
     }
   }
 }

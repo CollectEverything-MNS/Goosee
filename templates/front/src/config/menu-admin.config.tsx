@@ -2,6 +2,7 @@
 
 import {
   BarChart3,
+  Boxes,
   Layers,
   LayoutDashboard,
   LucideIcon,
@@ -64,6 +65,12 @@ export function getAdminMenu(): AdminMenuSection[] {
           path: routes.gooseeAdmin.categories.getHref(locale),
           icon: Tags,
           pageKey: 'categories',
+        },
+        {
+          name: 'admin.sidebar.stock',
+          path: routes.gooseeAdmin.stock.getHref(locale),
+          icon: Boxes,
+          pageKey: 'stock',
         },
       ],
     },

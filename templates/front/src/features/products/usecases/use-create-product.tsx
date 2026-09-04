@@ -6,13 +6,13 @@ export interface CreateProductPayload {
   name: string;
   description?: string;
   price: number;
-  stock: number;
   preparationTime?: number;
   sizeValue?: number;
   sizeUnit?: string;
   isAvailable?: boolean;
   categoryId?: string;
   categoryIds: string[];
+  initialStock?: number;
 }
 
 export function useCreateProduct() {

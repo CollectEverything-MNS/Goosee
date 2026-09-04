@@ -17,11 +17,6 @@ export class CreateProductDto {
   @Min(1)
   price: number;
 
-  @ApiProperty({ example: 50 })
-  @IsNumber()
-  @Min(0)
-  stock: number;
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
@@ -55,4 +50,10 @@ export class CreateProductDto {
   @ArrayNotEmpty()
   @IsUUID(undefined, { each: true })
   categoryIds?: string[];
+
+  @ApiPropertyOptional({ example: 20, description: 'Quantité en stock à la création du produit' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  initialStock?: number;
 }
