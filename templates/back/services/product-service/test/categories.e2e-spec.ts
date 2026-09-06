@@ -103,7 +103,7 @@ describe('Categories (e2e)', () => {
     await request(app.getHttpServer()).post('/products').send({
       name: 'Château Margaux',
       price: 100,
-      stock: 5,
+      initialStock: 5,
       categoryId: category.body.category.id,
     });
 

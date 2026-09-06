@@ -25,10 +25,10 @@ describe('TypeOrmProductRepository (integration)', () => {
       name: 'Pizza',
       description: 'Pizza margherita',
       price: 10,
-      stock: 5,
       preparationTime: 0,
       isAvailable: true,
       categoryId: 'category-1',
+      categoryIds: ['category-1'],
       ...overrides,
     });
 
