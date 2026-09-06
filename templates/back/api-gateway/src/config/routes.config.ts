@@ -10,6 +10,7 @@ const ordersBasePath = '/orders';
 const cartBasePath = '/cart';
 const paymentsBasePath = '/payments';
 const ticketsBasePath = '/tickets';
+const stockBasePath = '/stock';
 
 export const routesConfig = {
   upload: {
@@ -179,10 +180,6 @@ export const routesConfig = {
       path: `${productsBasePath}/:id`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}`,
     },
-    updateStock: {
-      path: `${productsBasePath}/:id/stock`,
-      link: (serviceUrl: string, id: string) => `${serviceUrl}${productsBasePath}/${id}/stock`,
-    },
     // Images
     getImages: {
       path: `${productsBasePath}/:id/images`,
@@ -342,6 +339,25 @@ export const routesConfig = {
     deleteTag: {
       path: `${tagsBasePath}/:id`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${tagsBasePath}/${id}`,
+    },
+  },
+
+  stock: {
+    listStock: {
+      path: stockBasePath,
+      link: (serviceUrl: string) => `${serviceUrl}${stockBasePath}`,
+    },
+    getStock: {
+      path: `${stockBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${stockBasePath}/${id}`,
+    },
+    adjustStock: {
+      path: `${stockBasePath}/:id`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${stockBasePath}/${id}`,
+    },
+    listStockMovements: {
+      path: `${stockBasePath}/:id/movements`,
+      link: (serviceUrl: string, id: string) => `${serviceUrl}${stockBasePath}/${id}/movements`,
     },
   },
 };

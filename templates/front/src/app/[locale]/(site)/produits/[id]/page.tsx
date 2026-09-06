@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useGetProduct } from '@/features/products/usecases/use-get-product';
 import { RelatedProducts } from '@/features/products/components/related-products';
 import { useCartContext } from '@/features/cart/context/cart-provider';
+import { useGetStock } from '@/features/stock/usecases/use-get-stock';
 
 function formatPrice(value: number, locale: string) {
   return new Intl.NumberFormat(locale, {
@@ -25,6 +26,7 @@ export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const locale = useLocale();
   const { data: product, isLoading, isError } = useGetProduct(params.id);
+  const { data: stock } = useGetStock(params.id);
   const cart = useCartContext();
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -55,7 +57,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const outOfStock = !product.isAvailable || product.stock <= 0;
+  const outOfStock = !product.isAvailable || (stock?.available ?? 0) <= 0;
 
   const handleAddToCart = () => {
     cart?.addItem(
@@ -188,8 +190,8 @@ export default function ProductDetailPage() {
               </Button>
             </div>
 
-            {!outOfStock && product.stock <= 5 && (
-              <p className="text-sm text-amber-600">Plus que {product.stock} en stock !</p>
+            {!outOfStock && (stock?.available ?? 0) <= 5 && (
+              <p className="text-sm text-amber-600">Plus que {stock?.available} en stock !</p>
             )}
           </div>
         </div>

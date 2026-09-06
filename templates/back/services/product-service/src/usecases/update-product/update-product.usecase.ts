@@ -35,23 +35,15 @@ export class UpdateProductUseCase {
       nextCategoryIds = await this.resolveCategoryIds([dto.categoryId]);
     }
 
-    const newStock = dto.stock ?? product.stock;
-
-    let newIsAvailable = dto.isAvailable ?? product.isAvailable;
-    if (newStock === 0) {
-      newIsAvailable = false;
-    }
-
     const updated = {
       ...product,
       name: dto.name ?? product.name,
       description: dto.description ?? product.description,
       price: dto.price ?? product.price,
-      stock: newStock,
       preparationTime: dto.preparationTime ?? product.preparationTime,
       sizeValue: dto.sizeValue ?? product.sizeValue,
       sizeUnit: dto.sizeUnit ?? product.sizeUnit,
-      isAvailable: newIsAvailable,
+      isAvailable: dto.isAvailable ?? product.isAvailable,
       categoryId: nextCategoryIds[0] ?? product.categoryId,
       categoryIds: nextCategoryIds,
     };

@@ -18,6 +18,7 @@ import { PaymentsModule } from './services/payments/payments.module';
 import { TagsModule } from './services/tags/tags.module';
 import { LogsModule } from './services/logs/logs.module';
 import { TicketsModule } from './services/tickets/tickets.module';
+import { StockModule } from './services/stock/stock.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { TicketsModule } from './services/tickets/tickets.module';
     LogsModule,
     InternalModule,
     TicketsModule,
+    StockModule,
   ],
   controllers: [HealthController, MetricsController],
   providers: [],

@@ -16,7 +16,6 @@ import { ListProductAttributesController } from './usecases/list-product-attribu
 import { ListProductTagsController } from './usecases/list-product-tags/list-product-tags.controller';
 import { ListProductsController } from './usecases/list-products/list-products.controller';
 import { SetMainProductImageController } from './usecases/set-main-product-image/set-main-product-image.controller';
-import { UpdateProductStockController } from './usecases/update-product-stock/update-product-stock.controller';
 import { UpdateProductController } from './usecases/update-product/update-product.controller';
 
 @Module({
@@ -27,7 +26,6 @@ import { UpdateProductController } from './usecases/update-product/update-produc
     CreateProductController,
     UpdateProductController,
     DeleteProductController,
-    UpdateProductStockController,
     GetProductImagesController,
     AddProductImageController,
     DeleteProductImageController,

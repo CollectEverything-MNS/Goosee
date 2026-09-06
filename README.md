@@ -29,12 +29,13 @@ Front (Next.js) ─HTTP→ API Gateway ─HTTP→ microservices (user, auth, pag
 ## Démarrage rapide (développement)
 
 ```bash
-yarn install:project          # dépendances
-yarn start:dev                # stack complète (front + back + infra) en Docker
+yarn install                  # dépendances
+yarn infra                    # infra en Docker (rabbitmq, minio, mailhog, dbs, adminer)
+yarn dev                      # front + api-gateway + microservices en natif (turbo)
 yarn init:user                # crée l'OWNER par défaut (admin@goosee.dev / goosee)
 ```
 Front : http://localhost:3000 · API : http://localhost:3001 · Admin : `/fr/goosee-admin`.
-Arrêt : `yarn stop:dev`. Reset volumes : `yarn clean:dev`.
+Arrêt de l'infra : `yarn infra:down`. Reset volumes : `yarn infra:clean`.
 
 ## 🎬 Présentation tout-en-un
 
@@ -70,8 +71,8 @@ retombe en mode mock.
 
 | Commande | Rôle |
 |---|---|
-| `yarn start:dev` / `stop:dev` / `restart:dev` / `clean:dev` | stack Docker de dev |
-| `yarn infra` | infra seule (rabbitmq, minio, mailhog, dbs) |
+| `yarn infra` / `infra:down` / `infra:clean` | infra de dev en Docker (rabbitmq, minio, mailhog, dbs) |
+| `yarn dev` | front + back en natif via turbo (nécessite `yarn infra`) |
 | `yarn init:user` | crée/maj l'OWNER par défaut |
 | `yarn build:images` | construit les images `goosee/*:local` |
 | `yarn observability` / `:down` | Prometheus central |

@@ -1,5 +1,12 @@
 # 🐳 Étape 7 — Configuration Docker Compose (Back-end)
 
+> ⚠️ En développement courant, le back tourne en **natif** via `yarn infra` + `yarn dev` (voir
+> [README](../../README.md)) — aucun script `yarn` ne lance plus ce fichier automatiquement.
+> Il reste utile comme référence de structure (et pour `docker-compose.back.prod.yml`, son
+> équivalent prod, qui lui est bien utilisé par `yarn start:prod`) et peut être lancé
+> manuellement (`docker compose -f docker/dev/docker-compose.back.dev.yml ... up`) si tu veux
+> tester le backend entièrement dockerisé.
+
 Le fichier `docker/dev/docker-compose.back.dev.yml` lance l'ensemble du backend dans un même réseau Docker (`goosee_net`) :
 
 - l'**API Gateway** (point d'entrée HTTP)
@@ -137,21 +144,17 @@ http://goosee-user-service-dev:${USER_SERVICE_PORT}
 ## ✅ Commandes utiles
 
 ```bash
-# Lancer toute la stack (front + back + infra)
-yarn start:dev
+# Flux de dev courant : infra en Docker, back+front en natif
+yarn infra
+yarn dev
 
-# Rebuild forcé (après modif de package.json ou Dockerfile)
-yarn start:dev:build
+# Arrêter l'infra / reset complet (supprime les volumes — perte de données)
+yarn infra:down
+yarn infra:clean
 
-# Arrêter
-yarn stop:dev
-
-# Reset complet (supprime les volumes — perte de données)
-yarn clean:dev
-
-# Logs d'un container spécifique
-docker logs -f goosee-log-service-dev
-
-# Entrer dans la base d'un service
+# Entrer dans la base d'un service (conteneur fourni par l'infra)
 docker exec -it goosee-log-db-dev psql -U postgres -d log_db
+
+# Lancer ce fichier manuellement pour tester le back entièrement dockerisé
+docker compose --env-file env/.env.dev -f docker/dev/docker-compose.back.dev.yml -f docker/dev/docker-compose.infra.dev.yml up --build
 ```

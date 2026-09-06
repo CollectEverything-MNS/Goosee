@@ -11,6 +11,7 @@ const ALL_PAGE_KEYS = [
   'clients',
   'return-clients',
   'products',
+  'stock',
   'categories',
   'orders',
   'sales-history',

@@ -67,8 +67,10 @@ Chaque microservice suit la même structure : `entities` → `repositories` (int
 ### 4. Une seule porte d'entrée
 Le frontend ne parle qu'à l'API Gateway. La gateway route ensuite vers les microservices internes. Voir [Étape 2](./back/2-structure-api-gateway.md).
 
-### 5. Tout en Docker
-La stack complète (front + back + infra) tourne dans Docker via `yarn start:dev`. Pas d'install locale de Postgres, RabbitMQ ou autre.
+### 5. Infra en Docker, services en natif
+L'infra (Postgres, RabbitMQ, MinIO, Mailhog) tourne dans Docker via `yarn infra` — pas
+d'install locale de ces briques. Le front, l'API Gateway et les microservices tournent en
+natif sur l'hôte via `yarn dev` (turbo), qui se connecte à cette infra dockerisée.
 
 ---
 

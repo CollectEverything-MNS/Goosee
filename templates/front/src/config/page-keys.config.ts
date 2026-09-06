@@ -12,6 +12,7 @@ export const ROUTE_PAGE_KEY_MAP: Record<string, string> = {
   'return-clients': 'return-clients',
   products: 'products',
   categories: 'categories',
+  stock: 'stock',
   orders: 'orders',
   caisse: 'orders',
   'sales-history': 'sales-history',

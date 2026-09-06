@@ -18,7 +18,6 @@ interface Product {
   name: string;
   description?: string;
   price: number;
-  stock: number;
   isAvailable: boolean;
   categoryId: string;
   categoryIds?: string[];
@@ -148,19 +147,6 @@ export function useProductsColumns({ categoriesById }: UseColumnsArgs): ColumnDe
       cell: ({ row }) => (
         <span className="font-medium text-foreground">{formatPrice(row.original.price, locale)}</span>
       ),
-    },
-    {
-      accessorKey: 'stock',
-      header: t('stock'),
-      cell: ({ row }) => {
-        const stock = row.original.stock ?? 0;
-        const tone = stock === 0 ? 'danger' : stock < 10 ? 'warning' : 'success';
-        return (
-          <AdminStatusBadge tone={tone} withDot>
-            {stock} {stock === 1 ? t('unit') : t('units')}
-          </AdminStatusBadge>
-        );
-      },
     },
     {
       accessorKey: 'isAvailable',

@@ -29,6 +29,12 @@ export const routes = {
     categories: {
       getHref: (locale: string) => `/${locale}/goosee-admin/categories`,
     },
+    stock: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/stock`,
+    },
+    stockMovements: {
+      getHref: (locale: string, id: string) => `/${locale}/goosee-admin/stock/${id}/movements`,
+    },
     orders: {
       getHref: (locale: string) => `/${locale}/goosee-admin/orders`,
     },

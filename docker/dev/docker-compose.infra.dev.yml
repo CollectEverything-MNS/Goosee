@@ -239,6 +239,26 @@ services:
     networks:
       - goosee_net
 
+  goosee-stock-db-dev:
+    image: postgres:16-alpine
+    container_name: goosee-stock-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${STOCK_DB_USER}
+      POSTGRES_PASSWORD: ${STOCK_DB_PASSWORD}
+      POSTGRES_DB: ${STOCK_DB_NAME}
+    ports:
+      - "${STOCK_DB_HOST_PORT:-5443}:5432"
+    volumes:
+      - stock_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${STOCK_DB_USER} -d ${STOCK_DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - goosee_net
+
 networks:
   goosee_net:
     name: goosee_net
@@ -256,3 +276,4 @@ volumes:
   cart_db_data:
   payment_db_data:
   ticket_db_data:
+  stock_db_data:

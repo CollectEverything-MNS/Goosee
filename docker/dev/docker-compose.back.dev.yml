@@ -30,6 +30,8 @@ services:
       PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
       TICKET_SERVICE_HOST: goosee-ticket-service-dev
       TICKET_SERVICE_PORT: ${TICKET_SERVICE_PORT}
+      STOCK_SERVICE_HOST: goosee-stock-service-dev
+      STOCK_SERVICE_PORT: ${STOCK_SERVICE_PORT}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -243,6 +245,7 @@ services:
     command: yarn dev
     environment:
       NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
       ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
       ORDER_DB_HOST: goosee-order-db-dev
       ORDER_DB_PORT: 5432
@@ -250,10 +253,14 @@ services:
       ORDER_DB_PASSWORD: ${ORDER_DB_PASSWORD}
       ORDER_DB_NAME: ${ORDER_DB_NAME}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+      STOCK_SERVICE_HOST: goosee-stock-service-dev
+      STOCK_SERVICE_PORT: ${STOCK_SERVICE_PORT}
     expose:
       - "${ORDER_SERVICE_PORT}"
     depends_on:
       goosee-order-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${ORDER_SERVICE_PORT}"]
@@ -346,6 +353,38 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${TICKET_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-stock-service-dev:
+    container_name: goosee-stock-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/stock-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      RABBITMQ_URL: amqp://guest:guest@goosee-rabbitmq-dev:5672
+      STOCK_SERVICE_PORT: ${STOCK_SERVICE_PORT}
+      STOCK_DB_HOST: goosee-stock-db-dev
+      STOCK_DB_PORT: 5432
+      STOCK_DB_USER: ${STOCK_DB_USER}
+      STOCK_DB_PASSWORD: ${STOCK_DB_PASSWORD}
+      STOCK_DB_NAME: ${STOCK_DB_NAME}
+      STOCK_RESERVATION_TTL_MINUTES: ${STOCK_RESERVATION_TTL_MINUTES}
+    expose:
+      - "${STOCK_SERVICE_PORT}"
+    depends_on:
+      goosee-stock-db-dev:
+        condition: service_healthy
+      goosee-rabbitmq-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${STOCK_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10

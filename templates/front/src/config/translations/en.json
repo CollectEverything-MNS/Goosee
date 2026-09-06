@@ -188,6 +188,7 @@
         "roles": "Roles",
         "logs": "Logs"
       },
+      "stock": "Stock",
       "logout": "Logout"
     },
     "create": {
@@ -309,6 +310,7 @@
       "analytics": "Analytics",
       "products": "Products",
       "categories": "Categories",
+      "stock": "Stock",
       "clients": "Clients",
       "returnClients": "Customer Returns",
       "users": "Users",
@@ -458,13 +460,10 @@
         "product": "Product",
         "category": "Category",
         "price": "Price",
-        "stock": "Stock",
         "availability": "Availability",
         "createdAt": "Created",
         "available": "Available",
-        "unavailable": "Unavailable",
-        "unit": "unit",
-        "units": "units"
+        "unavailable": "Unavailable"
       },
       "actions": {
         "edit": "Edit",
@@ -489,7 +488,6 @@
         "categoryPlaceholder": "Select a category",
         "noCategories": "No categories available — create one first.",
         "price": "Price",
-        "stock": "Available stock",
         "preparationTime": "Preparation time",
         "preparationHint": "Estimated delay before shipping (0 = immediate).",
         "minutes": "min",
@@ -497,6 +495,8 @@
         "sizeUnit": "Unit",
         "isAvailable": "Available for sale",
         "isAvailableHint": "Disable to temporarily remove from the catalog.",
+        "initialStock": "Initial stock",
+        "initialStockHint": "Quantity in stock at creation. Adjust stock afterwards from the Stock page.",
         "cancel": "Cancel",
         "create": "Create product",
         "update": "Save",
@@ -512,6 +512,45 @@
         "confirm": "Delete",
         "success": "Product deleted",
         "error": "Error deleting product"
+      }
+    },
+    "stock": {
+      "count": "{count, plural, =0 {No products in stock} one {# product in stock} other {# products in stock}}",
+      "searchPlaceholder": "Search a product...",
+      "table": {
+        "product": "Product",
+        "quantity": "Quantity",
+        "available": "Available"
+      },
+      "actions": {
+        "adjust": "Adjust",
+        "history": "History"
+      },
+      "adjust": {
+        "title": "Adjust stock",
+        "subtitle": "{name}",
+        "deltaLabel": "Adjustment (+/-)",
+        "deltaHint": "Positive value to restock, negative to remove.",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "success": "Stock adjusted successfully",
+        "error": "Error adjusting stock"
+      },
+      "movements": {
+        "title": "Movements history",
+        "back": "Back to stock",
+        "empty": "No movement recorded",
+        "columns": {
+          "date": "Date",
+          "delta": "Quantity",
+          "type": "Type",
+          "order": "Order"
+        },
+        "types": {
+          "sale": "Sale",
+          "restock": "Restock",
+          "correction": "Manual correction"
+        }
       }
     },
     "categories": {
