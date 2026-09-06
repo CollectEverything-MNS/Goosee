@@ -29,6 +29,9 @@ build/
 out/
 *.tsbuildinfo
 
+# Test coverage
+coverage/
+
 # IDEs and editors
 .vscode/
 .idea/

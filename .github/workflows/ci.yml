@@ -1,0 +1,39 @@
+name: CI
+
+# Tests unitaires + seuil de couverture bloquant sur les services métier.
+# Voir docs/strategie-tests.md pour le choix du seuil (70 % par service) et le périmètre.
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests unitaires (services métier)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # turbo run test:ci ne cible que les workspaces qui déclarent le script test:ci
+      # (payment-service, order-service, cart-service). Chaque service lance
+      # `jest --coverage --ci` : le job échoue si un test casse OU si un service
+      # passe sous 70 % de couverture (coverageThreshold dans son package.json).
+      - name: Run unit tests with coverage gate
+        run: yarn test:ci
