@@ -75,7 +75,7 @@ retombe en mode mock.
 | `yarn dev` | front + back en natif via turbo (nécessite `yarn infra`) |
 | `yarn init:user` | crée/maj l'OWNER par défaut |
 | `yarn build:images` | construit les images `goosee/*:local` |
-| `yarn observability` / `:down` | Prometheus central |
+| `yarn observability` / `:down` | Prometheus central + Alertmanager (alertes → Discord) |
 | `yarn presentation` / `:down` | démo multi-tenant (Docker + k8s) |
 | `yarn build` / `lint` / `test` / `format` | turbo sur tous les workspaces |
 
@@ -84,6 +84,7 @@ retombe en mode mock.
 - [Fonctionnement](docs/fonctionnement.md) · [Structure du projet](docs/structure-projet.md)
 - [Plan POC](docs/plan-poc.md) · [Journal de dev](docs/journal-dev.md)
 - [Stratégie de tests & couverture](docs/strategie-tests.md)
+- [Observabilité — Prometheus & Alertmanager](docker/observability/README.md)
 - [Forfait Kubernetes (k3d + Helm)](k8s/README.md)
 - Back : [microservice](docs/back/1-structure-micro-service.md) ·
   [API Gateway](docs/back/2-structure-api-gateway.md) ·
