@@ -1,5 +1,7 @@
 import { Controller, Get, Header } from '@nestjs/common';
 import { collectDefaultMetrics, register } from 'prom-client';
+// Import pour effet de bord : enregistre les métriques HTTP RED sur le `register`.
+import './http-metrics';
 
 collectDefaultMetrics();
 

@@ -75,11 +75,17 @@ Localement, `yarn test:ci` reproduit exactement ce que fait la CI.
 Workflow : [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 
 - **Déclencheurs** : `pull_request` vers `develop`, `push` sur `develop`.
-- **Étapes** : checkout → Node 22 (+ cache yarn) → `yarn install --frozen-lockfile`
-  → `yarn test:ci`.
+- **Étapes** : checkout → Node 22 → restauration du cache des tarballs yarn
+  (clé = hash des `package.json`) → `yarn install --non-interactive` → `yarn test:ci`.
 - **Critère d'échec** : un test qui casse **ou** un service sous 70 % de couverture.
 - Pas de base de données ni de conteneur de service : les tests unitaires mockent
   toutes les I/O.
+
+> `yarn.lock` n'est pas versionné (`.gitignore`). La CI ne peut donc utiliser ni
+> `cache: yarn` de `setup-node` ni `--frozen-lockfile`. Elle met seulement en
+> cache le dossier de tarballs de yarn (`yarn cache dir`) : `yarn install`
+> reconstruit `node_modules` à chaque run mais sans téléchargement réseau. Le
+> cache est invalidé dès qu'un `package.json` change.
 
 `turbo run test:ci` ne cible que les workspaces déclarant le script `test:ci`. Ajouter
 un service au portail = ajouter `"test:ci": "jest --coverage --ci"` et le bloc
