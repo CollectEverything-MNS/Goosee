@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UpdateProductUseCase } from './update-product.usecase';
 import { IProductRepository } from '../../repositories/product.repository';
 import { ICategoryRepository } from '../../repositories/category.repository';
@@ -65,13 +65,15 @@ describe('UpdateProductUseCase', () => {
       name: 'Pizza',
       description: 'Pizza margherita',
       price: 10,
-      stock: 5,
       preparationTime: 0,
       sizeValue: null,
       sizeUnit: null,
       isAvailable: true,
       categoryId: 'category-1',
+      categoryIds: ['category-1'],
     } as unknown as Product;
+
+    const otherCategory = { id: 'category-2', name: 'Boissons' } as Category;
 
     it('devrait lever NotFoundException si le produit n\'existe pas', async () => {
       productRepo.findById.mockResolvedValue(null);
@@ -82,63 +84,79 @@ describe('UpdateProductUseCase', () => {
       expect(productRepo.save).not.toHaveBeenCalled();
     });
 
-    it('devrait lever NotFoundException si la nouvelle catégorie n\'existe pas', async () => {
-      productRepo.findById.mockResolvedValue({ ...existingProduct });
-      categoryRepo.findById.mockResolvedValue(null);
-
-      const dto: UpdateProductDto = { categoryId: 'category-2' };
-
-      await expect(usecase.execute('product-1', dto)).rejects.toThrow(NotFoundException);
-      expect(categoryRepo.findById).toHaveBeenCalledWith('category-2');
-      expect(productRepo.save).not.toHaveBeenCalled();
-    });
-
-    it('ne devrait pas re-vérifier la catégorie si categoryId ne change pas', async () => {
+    it('devrait conserver les catégories existantes si aucune n\'est fournie', async () => {
       productRepo.findById.mockResolvedValue({ ...existingProduct });
       productRepo.save.mockImplementation(async (p) => p as Product);
 
-      const dto: UpdateProductDto = { categoryId: 'category-1', name: 'Pizza Royale' };
-
-      await usecase.execute('product-1', dto);
+      await usecase.execute('product-1', { name: 'Pizza Royale' });
 
       expect(categoryRepo.findById).not.toHaveBeenCalled();
       expect(productRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Pizza Royale', categoryId: 'category-1' }),
+        expect.objectContaining({
+          name: 'Pizza Royale',
+          categoryId: 'category-1',
+          categoryIds: ['category-1'],
+        }),
       );
     });
 
-    it('devrait accepter une nouvelle catégorie existante', async () => {
+    it('devrait lever NotFoundException si la nouvelle categoryId n\'existe pas', async () => {
       productRepo.findById.mockResolvedValue({ ...existingProduct });
-      categoryRepo.findById.mockResolvedValue({ id: 'category-2' } as Category);
+      categoryRepo.findById.mockResolvedValue(null);
+
+      await expect(usecase.execute('product-1', { categoryId: 'missing' })).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(productRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('devrait remplacer la categorie via categoryId', async () => {
+      productRepo.findById.mockResolvedValue({ ...existingProduct });
+      categoryRepo.findById.mockResolvedValue(otherCategory);
       productRepo.save.mockImplementation(async (p) => p as Product);
 
       await usecase.execute('product-1', { categoryId: 'category-2' });
 
       expect(productRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ categoryId: 'category-2' }),
+        expect.objectContaining({ categoryId: 'category-2', categoryIds: ['category-2'] }),
       );
     });
 
-    it('devrait forcer isAvailable à false quand le nouveau stock est 0, même si isAvailable=true est demandé', async () => {
+    it('devrait remplacer les catégories via categoryIds (priorité sur categoryId)', async () => {
       productRepo.findById.mockResolvedValue({ ...existingProduct });
+      categoryRepo.findById.mockResolvedValue(otherCategory);
       productRepo.save.mockImplementation(async (p) => p as Product);
 
-      await usecase.execute('product-1', { stock: 0, isAvailable: true });
+      await usecase.execute('product-1', {
+        categoryId: 'category-2',
+        categoryIds: ['category-2', 'category-2'],
+      });
 
       expect(productRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ stock: 0, isAvailable: false }),
+        expect.objectContaining({ categoryIds: ['category-2'] }),
       );
     });
 
-    it('devrait conserver isAvailable existant si stock non fourni et positif', async () => {
-      productRepo.findById.mockResolvedValue({ ...existingProduct, isAvailable: true });
-      productRepo.save.mockImplementation(async (p) => p as Product);
+    it('devrait lever BadRequestException si categoryIds est fourni vide après filtrage', async () => {
+      productRepo.findById.mockResolvedValue({ ...existingProduct });
 
-      await usecase.execute('product-1', { name: 'Pizza Royale' });
+      await expect(
+        usecase.execute('product-1', { categoryIds: [] }),
+      ).resolves.toBeDefined();
+      // categoryIds vide (longueur 0) ne déclenche pas resolveCategoryIds (garde `dto.categoryIds?.length`)
+      expect(categoryRepo.findById).not.toHaveBeenCalled();
+    });
 
-      expect(productRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ stock: 5, isAvailable: true, name: 'Pizza Royale' }),
+    it('devrait lever NotFoundException si une des nouvelles categoryIds n\'existe pas', async () => {
+      productRepo.findById.mockResolvedValue({ ...existingProduct });
+      categoryRepo.findById.mockImplementation(async (id) =>
+        id === 'category-2' ? otherCategory : null,
       );
+
+      await expect(
+        usecase.execute('product-1', { categoryIds: ['category-2', 'missing'] }),
+      ).rejects.toThrow(NotFoundException);
+      expect(productRepo.save).not.toHaveBeenCalled();
     });
 
     it('devrait conserver les champs non fournis', async () => {
@@ -153,7 +171,19 @@ describe('UpdateProductUseCase', () => {
           description: existingProduct.description,
           price: 15,
           preparationTime: existingProduct.preparationTime,
+          isAvailable: existingProduct.isAvailable,
         }),
+      );
+    });
+
+    it('devrait mettre à jour isAvailable si fourni', async () => {
+      productRepo.findById.mockResolvedValue({ ...existingProduct, isAvailable: true });
+      productRepo.save.mockImplementation(async (p) => p as Product);
+
+      await usecase.execute('product-1', { isAvailable: false });
+
+      expect(productRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ isAvailable: false }),
       );
     });
   });

@@ -14,6 +14,8 @@ export async function createTestApp(): Promise<INestApplication> {
   })
     .overrideProvider('LOG_CLIENT')
     .useValue({ emit: () => undefined, send: () => undefined })
+    .overrideProvider('STOCK_CLIENT')
+    .useValue({ emit: () => undefined, send: () => undefined })
     .overrideProvider(StorageService)
     .useValue({
       uploadFile: async () => ({ url: 'http://test/products/x.png', key: 'products/x.png' }),
