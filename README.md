@@ -78,12 +78,14 @@ retombe en mode mock.
 | `yarn observability` / `:down` | Prometheus central + Alertmanager (alertes → Discord) |
 | `yarn presentation` / `:down` | démo multi-tenant (Docker + k8s) |
 | `yarn build` / `lint` / `test` / `format` | turbo sur tous les workspaces |
+| `yarn test:ci` | tests unitaires + seuil de couverture 70 % (services métier) |
+| `yarn e2e` | parcours d'achat de bout en bout (stack dev requise) |
 
 ## Documentation
 
 - [Fonctionnement](docs/fonctionnement.md) · [Structure du projet](docs/structure-projet.md)
 - [Plan POC](docs/plan-poc.md) · [Journal de dev](docs/journal-dev.md)
-- [Stratégie de tests & couverture](docs/strategie-tests.md)
+- [Stratégie de tests & couverture](docs/strategie-tests.md) · [Tests e2e](templates/back/api-gateway/test/README.md)
 - [Observabilité — Prometheus & Alertmanager](docker/observability/README.md)
 - [Forfait Kubernetes (k3d + Helm)](k8s/README.md)
 - Back : [microservice](docs/back/1-structure-micro-service.md) ·
