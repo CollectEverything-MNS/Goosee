@@ -8,6 +8,8 @@
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
     "e2e": "yarn workspace api-gateway-goosee test:e2e",
+    "load:gateway": "docker compose -f docker/dev/docker-compose.load.dev.yml run --rm k6 run /scripts/gateway-lecture.js",
+    "load:navigation": "docker compose -f docker/dev/docker-compose.load.dev.yml run --rm k6 run /scripts/parcours-navigation.js",
     "format": "turbo run format",
     "infra": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.infra.dev.yml up -d",
     "infra:down": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.infra.dev.yml down",

@@ -1,0 +1,30 @@
+# Tests de charge k6 — service à la demande, jamais démarré avec la stack (profil "load").
+# Rejoint le réseau goosee_net pour joindre la gateway par son nom de conteneur : la
+# stack dev (infra + back) doit donc tourner. Voir load/README.md.
+#
+#   yarn load:gateway        # GET /health, /products, /products/:id
+#   yarn load:navigation     # login -> liste -> détail -> panier
+services:
+  k6:
+    image: grafana/k6:latest
+    profiles: ['load']
+    volumes:
+      - ../../load:/scripts:ro
+    environment:
+      BASE_URL: ${K6_BASE_URL:-http://goosee-api-gateway-dev:3001}
+      SCENARIO: ${SCENARIO:-smoke}
+      OWNER_EMAIL: ${K6_OWNER_EMAIL:-admin@goosee.dev}
+      OWNER_PASSWORD: ${K6_OWNER_PASSWORD:-goosee}
+      # Renseigner pour pousser les métriques vers Prometheus (voir load/README.md) :
+      #   http://host.docker.internal:9090/api/v1/write
+      K6_PROMETHEUS_RW_SERVER_URL: ${K6_PROMETHEUS_RW_SERVER_URL:-}
+      K6_PROMETHEUS_RW_TREND_STATS: 'p(90),p(95),p(99),avg,max'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - goosee_net
+
+networks:
+  goosee_net:
+    name: goosee_net
+    external: true

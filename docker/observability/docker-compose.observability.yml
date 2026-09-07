@@ -7,6 +7,14 @@ services:
     image: prom/prometheus:latest
     container_name: goosee-prometheus
     restart: unless-stopped
+    # --web.enable-remote-write-receiver : accepte le remote-write (métriques k6, cf.
+    # load/README.md). Les autres flags reprennent les valeurs par défaut de l'image.
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --web.enable-remote-write-receiver
     ports:
       - '9090:9090'
     volumes:
