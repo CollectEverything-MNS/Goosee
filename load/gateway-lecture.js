@@ -16,6 +16,7 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:3001';
 const SCENARIO = __ENV.SCENARIO || 'smoke';
 
 export const options = {
+  summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(90)', 'p(95)', 'p(99)'],
   scenarios: {
     lecture: {
       executor: 'ramping-vus',

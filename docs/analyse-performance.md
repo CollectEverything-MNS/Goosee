@@ -16,10 +16,12 @@ Deux scénarios, dans `load/` :
 | Script | Chemin exercé |
 | --- | --- |
 | `gateway-lecture.js` | `GET /health`, `GET /products`, `GET /products/:id` — lecture pure, sans authentification ni écriture |
-| `parcours-navigation.js` | `POST /auth/login` → `GET /products` → `GET /products/:id` → `POST /cart/:key/items` → `GET /cart/:key` |
+| `parcours-navigation.js` | `GET /products` → `GET /products/:id` → `POST /cart/:key/items` → `GET /cart/:key` (client anonyme, panier par clé de session) |
 
 `parcours-navigation.js` prépare le catalogue une fois (`setup()` : connexion OWNER puis
-création d'une catégorie et de produits si le catalogue est trop petit).
+création d'une catégorie et de produits si le catalogue est trop petit). Le parcours
+lui-même ne se connecte pas : `POST /auth/login` est limité à 5 requêtes/min
+(anti-force-brute) et n'a pas sa place dans un scénario de charge.
 
 ## 2. Profils de charge
 
@@ -64,7 +66,6 @@ Un seuil dépassé fait sortir k6 en code non nul.
 | `GET /products`, `GET /products/:id` | p95 < 500 ms (lecture) · < 400 ms (navigation) |
 | `GET /health` | p95 < 200 ms |
 | `POST /cart/items` | p95 < 600 ms |
-| `POST /auth/login` | p95 < 1500 ms (hachage bcrypt, volontairement large) |
 
 ### Corrélation avec les métriques serveur
 
@@ -75,15 +76,31 @@ voir `load/README.md`.
 
 ## 5. Résultats
 
-À remplir après un run réel.
+Runs du 2026-09-08 (base `36e285c`). Latences en millisecondes, par endpoint (`p95` / `p99`).
 
-| Scénario | Profil | Date / commit | p95 | p99 | Débit (req/s) | Erreurs | Seuils |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `gateway-lecture` | smoke | | | | | | |
-| `gateway-lecture` | load | | | | | | |
-| `parcours-navigation` | smoke | | | | | | |
-| `parcours-navigation` | load | | | | | | |
+| Scénario | Profil | VUs max | Requêtes | Débit (req/s) | Erreurs | Seuils |
+| --- | --- | --- | --- | --- | --- | --- |
+| `gateway-lecture` | smoke | 5 | 805 | 11,5 | 0,00 % | ✓ 3/3 |
+| `gateway-lecture` | load | 50 | 41 926 | 93,1 | 0,00 % | ✓ 3/3 |
+| `parcours-navigation` | smoke | 5 | 1 050 | 14,8 | 0,00 % | ✓ 4/4 |
+| `parcours-navigation` | load | 50 | 54 874 | 121,7 | 0,00 % | ✓ 4/4 |
 
-**Machine de test** : `__________` (CPU, RAM, OS) — les valeurs absolues en dépendent.
+### Latence par endpoint (p95 / p99, ms)
 
-**Observations** : `__________`
+| Endpoint | lecture smoke | lecture load | navigation smoke | navigation load |
+| --- | --- | --- | --- | --- |
+| `GET /health` | 2,7 / 2,9 | 2,9 / 3,9 | — | — |
+| `GET /products` | 8,9 / 10,6 | 10,0 / 13,2 | 10,2 / 11,9 | 11,1 / 15,1 |
+| `GET /products/:id` | — | — | 9,2 / 12,2 | 11,0 / 15,5 |
+| `POST /cart/:key/items` | — | — | 18,9 / 22,3 | 19,1 / 26,7 |
+
+**Machine de test** : AMD Ryzen 7 7735HS · 15,2 Go RAM · Windows 11 Famille (build 26200),
+Docker Desktop — back lancé en natif (`yarn dev`), k6 dans un conteneur pointant sur
+`host.docker.internal:3001`.
+
+**Observations** : aucun échec sur les quatre runs, tous les seuils tenus. Le passage de
+5 à 50 VUs multiplie le débit par ~8 (lecture) et ~8 (navigation) tout en gardant la
+latence quasi stable (p95 `/products` 8,9 → 10,0 ms ; p99 10,6 → 13,2 ms) : pas de
+saturation à cette charge. `POST /cart/:key/items` (seule écriture) reste le plus lent,
+sans dérive notable sous charge. `POST /auth/login` n'est pas mesuré : il est limité à
+5 requêtes/min (anti-force-brute) et le parcours de navigation est anonyme.

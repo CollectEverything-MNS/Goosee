@@ -6,7 +6,7 @@ mesurent débit, latence (p95/p99) et taux d'erreur.
 | Script | Ce qu'il exerce |
 | --- | --- |
 | `gateway-lecture.js` | `GET /health`, `GET /products`, `GET /products/:id` — lecture pure, sans auth ni écriture |
-| `parcours-navigation.js` | `POST /auth/login` → `GET /products` → `GET /products/:id` → `POST /cart/:key/items` → `GET /cart/:key` |
+| `parcours-navigation.js` | `GET /products` → `GET /products/:id` → `POST /cart/:key/items` → `GET /cart/:key` (client anonyme ; `setup()` se connecte une fois en OWNER pour semer le catalogue) |
 
 `profils.js` définit les paliers de charge, communs aux deux scripts.
 
@@ -77,7 +77,6 @@ Un seuil dépassé passe en `✗` et k6 **sort en code 99**. Les valeurs par scr
 | `GET /products`, `GET /products/:id` | p95 < 500 ms (lecture) · < 400 ms (navigation) |
 | `GET /health` | p95 < 200 ms |
 | `POST /cart/items` | p95 < 600 ms |
-| `POST /auth/login` | p95 < 1500 ms (bcrypt : volontairement large, on l'observe) |
 
 ### Optionnel : vers Prometheus (puis Grafana)
 

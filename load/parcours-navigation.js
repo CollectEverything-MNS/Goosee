@@ -1,17 +1,21 @@
 /**
- * Charge sur un parcours de navigation client, avec authentification et une écriture
- * légère :
+ * Charge sur un parcours de navigation client anonyme, avec une écriture légère :
  *
- *   POST /auth/login  →  GET /products  →  GET /products/:id
- *     →  POST /cart/:sessionKey/items  →  GET /cart/:sessionKey
+ *   GET /products  →  GET /products/:id  →  POST /cart/:sessionKey/items
+ *     →  GET /cart/:sessionKey
  *
- * setup() prépare le catalogue une fois : login OWNER puis, si moins de CATALOG_MIN
- * produits, crée une catégorie + des produits (stock large). Chaque VU utilise sa
- * propre clé de panier.
+ * Le panier est identifié par une clé de session (pas d'authentification) et le
+ * catalogue est public : le parcours ne se connecte pas. `POST /auth/login` est
+ * volontairement limité à 5 requêtes/min (anti-force-brute) et n'a donc pas sa place
+ * dans un scénario de charge — la connexion sert uniquement au `setup()` (une fois)
+ * pour préparer le catalogue.
+ *
+ * setup() : connexion OWNER puis, si moins de CATALOG_MIN produits, création d'une
+ * catégorie + des produits (stock large). Chaque VU utilise sa propre clé de panier.
  *
  * Lancement (stack dev up + `yarn init:user`) : `yarn load:navigation`
  * Profil : -e SCENARIO=smoke (défaut) | load     — voir profils.js
- * Identifiants OWNER : -e OWNER_EMAIL / -e OWNER_PASSWORD
+ * Identifiants OWNER (setup) : -e OWNER_EMAIL / -e OWNER_PASSWORD
  */
 import http from 'k6/http';
 import { check, sleep } from 'k6';
@@ -27,6 +31,7 @@ const CATALOG_MIN = 10;
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
 export const options = {
+  summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(90)', 'p(95)', 'p(99)'],
   scenarios: {
     navigation: {
       executor: 'ramping-vus',
@@ -40,8 +45,6 @@ export const options = {
     'http_req_duration{name:GET /products}': ['p(95)<400'],
     'http_req_duration{name:GET /products/:id}': ['p(95)<400'],
     'http_req_duration{name:POST /cart/items}': ['p(95)<600'],
-    // login = bcrypt, volontairement coûteux : seuil large, on l'observe.
-    'http_req_duration{name:POST /auth/login}': ['p(95)<1500'],
   },
 };
 
@@ -49,7 +52,7 @@ function login() {
   const res = http.post(
     `${BASE_URL}/auth/login`,
     JSON.stringify({ email: OWNER_EMAIL, password: OWNER_PASSWORD }),
-    { headers: JSON_HEADERS, tags: { name: 'POST /auth/login' } }
+    { headers: JSON_HEADERS }
   );
   if (res.status !== 200 && res.status !== 201) {
     throw new Error(
@@ -114,13 +117,6 @@ export default function (data) {
   const sessionKey = `charge-vu-${exec.vu.idInTest}`;
   const productIds = data.productIds;
   const pid = productIds[Math.floor(Math.random() * productIds.length)];
-
-  const cnx = http.post(
-    `${BASE_URL}/auth/login`,
-    JSON.stringify({ email: OWNER_EMAIL, password: OWNER_PASSWORD }),
-    { headers: JSON_HEADERS, tags: { name: 'POST /auth/login' } }
-  );
-  check(cnx, { 'login 200/201': (r) => r.status === 200 || r.status === 201 });
 
   const liste = http.get(`${BASE_URL}/products`, { tags: { name: 'GET /products' } });
   check(liste, { 'liste 200': (r) => r.status === 200 });
