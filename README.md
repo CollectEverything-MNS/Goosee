@@ -86,7 +86,7 @@ retombe en mode mock.
 
 - [Fonctionnement](docs/fonctionnement.md) · [Structure du projet](docs/structure-projet.md)
 - [Plan POC](docs/plan-poc.md) · [Journal de dev](docs/journal-dev.md)
-- [Stratégie de tests & couverture](docs/strategie-tests.md) · [Tests e2e](templates/back/api-gateway/test/README.md) · [Tests de charge k6](load/README.md)
+- [Stratégie de tests & couverture](docs/strategie-tests.md) · [Tests e2e](templates/back/api-gateway/test/README.md) · [Tests de charge k6](load/README.md) · [Analyse de performance](docs/analyse-performance.md)
 - [Observabilité — Prometheus & Alertmanager](docker/observability/README.md)
 - [Forfait Kubernetes (k3d + Helm)](k8s/README.md)
 - Back : [microservice](docs/back/1-structure-micro-service.md) ·
