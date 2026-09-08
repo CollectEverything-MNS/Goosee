@@ -3,9 +3,9 @@ import { Entity, PrimaryColumn, Unique } from 'typeorm';
 @Entity('product_tag')
 @Unique(['productId', 'tagId'])
 export class ProductTag {
-  @PrimaryColumn()
+  @PrimaryColumn('uuid')
   productId: string;
 
-  @PrimaryColumn()
+  @PrimaryColumn('uuid')
   tagId: string;
 }
