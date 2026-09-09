@@ -23,6 +23,9 @@ export default function ContactPage() {
   if (page && page.status === PageStatus.PUBLISHED && page.components?.length) {
     return (
       <main className="min-h-screen">
+        {!page.components.some((c) => c.type === 'hero') && (
+          <h1 className="sr-only">{page.title}</h1>
+        )}
         <PageRenderer components={page.components} context={{ mode: 'front' }} />
       </main>
     );
@@ -31,6 +34,7 @@ export default function ContactPage() {
   // Fallback : bloc contact par défaut si aucune page n'existe encore en base.
   return (
     <main className="min-h-screen">
+      <h1 className="sr-only">Contact</h1>
       <ContactBlock context={{ mode: 'front' }} />
     </main>
   );
