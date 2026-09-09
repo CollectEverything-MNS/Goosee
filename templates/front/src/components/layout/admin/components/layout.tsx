@@ -15,6 +15,12 @@ interface Props {
 export default function AdminLayout({ children }: Props) {
   return (
     <SidebarProvider>
+      <a
+        href="#contenu-principal-admin"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-black focus:p-2 focus:rounded"
+      >
+        Aller au contenu principal
+      </a>
       <AdminSidebar />
       <SidebarInset className="bg-muted/30">
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-border bg-background px-4 lg:px-6">
@@ -26,7 +32,9 @@ export default function AdminLayout({ children }: Props) {
             <AdminProfileDropdown />
           </div>
         </header>
-        <main className="flex-1 px-6 py-8">{children}</main>
+        <main id="contenu-principal-admin" tabIndex={-1} className="flex-1 px-6 py-8">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

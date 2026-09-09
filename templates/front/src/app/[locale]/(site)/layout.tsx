@@ -9,8 +9,16 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   return (
     <SiteThemeProvider>
       <CartProvider>
+        <a
+          href="#contenu-principal"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-black focus:p-2 focus:rounded"
+        >
+          Aller au contenu principal
+        </a>
         <HeaderBlock context={{ mode: 'front' }} />
-        <div className="min-h-screen">{children}</div>
+        <div id="contenu-principal" tabIndex={-1} className="min-h-screen">
+          {children}
+        </div>
         <FooterBlock />
       </CartProvider>
     </SiteThemeProvider>
