@@ -28,6 +28,7 @@ import { GetPageBySlugUseCase } from './usecases/get-page-by-slug/get-page-by-sl
 import { GetPageBySlugController } from './usecases/get-page-by-slug/get-page-by-slug.controller';
 import { SeedPagesUseCase } from './usecases/seed-pages/seed-pages.usecase';
 import { SeedPagesController } from './usecases/seed-pages/seed-pages.controller';
+import { PagesSeederService } from './shared/pages-seeder.service';
 import { GetMenusUseCase } from './usecases/get-menus/get-menus.usecase';
 import { GetMenusController } from './usecases/get-menus/get-menus.controller';
 import { CreateMenuUseCase } from './usecases/create-menu/create-menu.usecase';
@@ -122,6 +123,7 @@ import { UploadFileController } from './usecases/upload-file/upload-file.control
     GetPageUseCase,
     GetPageBySlugUseCase,
     SeedPagesUseCase,
+    PagesSeederService,
     GetMenusUseCase,
     CreateMenuUseCase,
     UpdateMenuUseCase,
