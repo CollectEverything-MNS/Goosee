@@ -14,7 +14,7 @@ Audit d'accessibilité mené sur le dépôt Goosee, dans le cadre du lot accessi
 |---|---|---|---|
 | 1 | Lien d'évitement (RGAA 12.7 / WCAG 2.4.1) | Corrigé | Voir ci-dessous |
 | 2 | Hiérarchie des titres (h1 unique, sans saut) | Conforme après corrections | Voir ci-dessous |
-| 3 | Navigation clavier / focus | Pas encore audité | |
+| 3 | Navigation clavier / focus | Corrigé | Voir ci-dessous |
 | 4 | Audit axe-core / Lighthouse (5 pages clés) | Pas encore fait | |
 
 ## 1. Lien d'évitement
@@ -45,8 +45,15 @@ Audit d'accessibilité mené sur le dépôt Goosee, dans le cadre du lot accessi
 
 **Correction appliquée** : le sélecteur de niveau du bloc Titre calcule maintenant le niveau le plus profond déjà utilisé par les blocs placés avant lui sur la page (chaque type de bloc a un niveau de base connu : Hero = h1, Produits vedettes et Avis clients descendent jusqu'à h3, etc.), et ne propose que les niveaux suivants valides, sans saut possible. Fichiers modifiés : `page-builder-component-editor.tsx` (calcul et filtrage), `page-builder.tsx` et `page-builder-stack.tsx` (transmission de la liste complète des blocs de la page à l'éditeur).
 
+## 3. Navigation clavier et visibilité du focus
+
+**Navigation clavier, vérifiée sur le parcours d'achat et l'admin** : fiche produit (sélection d'image, quantité, ajout au panier), checkout (paiement), et le tableau de données partagé par toutes les listes admin (produits, commandes, clients, stock, catégories). Tous les éléments cliquables sont de vrais boutons ou liens du langage HTML, aucun élément fabriqué à la main (comme une zone cliquable sans vraie balise bouton) qui empêcherait leur usage au clavier. Aucune correction nécessaire sur ce point.
+
+**Ecart trouvé et corrigé** : les champs de recherche de 5 listes admin (utilisateurs, stock, produits, catégories, commandes) supprimaient le cadre de focus par défaut et le remplaçaient par un simple changement de couleur de bordure à 20 pour cent d'opacité, largement insuffisant pour rester visible. Le reste du site (les boutons, notamment) remplace ce même cadre par un anneau net et bien visible.
+
+**Correction appliquée** : les 5 champs de recherche utilisent maintenant le même anneau de focus visible que les boutons (`focus-visible:ring-1 focus-visible:ring-ring`). Fichiers modifiés : `users-listing-toolbar.tsx`, `stock-listing-toolbar.tsx`, `products-listing-toolbar.tsx`, `categories-listing-toolbar.tsx`, `orders-listing-toolbar.tsx`.
+
 ## Prochaines étapes
 
-3. Vérifier la navigation clavier et la visibilité du focus sur le parcours d'achat et l'admin.
 4. Passer axe-core / Lighthouse sur les 5 pages clés, une fois du contenu réel publié.
-5. Compléter ce document avec les résultats des points 3 et 4.
+5. Compléter ce document avec les résultats du point 4.
