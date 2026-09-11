@@ -1,18 +1,46 @@
-# Observabilité de la plateforme : Prometheus central sur le réseau partagé goosee_platform.
-# Démarrer après Traefik (qui crée le réseau). Cibles découvertes via ./targets (file_sd)
-# alimenté par l'orchestrateur. UI sur http://localhost:9090.
+# Observabilité de la plateforme : Prometheus central + Alertmanager sur le réseau
+# partagé goosee_platform. Démarrer après Traefik (qui crée le réseau). Cibles
+# découvertes via ./targets (file_sd) alimenté par l'orchestrateur.
+# Prometheus : http://localhost:9090 · Alertmanager : http://localhost:9093
 services:
   goosee-prometheus:
     image: prom/prometheus:latest
     container_name: goosee-prometheus
     restart: unless-stopped
+    # --web.enable-remote-write-receiver : accepte le remote-write (métriques k6, cf.
+    # load/README.md). Les autres flags reprennent les valeurs par défaut de l'image.
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --web.enable-remote-write-receiver
     ports:
       - '9090:9090'
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./targets:/etc/prometheus/targets
+      - ./rules:/etc/prometheus/rules:ro
     networks:
       - goosee_platform
+    depends_on:
+      - goosee-alertmanager
+
+  goosee-alertmanager:
+    image: prom/alertmanager:latest
+    container_name: goosee-alertmanager
+    restart: unless-stopped
+    ports:
+      - '9093:9093'
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./alertmanager/secrets:/etc/alertmanager/secrets:ro
+      - goosee-alertmanager-data:/alertmanager
+    networks:
+      - goosee_platform
+
+volumes:
+  goosee-alertmanager-data:
 
 networks:
   goosee_platform:

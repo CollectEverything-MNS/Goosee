@@ -60,7 +60,7 @@ describe('SoftDeleteUseCase', () => {
 
       await usecase.execute(differentDto);
 
-      expect(authRepo.softDeleteById).toHaveBeenCalledWith(999);
+      expect(authRepo.softDeleteById).toHaveBeenCalledWith('id999');
     });
   });
 });

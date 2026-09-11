@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { HealthController } from './health/health.controller';
 import { MetricsController } from './metrics/metrics.controller';
+import { HttpMetricsInterceptor } from './metrics/http-metrics.interceptor';
 import { InternalModule } from './internal/internal.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './services/auth/auth.module';
@@ -44,6 +46,6 @@ import { StockModule } from './services/stock/stock.module';
     StockModule,
   ],
   controllers: [HealthController, MetricsController],
-  providers: [],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: HttpMetricsInterceptor }],
 })
 export class AppModule {}

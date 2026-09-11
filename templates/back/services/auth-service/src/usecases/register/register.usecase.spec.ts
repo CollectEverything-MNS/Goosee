@@ -94,6 +94,7 @@ describe('RegisterUseCase', () => {
       password: 'hashed-password',
       role: ['CUSTOMER'],
       isVerified: false,
+      tokenVersion: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
@@ -130,6 +131,8 @@ describe('RegisterUseCase', () => {
       expect(rmqAuthClient.emit).toHaveBeenCalledWith('auth.registered', {
         authId: savedAuth.id,
         email: savedAuth.email,
+        firstName: '',
+        lastName: '',
       });
       expect(result).toEqual({
         id: savedAuth.id,
@@ -145,6 +148,7 @@ describe('RegisterUseCase', () => {
         password: 'hashedpass',
         role: ['CUSTOMER'],
         isVerified: true,
+        tokenVersion: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: undefined,
@@ -157,7 +161,7 @@ describe('RegisterUseCase', () => {
         ConflictException,
       );
       await expect(usecase.execute(registerDto)).rejects.toThrow(
-        'Email already exists',
+        'Un compte existe déjà avec cet email',
       );
       expect(authRepo.findByEmail).toHaveBeenCalledWith(registerDto.email);
       expect(authRepo.save).not.toHaveBeenCalled();
@@ -196,6 +200,8 @@ describe('RegisterUseCase', () => {
       expect(rmqAuthClient.emit).toHaveBeenCalledWith('auth.registered', {
         authId: savedAuth.id,
         email: savedAuth.email,
+        firstName: '',
+        lastName: '',
       });
     });
 

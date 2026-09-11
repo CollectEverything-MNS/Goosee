@@ -1,0 +1,90 @@
+# Règles d'alerte de la plateforme Goosee.
+# Chargées par goosee-prometheus (rule_files: /etc/prometheus/rules/*.yml),
+# évaluées à chaque scrape_interval, routées vers goosee-alertmanager.
+#
+# Les métriques HTTP (http_requests_total, http_request_duration_seconds) sont
+# exposées par l'intercepteur RED de l'API Gateway sur /metrics.
+# Les métriques nodejs_* / process_* proviennent de collectDefaultMetrics().
+groups:
+  - name: gateway-red
+    rules:
+      # --- Taux d'erreurs (Errors) -------------------------------------------
+      - alert: GatewayHighErrorRate
+        expr: |
+          sum by (job) (rate(http_requests_total{status_code=~"5.."}[5m]))
+            /
+          sum by (job) (rate(http_requests_total[5m]))
+            > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Taux d'erreurs 5xx élevé ({{ $labels.job }})"
+          description: >-
+            {{ $labels.job }} renvoie {{ $value | humanizePercentage }} de
+            réponses 5xx sur les 5 dernières minutes (seuil : 5 %).
+
+      # --- Latence (Duration) ----------------------------------------------
+      - alert: GatewayHighLatencyP95
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (job, le) (rate(http_request_duration_seconds_bucket[5m]))
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latence p95 élevée ({{ $labels.job }})"
+          description: >-
+            p95 du temps de réponse de {{ $labels.job }} à
+            {{ $value | humanizeDuration }} sur 5 min (seuil : 1 s).
+
+  - name: disponibilite
+    rules:
+      - alert: TargetDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Cible injoignable ({{ $labels.job }})"
+          description: >-
+            {{ $labels.instance }} ({{ $labels.job }}) ne répond plus au scrape
+            Prometheus depuis 2 min.
+
+  - name: saturation
+    rules:
+      - alert: NodeEventLoopLagHigh
+        expr: nodejs_eventloop_lag_seconds > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Boucle d'événements Node saturée ({{ $labels.job }})"
+          description: >-
+            {{ $labels.instance }} : lag de l'event loop à
+            {{ $value | humanizeDuration }} depuis 5 min (seuil : 100 ms).
+
+      - alert: NodeHeapUsageHigh
+        expr: |
+          nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes > 0.9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tas V8 proche de la limite ({{ $labels.job }})"
+          description: >-
+            {{ $labels.instance }} : {{ $value | humanizePercentage }} du tas V8
+            utilisé depuis 10 min.
+
+      - alert: ProcessCpuHigh
+        expr: rate(process_cpu_seconds_total[5m]) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU process élevé ({{ $labels.job }})"
+          description: >-
+            {{ $labels.instance }} : {{ $value | humanizePercentage }} d'un cœur
+            CPU consommé en moyenne sur 5 min, depuis 10 min.
