@@ -16,9 +16,7 @@ usecases**, avec toutes les dépendances mockées (aucune base de données, aucu
 | `payment-service` | `create-payment`, `get-payment`, `handle-webhook`                  |
 | `order-service`   | `create-order`, `update-order-status`, `get-order`, `list-orders`  |
 | `cart-service`    | `add-item`, `update-item`, `remove-item`, `clear-cart`, `get-cart` |
-
-> `product-service` suit la même règle ; ses tests sont pris en charge séparément et
-> seront ajoutés au portail CI de la même manière (script `test:ci` + `coverageThreshold`).
+| `product-service` | les 24 usecases produits, catégories, tags, attributs et images    |
 
 ### Services techniques : tests joués en CI, sans seuil de couverture
 
@@ -67,7 +65,7 @@ ses 70 %.
 | Commande                        | Effet                                                                                                                                                                                                                                 |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `yarn test`                     | tous les tests de tous les workspaces (turbo), sans couverture                                                                                                                                                                        |
-| `yarn test:ci`                  | `turbo run test:ci` → `jest --coverage --ci` sur les services qui déclarent le script. Seuil 70 % appliqué pour payment/order/cart ; api-gateway, stock-service, auth-service et user-service jouent leurs tests sans seuil (voir §1) |
+| `yarn test:ci`                  | `turbo run test:ci` → `jest --coverage --ci` sur les services qui déclarent le script. Seuil 70 % appliqué pour payment/order/cart/product ; api-gateway, stock-service, auth-service et user-service jouent leurs tests sans seuil (voir §1) |
 | `yarn workspace <service> test` | tests d'un seul service                                                                                                                                                                                                               |
 
 Localement, `yarn test:ci` reproduit exactement ce que fait la CI.
