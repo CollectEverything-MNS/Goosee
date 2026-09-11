@@ -67,6 +67,7 @@ describe('ForgetPasswordRequestUseCase', () => {
       password: 'hashedPassword',
       role: ['CUSTOMER'],
       isVerified: true,
+      tokenVersion: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
