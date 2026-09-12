@@ -1,0 +1,159 @@
+name: Sécurité
+
+# Analyses de sécurité du générateur. Complète ci.yml, qui reste dédié aux tests unitaires
+# et à la porte de couverture — on garde les deux séparés pour que l'échec d'une analyse
+# de sécurité ne se confonde pas avec une régression fonctionnelle.
+#
+# Statut assumé de chaque analyse :
+#
+#   BLOQUANT   secrets dans l'historique, dépendances en gravité haute ou critique.
+#   INFORMATIF analyse statique du code, configuration d'infrastructure (Dockerfiles,
+#              Compose, chart Helm). Fort taux de faux positifs sur un code existant :
+#              on collecte, on trie dans le registre des anomalies, on durcit ensuite.
+#
+# Les rapports sont publiés en artefacts et alimentent le registre des anomalies.
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+  workflow_dispatch:
+  # Les dépendances deviennent vulnérables sans qu'on touche au code : on repasse
+  # chaque lundi matin même sans commit.
+  schedule:
+    - cron: '0 6 * * 1'
+
+concurrency:
+  group: securite-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependances:
+    name: Dépendances vulnérables
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # ⚠️ yarn.lock n'est pas versionné dans ce dépôt (cf. .gitignore), donc :
+      #   — ni `cache: yarn` de setup-node, ni `--frozen-lockfile` ;
+      #   — et surtout, l'audit porte sur les versions résolues AU MOMENT DU RUN, pas sur
+      #     celles réellement déployées. L'analyse est donc indicative tant que le
+      #     verrouillage n'est pas committé. Voir l'anomalie correspondante au registre.
+      - name: Cache des tarballs yarn
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/yarn
+          key: yarn-cache-${{ runner.os }}-node22-${{ hashFiles('**/package.json') }}
+          restore-keys: yarn-cache-${{ runner.os }}-node22-
+
+      - name: Installation
+        run: yarn install --non-interactive
+
+      # Masque de bits yarn 1 : 8 = élevé, 16 = critique.
+      - name: Audit des dépendances
+        run: |
+          set +e
+          yarn audit --groups dependencies --json > audit.json
+          code=$?
+          set -e
+          yarn audit --groups dependencies || true
+          if [ $((code & 24)) -ne 0 ]; then
+            echo "::error::Vulnérabilité de gravité élevée ou critique dans les dépendances"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-dependances
+          path: audit.json
+
+  secrets:
+    name: Secrets dans l'historique
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Enjeu particulier ici : le dépôt porte des fichiers d'exemple d'environnement et
+      # des valeurs de chart. Un secret réel qui s'y glisse est déployé chez tous les clients.
+      - name: Gitleaks
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            detect --source=/repo --redact --report-format=sarif \
+            --report-path=/repo/gitleaks.sarif --exit-code 1
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rapport-secrets
+          path: gitleaks.sarif
+
+  code:
+    name: Analyse statique du code
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Semgrep
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src returntocorp/semgrep:latest \
+            semgrep scan --config=p/typescript --config=p/nodejs \
+            --config=p/owasp-top-ten --sarif --output=/src/semgrep.sarif
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rapport-sast
+          path: semgrep.sarif
+
+  infrastructure:
+    name: Configuration d'infrastructure
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      # Périmètre : 11 Dockerfiles, les fichiers Compose de dev / prod / tenant, et le
+      # chart Helm du tenant (quotas, politiques réseau, contexte de sécurité des pods).
+      - name: Trivy — Dockerfiles, Compose, chart Helm
+        run: |
+          docker run --rm -v "$PWD:/src" aquasec/trivy:latest \
+            config /src --severity HIGH,CRITICAL --format json --output /src/trivy-config.json
+          docker run --rm -v "$PWD:/src" aquasec/trivy:latest \
+            config /src --severity HIGH,CRITICAL
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rapport-infrastructure
+          path: trivy-config.json
+
+  images:
+    name: Vulnérabilités des images
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      # On scanne deux images représentatives plutôt que les onze : la passerelle (seule
+      # exposée au réseau) et le front. Elles partagent la même base que les autres, donc
+      # les vulnérabilités système remontées valent pour toute la flotte.
+      - name: Construction
+        run: |
+          docker build -f templates/back/api-gateway/Dockerfile -t goosee/api-gateway:ci .
+          docker build -f templates/front/Dockerfile -t goosee/front:ci .
+
+      - name: Trivy — analyse des images
+        run: |
+          for image in goosee/api-gateway:ci goosee/front:ci; do
+            echo "== $image"
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:latest image "$image" --severity HIGH,CRITICAL --ignore-unfixed
+          done
