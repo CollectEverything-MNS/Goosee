@@ -15,7 +15,7 @@ Audit d'accessibilité mené sur le dépôt Goosee, dans le cadre du lot accessi
 | 1 | Lien d'évitement (RGAA 12.7 / WCAG 2.4.1) | Corrigé | Voir ci-dessous |
 | 2 | Hiérarchie des titres (h1 unique, sans saut) | Conforme après corrections | Voir ci-dessous |
 | 3 | Navigation clavier / focus | Corrigé | Voir ci-dessous |
-| 4 | Audit axe-core / Lighthouse (5 pages clés) | Pas encore fait | |
+| 4 | Audit axe-core / Lighthouse (5 pages clés) | En cours, 1 page sur 5 | Voir ci-dessous |
 
 ## 1. Lien d'évitement
 
@@ -25,6 +25,10 @@ Audit d'accessibilité mené sur le dépôt Goosee, dans le cadre du lot accessi
 - `templates/front/src/app/[locale]/(site)/layout.tsx` : lien caché "Aller au contenu principal" avec zone d'arrivée (`id="contenu-principal"`), appliqué automatiquement à toutes les pages publiques (accueil, produits, checkout, compte, contact...).
 - `templates/front/src/components/layout/admin/components/layout.tsx` : même principe côté admin (`id="contenu-principal-admin"`), appliqué à toutes les pages admin protégées (dashboard, clients, commandes, produits, stock, paramètres...).
 - **Non ajouté sur la page de login admin**, volontairement : cette page ne passe par aucun des deux layouts ci-dessus (juste `AuthProvider`, sans menu), donc il n'y a rien à sauter avant le formulaire de connexion.
+
+**Ecart trouvé et corrigé lors du test réel dans le navigateur** : le menu du haut de la boutique publique reste collé en haut au défilement (`sticky top-0 z-50`), avec le même niveau d'affichage (`z-50`) que notre lien d'évitement. Le menu passait donc visuellement par-dessus le lien, qui restait invisible même quand il avait le focus. Corrigé en augmentant le niveau du lien à `z-[60]`, pour qu'il passe toujours au-dessus du menu.
+
+**Ecart trouvé et corrigé, propre aux sites construits comme celui-ci (navigation sans rechargement complet de page)** : en changeant de page par un clic sur un lien du menu (sans rechargement complet), le focus ne se replaçait nulle part de façon cohérente. Corrigé en surveillant les changements d'adresse de page (`usePathname`) et en replaçant automatiquement le focus sur la zone de contenu principal à chaque changement, sauf au tout premier chargement (où c'est le lien d'évitement qui garde la priorité). Vérifié techniquement dans un vrai navigateur : le focus atterrit bien sur `#contenu-principal` immédiatement après un changement de page interne.
 
 ## 2. Hiérarchie des titres
 
@@ -53,7 +57,17 @@ Audit d'accessibilité mené sur le dépôt Goosee, dans le cadre du lot accessi
 
 **Correction appliquée** : les 5 champs de recherche utilisent maintenant le même anneau de focus visible que les boutons (`focus-visible:ring-1 focus-visible:ring-ring`). Fichiers modifiés : `users-listing-toolbar.tsx`, `stock-listing-toolbar.tsx`, `products-listing-toolbar.tsx`, `categories-listing-toolbar.tsx`, `orders-listing-toolbar.tsx`.
 
+## 4. Audit Lighthouse
+
+Méthode : Lighthouse en ligne de commande (`npx lighthouse <url> --only-categories=accessibility`), sur du contenu réel publié (template "Drive Moderne" appliqué).
+
+**Accueil (`/fr`)** : score initial 94/100, avec 2 audits en échec.
+- Contraste insuffisant sur le texte de copyright du pied de page (gris sur fond sombre, ratio 3,66 au lieu de 4,5 minimum). Corrigé (`text-gray-500` remplacé par `text-gray-400` dans `footer-block.tsx`).
+- Absence de repère "main" détectée lors d'un run, disparue au run suivant : liée à un état de chargement temporaire de la page, pas un vrai problème de code.
+- Saut de niveau de titre détecté après la première correction : le pied de page utilise des `h4` ("Navigation", "Contact") sans `h3` avant eux sur la page. Corrigé en remplaçant ces `h4` par des `h3` dans `footer-navigation.tsx` et `footer-contact.tsx` (correction valable sur toutes les pages du site, le pied de page étant partagé).
+
+Score final apres corrections : **100/100, 0 audit en echec.**
+
 ## Prochaines étapes
 
-4. Passer axe-core / Lighthouse sur les 5 pages clés, une fois du contenu réel publié.
-5. Compléter ce document avec les résultats du point 4.
+Passer Lighthouse sur les 4 pages restantes (catalogue, fiche produit, checkout, login admin), et compléter cette section avec leurs résultats.
