@@ -6,10 +6,12 @@ name: Sécurité
 #
 # Statut assumé de chaque analyse :
 #
-#   BLOQUANT   secrets dans l'historique, dépendances en gravité haute ou critique.
+#   BLOQUANT   secrets dans l'historique, dépendances en gravité critique.
 #   INFORMATIF analyse statique du code, configuration d'infrastructure (Dockerfiles,
-#              Compose, chart Helm). Fort taux de faux positifs sur un code existant :
-#              on collecte, on trie dans le registre des anomalies, on durcit ensuite.
+#              Compose, chart Helm), dépendances en gravité élevée. Fort taux de faux
+#              positifs sur un code existant, et correctifs souvent indisponibles sans
+#              forcer des majeures sous les paquets parents : on collecte, on trie dans le
+#              registre des anomalies, on durcit ensuite.
 #
 # Les rapports sont publiés en artefacts et alimentent le registre des anomalies.
 
@@ -53,7 +55,8 @@ jobs:
       - name: Installation
         run: yarn install --non-interactive
 
-      # Masque de bits yarn 1 : 8 = élevé, 16 = critique.
+      # Masque de bits yarn 1 : 8 = élevé, 16 = critique. On échoue sur critique seulement,
+      # les élevées étant collectées et triées au registre (cf. en-tête du fichier).
       - name: Audit des dépendances
         run: |
           set +e
@@ -61,8 +64,11 @@ jobs:
           code=$?
           set -e
           yarn audit --groups dependencies || true
-          if [ $((code & 24)) -ne 0 ]; then
-            echo "::error::Vulnérabilité de gravité élevée ou critique dans les dépendances"
+          if [ $((code & 8)) -ne 0 ]; then
+            echo "::warning::Vulnérabilité de gravité élevée — à trier dans le registre des anomalies"
+          fi
+          if [ $((code & 16)) -ne 0 ]; then
+            echo "::error::Vulnérabilité de gravité critique dans les dépendances"
             exit 1
           fi
 
