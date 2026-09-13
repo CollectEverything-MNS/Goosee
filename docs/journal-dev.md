@@ -9,9 +9,14 @@
 ## 2026-06-16 — Cadrage du programme (avant développement)
 
 **Fait :**
-- Définition de l'écosystème multi-tenant et des décisions d'architecture (voir
-  `audit.md` §8) : isolation totale par tenant, scale-to-zero, POC 100 % local,
-  superadmin intégré à la vitrine, orchestrateur dans `goosee-vitrine/apps/orchestrator`.
+- Définition de l'écosystème multi-tenant et des décisions d'architecture : isolation totale
+  par tenant, scale-to-zero, POC 100 % local, superadmin intégré à la vitrine, orchestrateur
+  dans `goosee-vitrine/apps/orchestrator`.
+  > **Correction du 13/09/2026** — cette entrée renvoyait à `audit.md` §8. Ce fichier n'a
+  > jamais été écrit (`git log --all --diff-filter=A -- "**/audit.md"` ne renvoie rien) : les
+  > décisions ci-dessus ont donc été prises sans audit formalisé. L'audit a été mené a
+  > posteriori et se trouve dans [`audit-si.md`](audit-si.md) ; sa §6 trace chaque décision
+  > d'architecture jusqu'au constat qui la motive.
 - Branche `flodev` créée dans les deux dépôts (`Goosee` et `goosee-vitrine`).
 - Inspection complète de l'implémentation existante des deux dépôts (voir
   `plan-poc.md` §2).
