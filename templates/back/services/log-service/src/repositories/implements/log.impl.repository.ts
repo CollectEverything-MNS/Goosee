@@ -18,4 +18,9 @@ export class TypeOrmLogRepository implements ILogRepository {
   async list(): Promise<Log[]> {
     return this.repository.find({ order: { createdAt: 'DESC' } });
   }
+
+  async deleteByUserId(userId: string): Promise<number> {
+    const res = await this.repository.delete({ userId });
+    return res.affected ?? 0;
+  }
 }
