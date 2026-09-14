@@ -47,9 +47,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --non-interactive
 
-      # turbo run test:ci ne cible que les workspaces qui déclarent le script test:ci
-      # (payment-service, order-service, cart-service). Chaque service lance
-      # `jest --coverage --ci` : le job échoue si un test casse OU si un service
-      # passe sous 70 % de couverture (coverageThreshold dans son package.json).
+      # turbo run test:ci ne cible que les workspaces qui déclarent le script test:ci.
+      # Chaque service lance `jest --coverage --ci` : le job échoue si un test casse
+      # OU si un service passe sous 70 % de couverture. Le seuil vient du
+      # coverageThreshold du package.json du service : les services métier le
+      # déclarent, log-service et ticket-service non — leurs tests sont dans la
+      # barrière, sans seuil de couverture.
       - name: Run unit tests with coverage gate
         run: yarn test:ci
