@@ -26,4 +26,11 @@ export class TypeOrmTicketRepository implements ITicketRepository {
   async delete(id: string): Promise<void> {
     await this.repository.delete(id);
   }
+
+  // Le ticket n'a pas de colonne "customerId" : le rattachement a l'acheteur
+  // se fait via authorId, l'identifiant de la personne qui a cree le ticket.
+  async deleteByCustomerId(customerId: string): Promise<number> {
+    const res = await this.repository.delete({ authorId: customerId });
+    return res.affected ?? 0;
+  }
 }
