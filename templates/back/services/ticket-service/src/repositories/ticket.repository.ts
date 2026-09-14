@@ -6,4 +6,5 @@ export abstract class ITicketRepository {
   abstract list(): Promise<Ticket[]>;
   abstract delete(id: string): Promise<void>;
   abstract deleteByCustomerId(customerId: string): Promise<number>;
+  abstract findByAuthorId(authorId: string): Promise<Ticket[]>;
 }

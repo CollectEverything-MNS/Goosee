@@ -33,4 +33,11 @@ export class TypeOrmTicketRepository implements ITicketRepository {
     const res = await this.repository.delete({ authorId: customerId });
     return res.affected ?? 0;
   }
+
+  async findByAuthorId(authorId: string): Promise<any[]> {
+    return this.repository.find({
+      where: { authorId },
+      order: { createdAt: 'DESC' },
+    });
+  }
 }
