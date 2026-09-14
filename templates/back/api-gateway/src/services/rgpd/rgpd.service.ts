@@ -31,11 +31,16 @@ export class RgpdService {
     const headers = { 'x-internal-token': this.config.get<string>('INTERNAL_API_TOKEN') };
     // `auth` ne figure pas ici : sa ligne est adressee par authId, que seul
     // user-service connait. Il est efface par l'evenement user.deleted (Task 3).
+    // `ticket` non plus : ticket-service n'est deploye que dans la pile de
+    // developpement, jamais dans la pile d'un tenant (docker-compose.tenant.yml
+    // ne le declare pas). L'appeler produirait un echec permanent au bilan, qui
+    // ferait douter d'un effacement pourtant complet. Son code d'effacement et
+    // d'export reste en place et reviendra dans cette liste le jour ou le
+    // service sera deploye.
     const cibles = [
       ['user', urls.user],
       ['cart', urls.cart],
       ['order', urls.order],
-      ['ticket', urls.ticket],
       ['log', urls.log],
     ] as const;
 
@@ -59,7 +64,9 @@ export class RgpdService {
   async export(customerId: string): Promise<Record<string, unknown>> {
     const urls = serviceUrl(this.config);
     const headers = { 'x-internal-token': this.config.get<string>('INTERNAL_API_TOKEN') };
-    const cibles = [urls.user, urls.order, urls.ticket];
+    // Meme exclusion de `ticket` que pour l'effacement, et pour la meme raison :
+    // le service n'existe pas dans une pile de tenant.
+    const cibles = [urls.user, urls.order];
 
     const reponses = await Promise.all(
       cibles.map((url) =>

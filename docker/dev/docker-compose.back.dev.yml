@@ -32,6 +32,7 @@ services:
       TICKET_SERVICE_PORT: ${TICKET_SERVICE_PORT}
       STOCK_SERVICE_HOST: goosee-stock-service-dev
       STOCK_SERVICE_PORT: ${STOCK_SERVICE_PORT}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
       - goosee-auth-service-dev
@@ -152,6 +153,7 @@ services:
       USER_DB_USER: ${USER_DB_USER}
       USER_DB_PASSWORD: ${USER_DB_PASSWORD}
       USER_DB_NAME: ${USER_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${USER_SERVICE_PORT}"
     depends_on:
@@ -183,6 +185,7 @@ services:
       LOG_DB_USER: ${LOG_DB_USER}
       LOG_DB_PASSWORD: ${LOG_DB_PASSWORD}
       LOG_DB_NAME: ${LOG_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${LOG_SERVICE_PORT}"
     depends_on:
@@ -285,6 +288,7 @@ services:
       CART_DB_USER: ${CART_DB_USER}
       CART_DB_PASSWORD: ${CART_DB_PASSWORD}
       CART_DB_NAME: ${CART_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${CART_SERVICE_PORT}"
     depends_on:
@@ -344,6 +348,7 @@ services:
       TICKET_DB_USER: ${TICKET_DB_USER}
       TICKET_DB_PASSWORD: ${TICKET_DB_PASSWORD}
       TICKET_DB_NAME: ${TICKET_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${TICKET_SERVICE_PORT}"
     depends_on:

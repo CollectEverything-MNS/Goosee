@@ -7,7 +7,13 @@ import { RgpdService } from './rgpd.service';
 describe('RgpdService', () => {
   let service: RgpdService;
   const mockHttp = { post: jest.fn(), get: jest.fn() };
-  const mockConfig = { get: jest.fn().mockReturnValue('jeton') };
+  // Chaque cle de configuration se rend elle-meme : les URL construites par
+  // serviceUrl portent alors le nom du service, ce qui rend la liste des cibles
+  // verifiable.
+  const mockConfig = { get: jest.fn((cle: string) => cle) };
+
+  const urlsAppelees = (mock: jest.Mock): string[] =>
+    mock.mock.calls.map((appel) => appel[0] as string);
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -41,5 +47,34 @@ describe('RgpdService', () => {
       .mockReturnValue(of({ data: { commandes: [] } }));
 
     await expect(service.export('c-1')).rejects.toThrow('service injoignable');
+  });
+
+  // ticket-service n'est deploye que dans la pile de developpement : le declarer
+  // comme cible produirait un echec permanent au bilan rendu au marchand.
+  it("l effacement vise user, cart, order et log, jamais ticket", async () => {
+    mockHttp.post.mockReturnValue(of({ data: { service: 'x', statut: 'efface' } }));
+
+    const bilan = await service.erase('c-1');
+
+    expect(bilan.resultats).toHaveLength(4);
+    const urls = urlsAppelees(mockHttp.post);
+    expect(urls).toHaveLength(4);
+    expect(urls.some((u) => u.includes('USER_SERVICE_HOST'))).toBe(true);
+    expect(urls.some((u) => u.includes('CART_SERVICE_HOST'))).toBe(true);
+    expect(urls.some((u) => u.includes('ORDER_SERVICE_HOST'))).toBe(true);
+    expect(urls.some((u) => u.includes('LOG_SERVICE_HOST'))).toBe(true);
+    expect(urls.some((u) => u.includes('TICKET_SERVICE_HOST'))).toBe(false);
+  });
+
+  it("l export agrege user et order, jamais ticket", async () => {
+    mockHttp.get.mockReturnValue(of({ data: {} }));
+
+    await service.export('c-1');
+
+    const urls = urlsAppelees(mockHttp.get);
+    expect(urls).toHaveLength(2);
+    expect(urls.some((u) => u.includes('USER_SERVICE_HOST'))).toBe(true);
+    expect(urls.some((u) => u.includes('ORDER_SERVICE_HOST'))).toBe(true);
+    expect(urls.some((u) => u.includes('TICKET_SERVICE_HOST'))).toBe(false);
   });
 });

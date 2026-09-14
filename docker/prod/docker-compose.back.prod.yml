@@ -230,6 +230,7 @@ services:
       LOG_DB_USER: ${LOG_DB_USER}
       LOG_DB_PASSWORD: ${LOG_DB_PASSWORD}
       LOG_DB_NAME: ${LOG_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${LOG_SERVICE_PORT}"
     depends_on:
@@ -393,6 +394,7 @@ services:
       CART_DB_USER: ${CART_DB_USER}
       CART_DB_PASSWORD: ${CART_DB_PASSWORD}
       CART_DB_NAME: ${CART_DB_NAME}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
     expose:
       - "${CART_SERVICE_PORT}"
     depends_on:
