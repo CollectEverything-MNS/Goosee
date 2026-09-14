@@ -46,6 +46,48 @@ describe('RgpdExportUseCase', () => {
     expect(res.tickets[0].statut).toBe(TicketStatus.CREATED);
   });
 
+  // Article 20 : le texte libre ecrit par la personne est precisement ce que la
+  // restitution doit contenir.
+  it('restitue la description et le commentaire ecrits par la personne', async () => {
+    mockTicketRepo.findByAuthorId.mockResolvedValue([
+      {
+        id: 'tkt-1',
+        title: 'Mon probleme',
+        description: 'Le colis est arrive ouvert',
+        comment: 'Je prefere un remboursement',
+        authorId: 'c-1',
+        authorEmail: 'test@test.fr',
+        status: TicketStatus.CREATED,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      },
+    ]);
+
+    const res = await usecase.execute('c-1');
+
+    expect(res.tickets[0].description).toBe('Le colis est arrive ouvert');
+    expect(res.tickets[0].commentaire).toBe('Je prefere un remboursement');
+  });
+
+  it('rend un commentaire absent explicitement nul', async () => {
+    mockTicketRepo.findByAuthorId.mockResolvedValue([
+      {
+        id: 'tkt-1',
+        title: 'Mon probleme',
+        description: 'Details',
+        authorId: 'c-1',
+        authorEmail: 'test@test.fr',
+        status: TicketStatus.CREATED,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      },
+    ]);
+
+    const res = await usecase.execute('c-1');
+
+    expect(res.tickets[0].commentaire).toBeNull();
+  });
+
   it('utilise findByAuthorId pour recuperer les tickets', async () => {
     mockTicketRepo.findByAuthorId.mockResolvedValue([]);
 

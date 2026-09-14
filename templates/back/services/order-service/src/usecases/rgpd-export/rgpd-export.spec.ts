@@ -49,6 +49,28 @@ describe('RgpdExportUseCase', () => {
     expect(res.commandes[0].billingAddress?.fullName).toBe('Test User');
   });
 
+  // Article 20 : la restitution porte sur les donnees fournies par la personne.
+  it('restitue le courriel et le statut de la commande', async () => {
+    mockOrderRepo.findByCustomerIncludingArchived.mockResolvedValue([
+      {
+        id: 'ord-1',
+        customerId: 'c-1',
+        customerEmail: 'test@test.fr',
+        items: [],
+        totalCents: 1000,
+        status: 'paid',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+        archivedAt: null,
+      } as any,
+    ]);
+
+    const res = await usecase.execute('c-1');
+
+    expect(res.commandes[0].courriel).toBe('test@test.fr');
+    expect(res.commandes[0].statut).toBe('paid');
+  });
+
   it('utilise la methode findByCustomerIncludingArchived', async () => {
     mockOrderRepo.findByCustomerIncludingArchived.mockResolvedValue([]);
 
