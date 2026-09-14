@@ -47,6 +47,8 @@ import { GetUserByAuthController } from './usecases/get-user-by-auth/get-user-by
 import { GetUserByAuthUseCase } from './usecases/get-user-by-auth/get-user-by-auth.usecase';
 import { RgpdEraseController } from './usecases/rgpd-erase/rgpd-erase.controller';
 import { RgpdEraseUseCase } from './usecases/rgpd-erase/rgpd-erase.usecase';
+import { RgpdExportController } from './usecases/rgpd-export/rgpd-export.controller';
+import { RgpdExportUseCase } from './usecases/rgpd-export/rgpd-export.usecase';
 
 @Module({
   imports: [
@@ -120,6 +122,7 @@ import { RgpdEraseUseCase } from './usecases/rgpd-erase/rgpd-erase.usecase';
     DeleteRoleController,
     GetUserByAuthController,
     RgpdEraseController,
+    RgpdExportController,
   ],
 
   providers: [
@@ -148,6 +151,7 @@ import { RgpdEraseUseCase } from './usecases/rgpd-erase/rgpd-erase.usecase';
     DeleteRoleUseCase,
     GetUserByAuthUseCase,
     RgpdEraseUseCase,
+    RgpdExportUseCase,
   ],
 })
 export class AppModule {}
