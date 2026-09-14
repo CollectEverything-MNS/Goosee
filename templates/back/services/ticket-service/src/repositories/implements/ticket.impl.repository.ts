@@ -34,7 +34,7 @@ export class TypeOrmTicketRepository implements ITicketRepository {
     return res.affected ?? 0;
   }
 
-  async findByAuthorId(authorId: string): Promise<any[]> {
+  async findByAuthorId(authorId: string): Promise<Ticket[]> {
     return this.repository.find({
       where: { authorId },
       order: { createdAt: 'DESC' },
