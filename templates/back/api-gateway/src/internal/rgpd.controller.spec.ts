@@ -6,7 +6,7 @@ import { RgpdController } from './rgpd.controller';
 
 describe('RgpdController', () => {
   let controller: RgpdController;
-  const mockHttp = { post: jest.fn() };
+  const mockHttp = { post: jest.fn(), get: jest.fn() };
   const mockConfig = { get: jest.fn().mockReturnValue('jeton') };
 
   beforeEach(async () => {
@@ -32,5 +32,14 @@ describe('RgpdController', () => {
     expect(bilan.customerId).toBe('c-1');
     expect(bilan.resultats.some((r) => r.statut === 'echec')).toBe(true);
     expect(bilan.resultats.filter((r) => r.statut !== 'echec').length).toBeGreaterThan(0);
+  });
+
+  it("un service en echec fait echouer tout l export (Promise.all, pas allSettled)", async () => {
+    mockHttp.get
+      .mockReturnValueOnce(of({ data: { compte: { id: 'c-1' } } }))
+      .mockReturnValueOnce(throwError(() => new Error('service injoignable')))
+      .mockReturnValue(of({ data: { commandes: [] } }));
+
+    await expect(controller.export('c-1')).rejects.toThrow('service injoignable');
   });
 });
