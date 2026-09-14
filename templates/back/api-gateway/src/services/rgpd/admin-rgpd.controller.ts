@@ -3,6 +3,8 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { JwtAuthGuard } from '../../shared/services/jwt-auth.guard';
 import { RolesGuard } from '../../shared/services/roles.guard';
 import { Roles } from '../../shared/services/roles.decorator';
+import { CurrentUser } from '../../shared/services/current-user.decorator';
+import { JwtPayload } from '../../shared/services/jwt-payload.type';
 import { RgpdService } from './rgpd.service';
 
 // Porte d'entree du back-office. Les routes `/internal/rgpd/*` portent le jeton
@@ -20,8 +22,13 @@ export class AdminRgpdController {
   @ApiOperation({ summary: "Effacer les donnees d'un acheteur" })
   @ApiResponse({ status: 201, description: "Bilan de l'effacement, service par service" })
   @ApiResponse({ status: 403, description: 'Habilitation rgpd manquante' })
-  async erase(@Param('customerId', ParseUUIDPipe) customerId: string) {
-    return this.rgpdService.erase(customerId);
+  async erase(
+    @Param('customerId', ParseUUIDPipe) customerId: string,
+    @CurrentUser() acteur?: JwtPayload,
+  ) {
+    // Seul l'identifiant du demandeur part au journal : son courriel n'y ajoute
+    // rien, et celui de la personne effacee n'y a pas sa place.
+    return this.rgpdService.erase(customerId, acteur?.sub);
   }
 
   @Get('export/:customerId')

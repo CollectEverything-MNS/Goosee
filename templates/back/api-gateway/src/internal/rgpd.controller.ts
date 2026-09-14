@@ -9,7 +9,9 @@ export class RgpdController {
 
   @Post('erase/:customerId')
   async erase(@Param('customerId') customerId: string) {
-    return this.rgpdService.erase(customerId);
+    // Pas de jeton d'acces ici, donc pas de personne a nommer : la trace dit
+    // seulement que l'ordre vient d'un appel de service a service.
+    return this.rgpdService.erase(customerId, 'service-interne');
   }
 
   @Get('export/:customerId')

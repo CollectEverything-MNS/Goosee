@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
@@ -21,12 +21,16 @@ export interface BilanEffacement {
 // services cibles ne doit pas diverger entre les deux portes d'entree.
 @Injectable()
 export class RgpdService {
+  private readonly logger = new Logger(RgpdService.name);
+
   constructor(
     private readonly http: HttpService,
     private readonly config: ConfigService,
   ) {}
 
-  async erase(customerId: string): Promise<BilanEffacement> {
+  // `acteur` est l'identifiant technique du demandeur : le `sub` du jeton pour
+  // le marchand, une constante pour un appel de service a service.
+  async erase(customerId: string, acteur = 'inconnu'): Promise<BilanEffacement> {
     const urls = serviceUrl(this.config);
     const headers = { 'x-internal-token': this.config.get<string>('INTERNAL_API_TOKEN') };
     // `auth` ne figure pas ici : sa ligne est adressee par authId, que seul
@@ -56,6 +60,15 @@ export class RgpdService {
       r.status === 'fulfilled'
         ? (r.value.data as ResultatService)
         : { service: cibles[i][0], statut: 'echec', raison: (r.reason as Error).message },
+    );
+
+    // Article 5.2 : la responsabilite se demontre. Le bilan rendu au navigateur
+    // ne survit pas a l'onglet du marchand ; il faut qu'il en reste une trace
+    // cote serveur. Par identifiants uniquement : le courriel de la personne
+    // effacee n'a rien a faire dans un journal qu'on conserve.
+    this.logger.log(
+      `Effacement RGPD acteur=${acteur} customerId=${customerId} bilan=` +
+        resultats.map((r) => `${r.service}:${r.statut}`).join(','),
     );
 
     return { customerId, resultats };

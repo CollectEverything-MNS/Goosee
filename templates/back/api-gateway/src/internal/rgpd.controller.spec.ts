@@ -21,7 +21,7 @@ describe('RgpdController', () => {
     mockRgpd.erase.mockResolvedValue(bilan);
 
     await expect(controller.erase('c-1')).resolves.toBe(bilan);
-    expect(mockRgpd.erase).toHaveBeenCalledWith('c-1');
+    expect(mockRgpd.erase).toHaveBeenCalledWith('c-1', 'service-interne');
   });
 
   it("l export relaie au service partage et rend ses donnees", async () => {

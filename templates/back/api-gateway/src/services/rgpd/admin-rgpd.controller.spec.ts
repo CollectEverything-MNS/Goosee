@@ -5,11 +5,19 @@ import { RgpdService } from './rgpd.service';
 import { JwtAuthGuard } from '../../shared/services/jwt-auth.guard';
 import { RolesGuard } from '../../shared/services/roles.guard';
 import { ROLES_KEY } from '../../shared/services/roles.decorator';
+import { JwtPayload } from '../../shared/services/jwt-payload.type';
 
 describe('AdminRgpdController', () => {
   let controller: AdminRgpdController;
   const mockRgpd = { erase: jest.fn(), export: jest.fn() };
   const reflector = new Reflector();
+  const acteur: JwtPayload = {
+    sub: 'admin-7',
+    email: 'admin@boutique.fr',
+    roles: ['rgpd'],
+    tokenVersion: 1,
+    typ: 'access',
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -35,8 +43,18 @@ describe('AdminRgpdController', () => {
     };
     mockRgpd.erase.mockResolvedValue(bilan);
 
-    await expect(controller.erase('c-1')).resolves.toBe(bilan);
-    expect(mockRgpd.erase).toHaveBeenCalledWith('c-1');
+    await expect(controller.erase('c-1', acteur)).resolves.toBe(bilan);
+    expect(mockRgpd.erase).toHaveBeenCalledWith('c-1', 'admin-7');
+  });
+
+  it("transmet l identifiant du demandeur au service, jamais son courriel", async () => {
+    mockRgpd.erase.mockResolvedValue({ customerId: 'c-1', resultats: [] });
+
+    await controller.erase('c-1', acteur);
+
+    const args = mockRgpd.erase.mock.calls[0];
+    expect(args).toEqual(['c-1', 'admin-7']);
+    expect(JSON.stringify(args)).not.toContain('admin@boutique.fr');
   });
 
   it("l export relaie au service partage", async () => {

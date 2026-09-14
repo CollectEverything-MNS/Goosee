@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { of, throwError } from 'rxjs';
@@ -64,6 +65,28 @@ describe('RgpdService', () => {
     expect(urls.some((u) => u.includes('ORDER_SERVICE_HOST'))).toBe(true);
     expect(urls.some((u) => u.includes('LOG_SERVICE_HOST'))).toBe(true);
     expect(urls.some((u) => u.includes('TICKET_SERVICE_HOST'))).toBe(false);
+  });
+
+  // Le bilan rendu au navigateur ne survit pas a l'onglet : sans trace serveur,
+  // l'article 5.2 n'a rien a montrer.
+  it("consigne l acteur, le customerId et le sort de chaque service", async () => {
+    const journal = jest
+      .spyOn(Logger.prototype, 'log')
+      .mockImplementation(() => undefined);
+    mockHttp.post
+      .mockReturnValueOnce(of({ data: { service: 'user', statut: 'efface' } }))
+      .mockReturnValueOnce(throwError(() => new Error('service injoignable')))
+      .mockReturnValue(of({ data: { service: 'autre', statut: 'efface' } }));
+
+    await service.erase('c-1', 'admin-7');
+
+    expect(journal).toHaveBeenCalledTimes(1);
+    const ligne = journal.mock.calls[0][0] as string;
+    expect(ligne).toContain('admin-7');
+    expect(ligne).toContain('c-1');
+    expect(ligne).toContain('user:efface');
+    expect(ligne).toContain('cart:echec');
+    journal.mockRestore();
   });
 
   it("l export agrege user et order, jamais ticket", async () => {
