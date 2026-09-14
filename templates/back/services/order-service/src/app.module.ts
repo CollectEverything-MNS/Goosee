@@ -22,6 +22,8 @@ import { UpdateOrderStatusController } from './usecases/update-order-status/upda
 import { UpdateOrderStatusUseCase } from './usecases/update-order-status/update-order-status.usecase';
 import { RgpdEraseController } from './usecases/rgpd-erase/rgpd-erase.controller';
 import { RgpdEraseUseCase } from './usecases/rgpd-erase/rgpd-erase.usecase';
+import { RgpdExportController } from './usecases/rgpd-export/rgpd-export.controller';
+import { RgpdExportUseCase } from './usecases/rgpd-export/rgpd-export.usecase';
 import { ProductClient } from './shared/product-client.service';
 import { StockClient } from './shared/stock-client.service';
 
@@ -72,6 +74,7 @@ import { StockClient } from './shared/stock-client.service';
     GetOrderController,
     UpdateOrderStatusController,
     RgpdEraseController,
+    RgpdExportController,
   ],
   providers: [
     {
@@ -83,6 +86,7 @@ import { StockClient } from './shared/stock-client.service';
     GetOrderUseCase,
     UpdateOrderStatusUseCase,
     RgpdEraseUseCase,
+    RgpdExportUseCase,
     ProductClient,
     StockClient,
   ],
