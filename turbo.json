@@ -122,6 +122,10 @@
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
+    "test:ci": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
     "format": {
       "cache": false
     }

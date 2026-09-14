@@ -2,8 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { CreateUserUseCase } from './create-user.usecase';
 import { IUserRepository } from '../../repositories/user.repository';
+import { IRoleRepository } from '../../repositories/role.repository';
+import { LogClient } from '../../shared/log-client.service';
 import { CreateUserDto } from './create-user.dto';
 import { User } from '../../entities/user.entity';
+import { Role } from '../../entities/role.entity';
 
 describe('CreateUserUseCase', () => {
   let usecase: CreateUserUseCase;
@@ -17,6 +20,24 @@ describe('CreateUserUseCase', () => {
     deleteById: jest.fn(),
   };
 
+  const mockRoleRepo = {
+    save: jest.fn(),
+    findById: jest.fn(),
+    findByName: jest.fn(),
+    list: jest.fn(),
+    deleteById: jest.fn(),
+    count: jest.fn(),
+  };
+
+  const mockLogClient = {
+    info: jest.fn(),
+    success: jest.fn(),
+    warning: jest.fn(),
+    error: jest.fn(),
+    critical: jest.fn(),
+    debug: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -25,6 +46,14 @@ describe('CreateUserUseCase', () => {
           provide: IUserRepository,
           useValue: mockUserRepo,
         },
+        {
+          provide: IRoleRepository,
+          useValue: mockRoleRepo,
+        },
+        {
+          provide: LogClient,
+          useValue: mockLogClient,
+        },
       ],
     }).compile();
 
@@ -32,6 +61,9 @@ describe('CreateUserUseCase', () => {
     userRepo = module.get(IUserRepository);
 
     jest.clearAllMocks();
+    mockRoleRepo.findByName.mockImplementation((name: string) =>
+      Promise.resolve({ id: `role-${name}`, name } as Role)
+    );
   });
 
   describe('execute', () => {

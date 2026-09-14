@@ -27,7 +27,14 @@ dist/
 build/
 .next/
 out/
+coverage/
 *.tsbuildinfo
+
+# Turbo cache
+.turbo/
+
+# Test coverage
+coverage/
 
 # IDEs and editors
 .vscode/

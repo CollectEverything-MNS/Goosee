@@ -15,6 +15,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
+    "test:ci": "jest --coverage --ci",
     "typeorm": "typeorm-ts-node-commonjs -d src/config/orm.config.ts",
     "migration:generate": "yarn typeorm migration:generate",
     "migration:run": "yarn typeorm migration:run",
@@ -63,8 +64,11 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": { "^.+\\.(t|j)s$": "ts-jest" },
-    "collectCoverageFrom": ["**/*.(t|j)s"],
+    "collectCoverageFrom": ["usecases/**/*.usecase.ts"],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coverageThreshold": {
+      "global": { "branches": 70, "functions": 70, "lines": 70, "statements": 70 }
+    }
   }
 }

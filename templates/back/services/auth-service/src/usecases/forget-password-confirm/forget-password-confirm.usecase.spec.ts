@@ -65,6 +65,7 @@ describe('ForgetPasswordConfirmUseCase', () => {
       password: 'oldHashedPassword',
       role: ['CUSTOMER'],
       isVerified: true,
+      tokenVersion: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
