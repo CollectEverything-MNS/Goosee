@@ -234,6 +234,7 @@ export function PageBuilderStack({ components, onChange }: Props) {
               <div className="max-h-[calc(90vh-3.5rem)] overflow-hidden">
                 <PageBuilderComponentEditor
                   component={selected}
+                  allComponents={components}
                   onUpdate={(props) => updateComponent(selected.id, props)}
                   onClose={() => setSelectedId(null)}
                   embedded

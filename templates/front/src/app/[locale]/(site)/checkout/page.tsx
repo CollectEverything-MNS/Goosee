@@ -202,6 +202,7 @@ export default function CheckoutPage() {
           <ShoppingCart className="h-8 w-8 text-muted-foreground" />
         </div>
         <h1 className="text-2xl font-bold">Votre panier est vide</h1>
+        <h2 className="sr-only">Panier</h2>
         <p className="text-muted-foreground">Ajoutez des produits avant de passer commande.</p>
         <Button asChild>
           <Link href={`/${locale}`}>Retour à la boutique</Link>

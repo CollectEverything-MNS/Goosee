@@ -32,6 +32,32 @@ import { ListField } from './list-field'
 const LIST_FIELD_KEYS = ['products', 'testimonials', 'features'] as const
 type ListFieldComponentType = 'featured-products' | 'testimonials' | 'features'
 
+// Niveau de titre le plus profond que chaque type de bloc utilise deja par lui-meme,
+// pour eviter qu'un bloc "Titre" propose un niveau qui creerait un saut (ex: h2 -> h4).
+const HEADING_BASELINE: Partial<Record<string, number>> = {
+  hero: 1,
+  'featured-products': 3,
+  testimonials: 2,
+  banner: 2,
+  features: 3,
+  contact: 3,
+}
+
+function getMaxHeadingLevelBefore(allComponents: PageComponent[], currentId: string): number {
+  let max = 1 // un h1 est toujours present sur la page (bloc Hero ou titre de secours)
+  const sorted = [...allComponents].sort((a, b) => a.order - b.order)
+  for (const c of sorted) {
+    if (c.id === currentId) break
+    if (c.type === 'heading') {
+      const level = Number(((c.props?.level as string) || 'h2').replace('h', ''))
+      if (!Number.isNaN(level)) max = Math.max(max, level)
+    } else if (HEADING_BASELINE[c.type]) {
+      max = Math.max(max, HEADING_BASELINE[c.type]!)
+    }
+  }
+  return max
+}
+
 function ImageField({
   label,
   value,
@@ -98,6 +124,7 @@ function ImageField({
 
 interface PageBuilderComponentEditorProps {
   component: PageComponent
+  allComponents: PageComponent[]
   onUpdate: (props: Record<string, unknown>) => void
   onClose: () => void
   embedded?: boolean
@@ -105,6 +132,7 @@ interface PageBuilderComponentEditorProps {
 
 export function PageBuilderComponentEditor({
   component,
+  allComponents,
   onUpdate,
   onClose,
   embedded = false,
@@ -243,8 +271,12 @@ export function PageBuilderComponentEditor({
       )
     }
 
-    // Level (h1-h6)
+    // Level (h2-h6, jamais h1 : reserve au bloc Hero / au titre de la page)
     if (key === 'level') {
+      const maxBefore = getMaxHeadingLevelBefore(allComponents, component.id)
+      const maxAllowed = Math.min(maxBefore + 1, 6)
+      const availableLevels = [2, 3, 4, 5, 6].filter((l) => l <= maxAllowed)
+
       return (
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
@@ -253,14 +285,16 @@ export function PageBuilderComponentEditor({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="h1">{tOptions('level.h1')}</SelectItem>
-              <SelectItem value="h2">{tOptions('level.h2')}</SelectItem>
-              <SelectItem value="h3">{tOptions('level.h3')}</SelectItem>
-              <SelectItem value="h4">{tOptions('level.h4')}</SelectItem>
-              <SelectItem value="h5">{tOptions('level.h5')}</SelectItem>
-              <SelectItem value="h6">{tOptions('level.h6')}</SelectItem>
+              {availableLevels.map((l) => (
+                <SelectItem key={l} value={`h${l}`}>
+                  {tOptions(`level.h${l}` as never)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+          <p className="text-[11px] text-muted-foreground">
+            Seuls les niveaux qui ne sautent pas d&apos;étape par rapport aux titres déjà présents plus haut sur la page sont proposés.
+          </p>
         </div>
       )
     }

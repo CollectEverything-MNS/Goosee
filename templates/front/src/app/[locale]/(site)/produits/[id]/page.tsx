@@ -170,6 +170,7 @@ export default function ProductDetailPage() {
                   className="h-10 w-10"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={outOfStock}
+                  aria-label="Diminuer la quantité"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -180,6 +181,7 @@ export default function ProductDetailPage() {
                   className="h-10 w-10"
                   onClick={() => setQuantity((q) => q + 1)}
                   disabled={outOfStock}
+                  aria-label="Augmenter la quantité"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
