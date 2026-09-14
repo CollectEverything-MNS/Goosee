@@ -15,7 +15,7 @@ Audit d'accessibilité mené sur le dépôt Goosee, dans le cadre du lot accessi
 | 1 | Lien d'évitement (RGAA 12.7 / WCAG 2.4.1) | Corrigé | Voir ci-dessous |
 | 2 | Hiérarchie des titres (h1 unique, sans saut) | Conforme après corrections | Voir ci-dessous |
 | 3 | Navigation clavier / focus | Corrigé | Voir ci-dessous |
-| 4 | Audit axe-core / Lighthouse (5 pages clés) | En cours, 1 page sur 5 | Voir ci-dessous |
+| 4 | Audit axe-core / Lighthouse (5 pages clés) | Conforme après corrections | Voir ci-dessous |
 
 ## 1. Lien d'évitement
 
@@ -66,8 +66,25 @@ Méthode : Lighthouse en ligne de commande (`npx lighthouse <url> --only-categor
 - Absence de repère "main" détectée lors d'un run, disparue au run suivant : liée à un état de chargement temporaire de la page, pas un vrai problème de code.
 - Saut de niveau de titre détecté après la première correction : le pied de page utilise des `h4` ("Navigation", "Contact") sans `h3` avant eux sur la page. Corrigé en remplaçant ces `h4` par des `h3` dans `footer-navigation.tsx` et `footer-contact.tsx` (correction valable sur toutes les pages du site, le pied de page étant partagé).
 
-Score final apres corrections : **100/100, 0 audit en echec.**
+Score final après corrections : **100/100, 0 audit en échec.**
 
-## Prochaines étapes
+**Catalogue (`/fr/catalogue`)** : score de 100/100 directement, aucune correction nécessaire. Cette page hérite automatiquement de la correction du pied de page appliquée ci-dessus, puisque le pied de page est partagé par toutes les pages du site.
 
-Passer Lighthouse sur les 4 pages restantes (catalogue, fiche produit, checkout, login admin), et compléter cette section avec leurs résultats.
+**Fiche produit (`/fr/produits/<id>`)** : score initial 95/100, avec 1 audit en échec.
+- Les boutons "-" et "+" utilisés pour modifier la quantité n'avaient pas de nom accessible : ce sont des boutons composés uniquement d'une icône, sans texte, donc invisibles pour un lecteur d'écran qui ne peut pas deviner leur fonction. Corrigé en ajoutant un attribut `aria-label` ("Diminuer la quantité" / "Augmenter la quantité") sur chacun des deux boutons, dans `produits/[id]/page.tsx`.
+
+Score final après correction : **100/100, 0 audit en échec.**
+
+**Checkout (`/fr/checkout`)** : score initial 98/100, avec 1 audit en échec.
+- Saut de niveau de titre détecté sur l'état "panier vide" de cette page : le `h1` "Votre panier est vide" est directement suivi par le `h3` du pied de page, sans aucun `h2` entre les deux. Lighthouse ouvre systématiquement sa propre page sans session de panier, donc il tombe toujours sur cet état précis, même famille de problème que celui déjà rencontré au point 2 sur l'accueil sans bloc Hero. Corrigé en ajoutant un `h2` invisible ("Panier") juste après le `h1`, dans la branche "panier vide" de `checkout/page.tsx`.
+
+Score final après correction : **100/100, 0 audit en échec.**
+
+**Login admin (`/fr/goosee-admin/login`)** : score initial 98/100, avec 1 audit en échec.
+- Absence totale de repère "contenu principal" sur cette page. Cette page ne passe par aucun des deux layouts du site (boutique ou admin) : elle est construite uniquement avec des balises génériques, sans aucune indication de structure pour un lecteur d'écran. Corrigé en transformant le conteneur principal de la page en repère "contenu principal", sans aucun changement visuel ni fonctionnel.
+
+Score final après correction : **100/100, 0 audit en échec.**
+
+## Conclusion
+
+Les 5 pages prévues par la mission (accueil, catalogue, fiche produit, checkout, connexion admin) obtiennent toutes un score de 100/100 sur l'audit d'accessibilité automatique, après correction des écarts trouvés. Le périmètre couvert va au-delà de ces 5 pages : les corrections sur le pied de page et sur la structure des titres du constructeur de page s'appliquent à l'ensemble du site public, et la vérification du clavier a couvert l'ensemble du tableau de données partagé par les 19 pages de l'espace admin.
