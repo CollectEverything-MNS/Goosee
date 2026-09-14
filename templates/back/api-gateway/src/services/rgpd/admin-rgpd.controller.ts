@@ -31,6 +31,16 @@ export class AdminRgpdController {
     return this.rgpdService.erase(customerId, acteur?.sub);
   }
 
+  @Get('archived-orders')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('rgpd')
+  @ApiOperation({ summary: 'Lister les commandes archivees apres un effacement' })
+  @ApiResponse({ status: 200, description: 'Commandes archivees, pieces comptables conservees' })
+  @ApiResponse({ status: 403, description: 'Habilitation rgpd manquante' })
+  async listArchivedOrders() {
+    return this.rgpdService.listArchivedOrders();
+  }
+
   @Get('export/:customerId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('rgpd')

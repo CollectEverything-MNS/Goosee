@@ -74,6 +74,21 @@ export class RgpdService {
     return { customerId, resultats };
   }
 
+  // L'archivage n'aurait aucun sens sans cette lecture : `list()` et
+  // `findByCustomer()` d'order-service ecartent les commandes archivees, si bien
+  // qu'une commande archivee ne serait visible nulle part. C'est la seule porte
+  // vers l'archive, et elle demande l'habilitation `rgpd`.
+  async listArchivedOrders(): Promise<Record<string, unknown>> {
+    const urls = serviceUrl(this.config);
+    const headers = { 'x-internal-token': this.config.get<string>('INTERNAL_API_TOKEN') };
+
+    const reponse = await firstValueFrom(
+      this.http.get(`${urls.order}/internal/rgpd/archived-orders`, { headers }),
+    );
+
+    return reponse.data as Record<string, unknown>;
+  }
+
   async export(customerId: string): Promise<Record<string, unknown>> {
     const urls = serviceUrl(this.config);
     const headers = { 'x-internal-token': this.config.get<string>('INTERNAL_API_TOKEN') };

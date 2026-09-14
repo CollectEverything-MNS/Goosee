@@ -89,6 +89,17 @@ describe('RgpdService', () => {
     journal.mockRestore();
   });
 
+  it("la lecture des archives frappe order-service avec le jeton interne", async () => {
+    mockHttp.get.mockReturnValue(of({ data: { commandes: [{ id: 'o-1' }] } }));
+
+    const res = await service.listArchivedOrders();
+
+    expect(res).toEqual({ commandes: [{ id: 'o-1' }] });
+    const [url, options] = mockHttp.get.mock.calls[0] as [string, { headers: Record<string, string> }];
+    expect(url).toBe('http://ORDER_SERVICE_HOST:ORDER_SERVICE_PORT/internal/rgpd/archived-orders');
+    expect(options.headers['x-internal-token']).toBe('INTERNAL_API_TOKEN');
+  });
+
   it("l export agrege user et order, jamais ticket", async () => {
     mockHttp.get.mockReturnValue(of({ data: {} }));
 
