@@ -1,4 +1,4 @@
-import { Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
@@ -48,5 +48,25 @@ export class RgpdController {
     );
 
     return { customerId, resultats };
+  }
+
+  @Get('export/:customerId')
+  async export(@Param('customerId') customerId: string) {
+    const urls = serviceUrl(this.config);
+    const headers = { 'x-internal-token': this.config.get<string>('INTERNAL_API_TOKEN') };
+    const cibles = [urls.user, urls.order, urls.ticket];
+
+    const reponses = await Promise.all(
+      cibles.map((url) =>
+        firstValueFrom(
+          this.http.get(`${url}/internal/rgpd/export`, { headers, params: { customerId } }),
+        ),
+      ),
+    );
+
+    return Object.assign(
+      { exporteLe: new Date().toISOString() },
+      ...reponses.map((r) => r.data as Record<string, unknown>),
+    );
   }
 }
