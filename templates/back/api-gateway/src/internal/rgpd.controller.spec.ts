@@ -1,45 +1,39 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { of, throwError } from 'rxjs';
 import { RgpdController } from './rgpd.controller';
+import { RgpdService } from '../services/rgpd/rgpd.service';
+import { InternalTokenGuard } from '../shared/internal-token.guard';
 
 describe('RgpdController', () => {
   let controller: RgpdController;
-  const mockHttp = { post: jest.fn(), get: jest.fn() };
-  const mockConfig = { get: jest.fn().mockReturnValue('jeton') };
+  const mockRgpd = { erase: jest.fn(), export: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RgpdController],
-      providers: [
-        { provide: HttpService, useValue: mockHttp },
-        { provide: ConfigService, useValue: mockConfig },
-      ],
+      providers: [{ provide: RgpdService, useValue: mockRgpd }],
     }).compile();
     controller = module.get<RgpdController>(RgpdController);
   });
 
-  it("un service en echec n empeche pas les autres et figure au bilan", async () => {
-    mockHttp.post
-      .mockReturnValueOnce(of({ data: { service: 'user', statut: 'efface' } }))
-      .mockReturnValueOnce(throwError(() => new Error('service injoignable')))
-      .mockReturnValue(of({ data: { service: 'autre', statut: 'efface' } }));
+  it("l effacement relaie au service partage et rend son bilan", async () => {
+    const bilan = { customerId: 'c-1', resultats: [{ service: 'user', statut: 'efface' }] };
+    mockRgpd.erase.mockResolvedValue(bilan);
 
-    const bilan = await controller.erase('c-1');
-
-    expect(bilan.customerId).toBe('c-1');
-    expect(bilan.resultats.some((r) => r.statut === 'echec')).toBe(true);
-    expect(bilan.resultats.filter((r) => r.statut !== 'echec').length).toBeGreaterThan(0);
+    await expect(controller.erase('c-1')).resolves.toBe(bilan);
+    expect(mockRgpd.erase).toHaveBeenCalledWith('c-1');
   });
 
-  it("un service en echec fait echouer tout l export (Promise.all, pas allSettled)", async () => {
-    mockHttp.get
-      .mockReturnValueOnce(of({ data: { compte: { id: 'c-1' } } }))
-      .mockReturnValueOnce(throwError(() => new Error('service injoignable')))
-      .mockReturnValue(of({ data: { commandes: [] } }));
+  it("l export relaie au service partage et rend ses donnees", async () => {
+    const donnees = { exporteLe: '2026-09-14T00:00:00.000Z' };
+    mockRgpd.export.mockResolvedValue(donnees);
 
-    await expect(controller.export('c-1')).rejects.toThrow('service injoignable');
+    await expect(controller.export('c-1')).resolves.toBe(donnees);
+    expect(mockRgpd.export).toHaveBeenCalledWith('c-1');
+  });
+
+  it('reste ferme derriere le jeton interne', () => {
+    const guards = Reflect.getMetadata('__guards__', RgpdController) ?? [];
+    expect(guards).toContain(InternalTokenGuard);
   });
 });

@@ -19,6 +19,7 @@ const ALL_PAGE_KEYS = [
   'menu',
   'settings',
   'templates',
+  'rgpd',
 ];
 
 @Injectable()
