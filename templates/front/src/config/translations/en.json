@@ -680,7 +680,7 @@
           "action": "Erase data (GDPR)",
           "title": "Erase client data",
           "subtitle": "Right to erasure — GDPR article 17.",
-          "warning": "{name}'s data will be erased across every service: account, credentials, cart, tickets and logs. Orders are archived to meet accounting obligations. This action cannot be undone.",
+          "warning": "{name}'s data will be erased across every service: account, credentials, cart and logs. Orders are archived to meet accounting obligations. This action cannot be undone.",
           "continue": "Continue",
           "cancel": "Cancel",
           "back": "Back",
