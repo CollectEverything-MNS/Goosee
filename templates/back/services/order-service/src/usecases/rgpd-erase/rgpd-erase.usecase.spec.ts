@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RgpdEraseUseCase } from './rgpd-erase.usecase';
 import { IOrderRepository } from '../../repositories/order.repository';
+import { TypeOrmOrderRepository } from '../../repositories/implements/order.impl.repository';
 
 describe('RgpdEraseUseCase (order)', () => {
   let usecase: RgpdEraseUseCase;
@@ -34,6 +35,19 @@ describe('RgpdEraseUseCase (order)', () => {
   it("n'expose aucune methode de suppression de commande", () => {
     // Une facture doit porter nom et adresse pour rester valable : l'effacement
     // serait une faute, pas une precaution.
-    expect((mockOrderRepo as Record<string, unknown>).deleteByCustomerId).toBeUndefined();
+    //
+    // L'assertion porte sur le depot reel, pas sur le mock que ce fichier
+    // ecrit lui-meme : un mock ne peut attester que de sa propre redaction. Les
+    // methodes abstraites d'IOrderRepository n'existant pas a l'execution, seul
+    // le prototype de l'implementation concrete peut etre interroge.
+    const suppression = /delete|remove/i;
+    const methodes = Object.getOwnPropertyNames(TypeOrmOrderRepository.prototype).filter(
+      (nom) => nom !== 'constructor',
+    );
+
+    // Le depot expose bien des methodes : le filtre ci-dessous ne passe pas
+    // par vacuite.
+    expect(methodes.length).toBeGreaterThan(0);
+    expect(methodes.filter((nom) => suppression.test(nom))).toEqual([]);
   });
 });
