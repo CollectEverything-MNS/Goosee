@@ -669,6 +669,33 @@
         "confirm": "Delete",
         "success": "Client deleted successfully",
         "error": "Error deleting client"
+      },
+      "rgpd": {
+        "export": {
+          "action": "Export data (GDPR)",
+          "success": "Export downloaded",
+          "error": "Error exporting data"
+        },
+        "erase": {
+          "action": "Erase data (GDPR)",
+          "title": "Erase client data",
+          "subtitle": "Right to erasure — GDPR article 17.",
+          "warning": "{name}'s data will be erased across every service: account, credentials, cart, tickets and logs. Orders are archived to meet accounting obligations. This action cannot be undone.",
+          "continue": "Continue",
+          "cancel": "Cancel",
+          "back": "Back",
+          "confirmLabel": "Type the client's email address to confirm the erasure.",
+          "confirmPlaceholder": "client@mail.com",
+          "confirmMismatch": "The address you typed does not match the client's.",
+          "confirm": "Erase permanently",
+          "reportTitle": "Erasure report",
+          "reportSubtitle": "Keep this report: it is the evidence of the erasure, service by service.",
+          "reportHint": "A failed service has not erased its data. Run the erasure again once the service is back.",
+          "close": "Close",
+          "success": "Client data erased",
+          "partial": "Partial erasure: at least one service failed",
+          "error": "Error erasing client data"
+        }
       }
     },
     "pageBuilder": {
