@@ -30,6 +30,9 @@ export default function PublicPage() {
 
   return (
     <main className="min-h-screen">
+      {!page.components?.some((c) => c.type === 'hero') && (
+        <h1 className="sr-only">{page.title}</h1>
+      )}
       <PageRenderer components={page.components} context={{ mode: 'front' }} />
     </main>
   )

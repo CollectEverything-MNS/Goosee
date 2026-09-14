@@ -40,7 +40,7 @@ export function FooterBlock() {
           <FooterContact />
         </div>
 
-        <div className="mt-8 border-t border-gray-800 pt-6 text-center text-xs text-gray-500">
+        <div className="mt-8 border-t border-gray-800 pt-6 text-center text-xs text-gray-400">
           &copy; {year} {siteName}. Tous droits réservés.
         </div>
       </div>

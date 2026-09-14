@@ -12,7 +12,7 @@ interface FooterNavigationProps {
 export function FooterNavigation({ menus, slugMap }: FooterNavigationProps) {
   return (
     <div>
-      <h4 className="mb-3 text-sm font-semibold text-white">Navigation</h4>
+      <h3 className="mb-3 text-sm font-semibold text-white">Navigation</h3>
       <ul className="space-y-2">
         {menus.map((item) => (
           <li key={item.id}>
