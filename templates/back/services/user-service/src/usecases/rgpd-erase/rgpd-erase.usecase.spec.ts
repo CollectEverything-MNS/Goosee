@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { RgpdEraseUseCase } from './rgpd-erase.usecase';
 import { IUserRepository } from '../../repositories/user.repository';
 import { LogClient } from '../../shared/log-client.service';
@@ -37,9 +37,11 @@ describe('RgpdEraseUseCase (user)', () => {
   });
 
   const loggedPayloads = () =>
-    [...mockLogClient.success.mock.calls, ...mockLogClient.warning.mock.calls].map((c) =>
-      JSON.stringify(c[0]),
-    );
+    [
+      ...mockLogClient.success.mock.calls,
+      ...mockLogClient.warning.mock.calls,
+      ...mockLogClient.error.mock.calls,
+    ].map((c) => JSON.stringify(c[0]));
 
   it('supprime le profil et propage l effacement a auth', async () => {
     mockUserRepo.findById.mockResolvedValue({ id: 'c-1', email: 'a@b.fr', authId: 'auth-1' });
@@ -68,6 +70,44 @@ describe('RgpdEraseUseCase (user)', () => {
     );
     expect(loggedPayloads().join(' ')).not.toContain('a@b.fr');
     expect(loggedPayloads().join(' ')).toContain('c-1');
+  });
+
+  // Ce service est le seul a connaitre la correspondance customerId -> authId.
+  // Si le profil partait avant la propagation, un courtier en panne laisserait
+  // la ligne auth (courriel, condensat) vivante et plus aucun code ne saurait
+  // la designer : le rejeu ne trouverait qu'un profil absent.
+  it('laisse le profil intact quand la propagation a auth echoue', async () => {
+    mockUserRepo.findById.mockResolvedValue({ id: 'c-1', email: 'a@b.fr', authId: 'auth-1' });
+    mockRmq.emit.mockReturnValueOnce(throwError(() => new Error('courtier indisponible')));
+
+    const res = await usecase.execute('c-1');
+
+    expect(mockUserRepo.deleteById).not.toHaveBeenCalled();
+    expect(res).toEqual({
+      service: 'user',
+      statut: 'echec',
+      authPropage: false,
+      raison: 'courtier indisponible',
+    });
+    expect(mockLogClient.error).toHaveBeenCalledWith(expect.objectContaining({ userId: 'c-1' }));
+    expect(loggedPayloads().join(' ')).not.toContain('a@b.fr');
+  });
+
+  it('un rejeu apres un echec de propagation retrouve authId et aboutit', async () => {
+    mockUserRepo.findById.mockResolvedValue({ id: 'c-1', email: 'a@b.fr', authId: 'auth-1' });
+    mockRmq.emit.mockReturnValueOnce(throwError(() => new Error('courtier indisponible')));
+
+    expect((await usecase.execute('c-1')).statut).toBe('echec');
+
+    // Le depot n'a rien perdu : le second passage lit le meme profil et
+    // retrouve donc authId, que lui seul pouvait fournir.
+    mockRmq.emit.mockReturnValueOnce(of(undefined));
+    const rejeu = await usecase.execute('c-1');
+
+    expect(rejeu).toEqual({ service: 'user', statut: 'efface', authPropage: true });
+    expect(mockRmq.emit).toHaveBeenLastCalledWith('user.deleted', { authId: 'auth-1' });
+    expect(mockUserRepo.deleteById).toHaveBeenCalledTimes(1);
+    expect(mockUserRepo.deleteById).toHaveBeenCalledWith('c-1');
   });
 
   it('renvoie "absent" si le profil n existe plus, sans lever', async () => {
