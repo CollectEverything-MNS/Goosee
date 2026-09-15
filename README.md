@@ -89,6 +89,8 @@ retombe en mode mock.
 
 - [Audit du SI](docs/audit-si.md) — état des lieux mesuré, constats, et traçabilité des
   décisions d'architecture
+- [Dossier d'architecture](docs/architecture/README.md) — diagrammes C4, déploiement,
+  séquences et modèle de données, en mermaid versionné
 - [Fonctionnement](docs/fonctionnement.md) · [Structure du projet](docs/structure-projet.md)
 - [Plan POC](docs/plan-poc.md) · [Journal de dev](docs/journal-dev.md)
 - [Stratégie de tests & couverture](docs/strategie-tests.md) · [Tests e2e](templates/back/api-gateway/test/README.md) · [Tests de charge k6](load/README.md) · [Analyse de performance](docs/analyse-performance.md)

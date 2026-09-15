@@ -271,7 +271,12 @@ Deux branches portent les premières décisions, avec leurs chaînes d'intégrat
 | `securite/durcissement-control-plane` | `goosee-vitrine` | Décisions 1, 2 — gardes, secrets hors ligne de commande, registre des anomalies, artefacts archivés |
 | `ci/analyses-securite` | `Goosee` | Chaîne d'analyses de sécurité, porte recentrée sur les gravités critiques |
 
-Les décisions 3 à 10 sont réparties dans le plan d'actions de l'équipe.
+La **décision 8** est livrée avec cet audit : le [dossier d'architecture](architecture/README.md)
+porte les diagrammes C4, de déploiement, de séquences et de modèle de données, en mermaid
+versionné dans le dépôt. Ils ne sont pas illustratifs — leurs valeurs (ports, événements AMQP,
+entités) sont relevées dans le code et recontrôlables par les commandes de l'annexe.
+
+Les autres décisions sont réparties dans le plan d'actions de l'équipe.
 
 ---
 
