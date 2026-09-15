@@ -18,4 +18,9 @@ export class TypeOrmCartRepository implements ICartRepository {
   async save(cart: Cart): Promise<Cart> {
     return this.repository.save(cart);
   }
+
+  async deleteByCustomerId(customerId: string): Promise<number> {
+    const res = await this.repository.delete({ customerId });
+    return res.affected ?? 0;
+  }
 }

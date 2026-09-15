@@ -26,4 +26,8 @@ export class TypeOrmAuthRepository implements IAuthRepository {
   async softDeleteById(id: string): Promise<void> {
     await this.repository.softDelete(id);
   }
+
+  async eraseById(id: string): Promise<void> {
+    await this.repository.delete({ id });
+  }
 }

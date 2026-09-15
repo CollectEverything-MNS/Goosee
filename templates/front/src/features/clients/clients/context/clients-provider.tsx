@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useDialogState from '@/hooks/use-dialog-state';
 
-type ClientDialogType = 'create' | 'edit' | 'delete'
+type ClientDialogType = 'create' | 'edit' | 'delete' | 'rgpd-erase'
 
 interface ClientContextType {
   open: ClientDialogType | null

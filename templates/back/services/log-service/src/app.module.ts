@@ -13,6 +13,8 @@ import { CreateLogUseCase } from './usecases/create-log/create-log.usecase';
 import { CreateLogEventsListener } from './usecases/create-log/create-log.event';
 import { ListLogsUseCase } from './usecases/list-logs/list-logs.usecase';
 import { ListLogsController } from './usecases/list-logs/list-logs.controller';
+import { RgpdEraseController } from './usecases/rgpd-erase/rgpd-erase.controller';
+import { RgpdEraseUseCase } from './usecases/rgpd-erase/rgpd-erase.usecase';
 
 @Module({
   imports: [
@@ -37,7 +39,13 @@ import { ListLogsController } from './usecases/list-logs/list-logs.controller';
     }),
     TypeOrmModule.forFeature([Log]),
   ],
-  controllers: [HealthController, MetricsController, CreateLogEventsListener, ListLogsController],
+  controllers: [
+    HealthController,
+    MetricsController,
+    CreateLogEventsListener,
+    ListLogsController,
+    RgpdEraseController,
+  ],
   providers: [
     {
       provide: ILogRepository,
@@ -45,6 +53,7 @@ import { ListLogsController } from './usecases/list-logs/list-logs.controller';
     },
     CreateLogUseCase,
     ListLogsUseCase,
+    RgpdEraseUseCase,
   ],
 })
 export class AppModule {}

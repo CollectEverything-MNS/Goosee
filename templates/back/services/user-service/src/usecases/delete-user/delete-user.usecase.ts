@@ -34,7 +34,7 @@ export class DeleteUserUseCase {
     }
 
     this.logClient.success({
-      message: `Utilisateur supprimé : ${user.email}`,
+      message: `Utilisateur supprime : ${id}`,
       userId: id,
     });
 

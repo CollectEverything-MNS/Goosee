@@ -11,6 +11,7 @@ import { useListCustomers } from '@/features/users/usecases/use-list-customers';
 import ClientsProvider, { useClient } from './context/clients-provider';
 import { ClientDeleteDialog } from './components/client-delete-dialog';
 import { ClientFormDialog } from './components/client-form-dialog';
+import { ClientRgpdEraseDialog } from './components/client-rgpd-erase-dialog';
 import { ClientsListingToolbar } from './components/clients-listing-toolbar';
 import { getClientsColumns } from './components/clients-columns';
 import { useDetailUrlSync } from '@/hooks/use-detail-url-sync';
@@ -38,6 +39,7 @@ function ClientsContent() {
       <DataTable columns={getClientsColumns()} data={customers} Toolbar={ClientsListingToolbar} />
       <ClientFormDialog />
       <ClientDeleteDialog />
+      <ClientRgpdEraseDialog />
     </div>
   );
 }
