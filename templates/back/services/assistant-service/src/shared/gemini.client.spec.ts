@@ -46,7 +46,7 @@ describe('GeminiClient', () => {
 
   it('utilise le modele par defaut si GEMINI_MODEL est absent', () => {
     const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k' }), jest.fn());
-    expect(client.name).toBe('gemini-2.5-flash');
+    expect(client.name).toBe('gemini-3.6-flash');
   });
 
   it('traduit un 429 en TOO_MANY_REQUESTS', async () => {

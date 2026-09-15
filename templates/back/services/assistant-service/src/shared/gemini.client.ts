@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { AssistantModel, ChatMessage } from './assistant-model';
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+const DEFAULT_MODEL = 'gemini-3.6-flash';
 const REQUEST_TIMEOUT_MS = 30_000;
 
 type FetchFn = typeof fetch;

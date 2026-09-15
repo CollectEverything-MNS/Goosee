@@ -1042,7 +1042,8 @@
       "welcome": "Bonjour ! Je réponds à vos questions sur l'administration de votre boutique : pages, produits, commandes, rôles, statistiques… Que souhaitez-vous savoir ?",
       "thinking": "L'assistant réfléchit…",
       "error": "L'assistant est indisponible pour le moment. Réessayez dans un instant.",
-      "poweredBy": "Propulsé par Gemini · réponses basées sur le guide utilisateur"
+      "poweredBy": "Propulsé par Gemini · réponses basées sur le guide utilisateur",
+      "launcher": "Assistant IA"
     }
   }
 }
