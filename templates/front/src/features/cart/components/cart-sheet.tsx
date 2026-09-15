@@ -99,6 +99,7 @@ export function CartSheet() {
                             className="h-7 w-7"
                             disabled={isMutating}
                             onClick={() => updateItem(item.productId, item.quantity - 1)}
+                            aria-label="Diminuer la quantité"
                           >
                             <Minus className="h-3.5 w-3.5" />
                           </Button>
@@ -109,6 +110,7 @@ export function CartSheet() {
                             className="h-7 w-7"
                             disabled={isMutating}
                             onClick={() => updateItem(item.productId, item.quantity + 1)}
+                            aria-label="Augmenter la quantité"
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </Button>
@@ -119,6 +121,7 @@ export function CartSheet() {
                           className="h-7 w-7 text-muted-foreground hover:text-destructive"
                           disabled={isMutating}
                           onClick={() => removeItem(item.productId)}
+                          aria-label="Retirer du panier"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
