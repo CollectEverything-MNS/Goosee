@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BookOpen, ChevronRight, Loader2, Search } from 'lucide-react';
 
@@ -108,6 +108,7 @@ export function Documentation() {
   const { data: guide, isLoading, isError } = useGuide();
   const [query, setQuery] = useState('');
   const [openParts, setOpenParts] = useState<Record<string, boolean>>({});
+  const tocRef = useRef<HTMLElement>(null);
 
   const body = useMemo(() => (guide ? stripToc(guide) : ''), [guide]);
   const headings = useMemo(() => extractHeadings(body), [body]);
@@ -126,13 +127,23 @@ export function Documentation() {
     if (activePartId) setOpenParts((prev) => (prev[activePartId] ? prev : { ...prev, [activePartId]: true }));
   }, [activePartId]);
 
-  // Le sommaire suit le scroll : l'entree active reste visible dans le panneau lateral.
+  // Le sommaire suit le scroll : on ne fait defiler que le panneau lateral (pas la page),
+  // sans animation, et uniquement si l'entree active est sortie de la zone visible.
   useEffect(() => {
     if (!activeId) return;
     const frame = window.requestAnimationFrame(() => {
-      document
-        .querySelector<HTMLElement>(`[data-toc-id="${activeId}"]`)
-        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      const nav = tocRef.current;
+      const link = nav?.querySelector<HTMLElement>(`[data-toc-id="${activeId}"]`);
+      if (!nav || !link) return;
+
+      const navRect = nav.getBoundingClientRect();
+      const linkRect = link.getBoundingClientRect();
+      const margin = 24;
+      if (linkRect.top < navRect.top + margin) {
+        nav.scrollTop += linkRect.top - navRect.top - margin;
+      } else if (linkRect.bottom > navRect.bottom - margin) {
+        nav.scrollTop += linkRect.bottom - navRect.bottom + margin;
+      }
     });
     return () => window.cancelAnimationFrame(frame);
   }, [activeId, activePartId]);
@@ -188,6 +199,7 @@ export function Documentation() {
             </div>
 
             <nav
+              ref={tocRef}
               aria-label={t('admin.documentation.toc')}
               className="mt-4 max-h-[calc(100vh-14rem)] overflow-y-auto pr-1 text-sm"
             >
