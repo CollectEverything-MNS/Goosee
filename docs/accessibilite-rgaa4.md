@@ -16,6 +16,7 @@ Audit d'accessibilité mené sur le dépôt Goosee, dans le cadre du lot accessi
 | 2 | Hiérarchie des titres (h1 unique, sans saut) | Conforme après corrections | Voir ci-dessous |
 | 3 | Navigation clavier / focus | Corrigé | Voir ci-dessous |
 | 4 | Audit axe-core / Lighthouse (5 pages clés) | Conforme après corrections | Voir ci-dessous |
+| 5 | Noms accessibles des champs et boutons (RGAA 11.1, 11.2, 7.1 / WCAG 1.3.1, 4.1.2), langue de page (RGAA 8.3) | Corrigé | Voir ci-dessous |
 
 ## 1. Lien d'évitement
 
@@ -84,6 +85,24 @@ Score final après correction : **100/100, 0 audit en échec.**
 - Absence totale de repère "contenu principal" sur cette page. Cette page ne passe par aucun des deux layouts du site (boutique ou admin) : elle est construite uniquement avec des balises génériques, sans aucune indication de structure pour un lecteur d'écran. Corrigé en transformant le conteneur principal de la page en repère "contenu principal", sans aucun changement visuel ni fonctionnel.
 
 Score final après correction : **100/100, 0 audit en échec.**
+
+## 5. Noms accessibles des champs et boutons, langue de page
+
+**Constat de départ** (audit du SI, section 4.6, et comptage statique sur `templates/front/src` hors composants génériques `ui/`) : sur **133 champs de formulaire**, **83** avaient un nom accessible (libellé associé par `htmlFor`/`id`, composant `FormControl` du design system, ou `aria-label`), **50** n'en avaient aucun. La balise `<html>` portait `lang="fr"` en dur, même sur les pages anglaises. Toutes les images (29) avaient déjà un attribut `alt`.
+
+**Corrections appliquées** :
+- Champs de recherche des tableaux de l'administration (produits, catégories, commandes, stock, utilisateurs, recherche globale, sélecteur de bloc) : `aria-label` reprenant le texte indicatif.
+- Éditeur de blocs du constructeur de page : les 14 listes déroulantes (niveau de titre, alignement, variante, taille, colonnes, style, ratio, marges, fond…), les champs d'image et de couleur reçoivent le libellé affiché à côté d'eux (`page-builder-component-editor.tsx`, `list-field.tsx`).
+- Éditeur de page : sélecteur de type relié à son libellé par `id`, sélecteur de statut, boutons « Retour », « Paramètres de la page » et « Aperçu » nommés (`page-editor.tsx`).
+- Modales du compte administrateur (changement d'e-mail, de mot de passe, profil) : libellés associés par `htmlFor`/`id`, champs du code de vérification numérotés (« Code 1/6 »…).
+- Préférences (site public et administration) : sélecteurs de langue et de thème, interrupteurs newsletter et notifications nommés.
+- Permissions d'un rôle : chaque case à cocher porte le nom de l'écran qu'elle autorise. Statut d'une commande, période des statistiques, champ hexadécimal de la couleur principale : nommés.
+- Boutons composés d'une seule icône : déplacer / modifier / dupliquer / supprimer un bloc, monter / descendre un élément de liste, définir l'image principale / supprimer une image / ajouter des images, ajouter / supprimer une caractéristique produit, quantité et retrait dans le panier, retirer un fichier envoyé, fermer l'éditeur.
+- Langue : `app/layout.tsx` lit la locale courante via `getLocale()` de next-intl et l'applique à `<html lang>` (`fr` ou `en` selon l'adresse).
+
+**Résultat après corrections** (même comptage) : **133 champs sur 133** avec un nom accessible, 0 sans. Aucun changement visuel ni fonctionnel : uniquement des attributs `aria-label`, `id`/`htmlFor` et `lang`.
+
+**Audit automatique axe-core avant/après** : rapports versionnés dans `docs/accessibilite/rapports/` (5 pages non authentifiées). Les violations par page sont identiques avant et après, parce que les champs corrigés sont presque tous derrière une session ; l'écart restant relevé par axe est structurel (page « mot de passe oublié » sans repère `<main>` ni régions) et n'est pas traité ici.
 
 ## Conclusion
 
