@@ -77,6 +77,7 @@ interface ListFieldProps {
 
 export function ListField({ label, value, onChange, componentType }: ListFieldProps) {
   const t = useTranslations('admin.pageBuilder.editor.lists');
+  const tA11y = useTranslations('admin.a11y');
   const schema = useSchema(componentType);
 
   const items = useMemo<Record<string, unknown>[]>(() => {
@@ -197,7 +198,7 @@ function ItemCard({
                 onClick={onMoveUp}
                 disabled={isFirst}
                 title="Monter"
-                aria-label="Monter"
+                aria-label={tA11y('moveUp')}
               >
                 <ChevronDown className="h-3.5 w-3.5 rotate-180" />
               </Button>
@@ -209,7 +210,7 @@ function ItemCard({
                 onClick={onMoveDown}
                 disabled={isLast}
                 title="Descendre"
-                aria-label="Descendre"
+                aria-label={tA11y('moveDown')}
               >
                 <ChevronDown className="h-3.5 w-3.5" />
               </Button>

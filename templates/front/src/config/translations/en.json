@@ -1064,7 +1064,15 @@
     "a11y": {
       "back": "Back",
       "previewPage": "Preview page",
-      "pageStatus": "Page status"
+      "pageStatus": "Page status",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removeImage": "Remove image",
+      "category": "Category",
+      "addAttribute": "Add attribute",
+      "setMainImage": "Set as main image",
+      "deleteImage": "Delete image",
+      "addImages": "Add images"
     }
   }
 }

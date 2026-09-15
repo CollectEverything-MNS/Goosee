@@ -71,6 +71,7 @@ function ImageField({
   onUpload: (file: File) => Promise<{ url: string }>
   uploadPlaceholder: string
 }) {
+  const tA11y = useTranslations('admin.a11y')
   return (
     <div className="min-w-0 space-y-2">
       <Label className="text-xs font-medium">{label}</Label>
@@ -97,7 +98,7 @@ function ImageField({
             className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
             onClick={() => onChange('')}
             title="Retirer"
-            aria-label="Retirer l'image"
+            aria-label={tA11y('removeImage')}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -144,6 +145,7 @@ export function PageBuilderComponentEditor({
   const tEditor = useTranslations('admin.pageBuilder.editor')
   const tLabels = useTranslations('admin.pageBuilder.editor.labels')
   const tOptions = useTranslations('admin.pageBuilder.editor.options')
+  const tA11y = useTranslations('admin.a11y')
   const uploadMutation = useUploadFile()
   const { data: categories = [] } = useListCategories()
 
@@ -209,7 +211,7 @@ export function PageBuilderComponentEditor({
             value={value ? (value as string) : ALL}
             onValueChange={(v) => handleChange(key, v === ALL ? '' : v)}
           >
-            <SelectTrigger aria-label="Catégorie">
+            <SelectTrigger aria-label={tA11y('category')}>
               <SelectValue placeholder="Toutes les catégories" />
             </SelectTrigger>
             <SelectContent>

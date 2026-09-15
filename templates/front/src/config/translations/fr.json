@@ -1063,7 +1063,15 @@
     "a11y": {
       "back": "Retour",
       "previewPage": "Aperçu de la page",
-      "pageStatus": "Statut de la page"
+      "pageStatus": "Statut de la page",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "removeImage": "Retirer l'image",
+      "category": "Catégorie",
+      "addAttribute": "Ajouter la caractéristique",
+      "setMainImage": "Définir comme image principale",
+      "deleteImage": "Supprimer l'image",
+      "addImages": "Ajouter des images"
     }
   }
 }

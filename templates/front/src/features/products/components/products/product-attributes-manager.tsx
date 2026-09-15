@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,6 +14,7 @@ import {
 } from '../../usecases/use-product-attributes';
 
 export function ProductAttributesManager({ productId }: { productId: string }) {
+  const tA11y = useTranslations('admin.a11y');
   const { data: attributes = [], isLoading } = useProductAttributes(productId);
   const addMutation = useAddProductAttribute(productId);
   const deleteMutation = useDeleteProductAttribute(productId);
@@ -115,7 +117,7 @@ export function ProductAttributesManager({ productId }: { productId: string }) {
           className="h-9 w-9 shrink-0"
           onClick={handleAdd}
           disabled={addMutation.isPending}
-          aria-label="Ajouter la caractéristique"
+          aria-label={tA11y('addAttribute')}
         >
           {addMutation.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
