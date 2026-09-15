@@ -7,6 +7,7 @@ export type CreateLogPayload = {
   level?: LogLevel;
   message: string;
   userId?: string;
+  categorie?: string;
 };
 
 @Injectable()
@@ -26,6 +27,7 @@ export class CreateLogUseCase {
     log.level = payload.level;
     log.message = payload.message;
     log.userId = payload.userId;
+    log.categorie = payload.categorie ?? null;
 
     await this.logRepo.save(log);
   }

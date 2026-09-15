@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { IUserRepository } from '../../repositories/user.repository';
-import { LogClient } from '../../shared/log-client.service';
+import { CATEGORIE_PREUVE_RGPD, LogClient } from '../../shared/log-client.service';
 
 export interface RgpdEraseResult {
   service: string;
@@ -35,6 +35,7 @@ export class RgpdEraseUseCase {
       this.logClient.warning({
         message: `Demande d'effacement RGPD pour un profil deja absent : ${customerId}`,
         userId: customerId,
+        categorie: CATEGORIE_PREUVE_RGPD,
       });
       return { service: 'user', statut: 'absent', authPropage: false };
     }
@@ -44,6 +45,7 @@ export class RgpdEraseUseCase {
       this.logClient.success({
         message: `Profil efface par demande RGPD (sans compte auth associe) : ${customerId}`,
         userId: customerId,
+        categorie: CATEGORIE_PREUVE_RGPD,
       });
       return { service: 'user', statut: 'efface', authPropage: false };
     }
@@ -57,6 +59,7 @@ export class RgpdEraseUseCase {
           `Effacement RGPD interrompu : propagation a auth impossible, ` +
           `profil conserve pour permettre un rejeu : ${customerId} (${raison})`,
         userId: customerId,
+        categorie: CATEGORIE_PREUVE_RGPD,
       });
       return { service: 'user', statut: 'echec', authPropage: false, raison };
     }
@@ -65,6 +68,7 @@ export class RgpdEraseUseCase {
     this.logClient.success({
       message: `Profil efface par demande RGPD et effacement propage a auth : ${customerId}`,
       userId: customerId,
+      categorie: CATEGORIE_PREUVE_RGPD,
     });
     return { service: 'user', statut: 'efface', authPropage: true };
   }

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
 import { RgpdEraseUseCase } from './rgpd-erase.usecase';
 import { IUserRepository } from '../../repositories/user.repository';
-import { LogClient } from '../../shared/log-client.service';
+import { CATEGORIE_PREUVE_RGPD, LogClient } from '../../shared/log-client.service';
 
 describe('RgpdEraseUseCase (user)', () => {
   let usecase: RgpdEraseUseCase;
@@ -122,5 +122,37 @@ describe('RgpdEraseUseCase (user)', () => {
     );
     expect(loggedPayloads().join(' ')).not.toContain('a@b.fr');
     expect(loggedPayloads().join(' ')).toContain('c-1');
+  });
+
+  // Sans cette categorie la purge de log-service emporte la trace, et rejouer un
+  // effacement detruit la preuve du precedent — constate a l'execution le 15/09.
+  it('marque chaque trace d effacement comme preuve, quel que soit l issue', async () => {
+    const cas: Array<() => void> = [
+      () => mockUserRepo.findById.mockResolvedValue({ id: 'c-1', authId: 'auth-1' }),
+      () => mockUserRepo.findById.mockResolvedValue({ id: 'c-1', authId: null }),
+      () => mockUserRepo.findById.mockResolvedValue(null),
+      () => {
+        mockUserRepo.findById.mockResolvedValue({ id: 'c-1', authId: 'auth-1' });
+        mockRmq.emit.mockReturnValueOnce(throwError(() => new Error('courtier indisponible')));
+      },
+    ];
+
+    for (const preparer of cas) {
+      jest.clearAllMocks();
+      mockRmq.emit.mockReturnValue(of(undefined));
+      preparer();
+
+      await usecase.execute('c-1');
+
+      const tracees = [
+        ...mockLogClient.success.mock.calls,
+        ...mockLogClient.warning.mock.calls,
+        ...mockLogClient.error.mock.calls,
+      ];
+      expect(tracees).toHaveLength(1);
+      expect(tracees[0][0]).toEqual(
+        expect.objectContaining({ categorie: CATEGORIE_PREUVE_RGPD }),
+      );
+    }
   });
 });
