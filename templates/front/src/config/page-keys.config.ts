@@ -20,6 +20,7 @@ export const ROUTE_PAGE_KEY_MAP: Record<string, string> = {
   menu: 'menu',
   settings: 'settings',
   templates: 'templates',
+  documentation: 'dashboard',
 };
 
 /**

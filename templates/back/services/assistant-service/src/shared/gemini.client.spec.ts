@@ -27,8 +27,15 @@ describe('GeminiClient', () => {
   it("appelle l'API Gemini avec le prompt systeme et les roles convertis", async () => {
     const fetchFn = jest
       .fn()
-      .mockResolvedValue(jsonResponse(200, { candidates: [{ content: { parts: [{ text: 'Bonjour ' }, { text: '!' }] } }] }));
-    const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'gemini-test' }), fetchFn);
+      .mockResolvedValue(
+        jsonResponse(200, {
+          candidates: [{ content: { parts: [{ text: 'Bonjour ' }, { text: '!' }] } }],
+        })
+      );
+    const client = new TestableGeminiClient(
+      configWith({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'gemini-test' }),
+      fetchFn
+    );
 
     const answer = await client.generate('SYS', [
       { role: 'user', content: 'Salut' },
@@ -53,25 +60,33 @@ describe('GeminiClient', () => {
     const fetchFn = jest.fn().mockResolvedValue(jsonResponse(429, {}));
     const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k' }), fetchFn);
 
-    await expect(client.generate('s', [])).rejects.toMatchObject({ status: HttpStatus.TOO_MANY_REQUESTS });
+    await expect(client.generate('s', [])).rejects.toMatchObject({
+      status: HttpStatus.TOO_MANY_REQUESTS,
+    });
   });
 
   it('traduit une erreur HTTP en BAD_GATEWAY', async () => {
     const fetchFn = jest.fn().mockResolvedValue(jsonResponse(500, { error: { message: 'boom' } }));
     const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k' }), fetchFn);
 
-    await expect(client.generate('s', [])).rejects.toMatchObject({ status: HttpStatus.BAD_GATEWAY });
+    await expect(client.generate('s', [])).rejects.toMatchObject({
+      status: HttpStatus.BAD_GATEWAY,
+    });
   });
 
   it('traduit une erreur reseau en BAD_GATEWAY', async () => {
     const fetchFn = jest.fn().mockRejectedValue(new Error('ECONNRESET'));
     const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k' }), fetchFn);
 
-    await expect(client.generate('s', [])).rejects.toMatchObject({ status: HttpStatus.BAD_GATEWAY });
+    await expect(client.generate('s', [])).rejects.toMatchObject({
+      status: HttpStatus.BAD_GATEWAY,
+    });
   });
 
   it('renvoie un refus lisible quand le prompt est bloque', async () => {
-    const fetchFn = jest.fn().mockResolvedValue(jsonResponse(200, { promptFeedback: { blockReason: 'SAFETY' } }));
+    const fetchFn = jest
+      .fn()
+      .mockResolvedValue(jsonResponse(200, { promptFeedback: { blockReason: 'SAFETY' } }));
     const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k' }), fetchFn);
 
     await expect(client.generate('s', [])).resolves.toMatch(/ne peux pas repondre/);
@@ -81,6 +96,8 @@ describe('GeminiClient', () => {
     const fetchFn = jest.fn().mockResolvedValue(jsonResponse(200, { candidates: [] }));
     const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k' }), fetchFn);
 
-    await expect(client.generate('s', [])).rejects.toMatchObject({ status: HttpStatus.BAD_GATEWAY });
+    await expect(client.generate('s', [])).rejects.toMatchObject({
+      status: HttpStatus.BAD_GATEWAY,
+    });
   });
 });

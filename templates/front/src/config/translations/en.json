@@ -189,7 +189,8 @@
         "logs": "Logs"
       },
       "stock": "Stock",
-      "logout": "Logout"
+      "logout": "Logout",
+      "documentation": "Documentation"
     },
     "create": {
       "label": "Create",
@@ -322,7 +323,8 @@
       "orders": "Orders",
       "salesHistory": "History",
       "logs": "Logs",
-      "counter": "Counter"
+      "counter": "Counter",
+      "documentation": "Documentation"
     },
     "analytics": {
       "title": "Analytics",
@@ -1045,6 +1047,14 @@
       "error": "The assistant is unavailable right now. Please try again shortly.",
       "poweredBy": "Powered by Gemini · answers based on the user guide",
       "launcher": "AI Assistant"
+    },
+    "documentation": {
+      "subtitle": "Functional guide for your shop and its administration",
+      "loading": "Loading the guide…",
+      "error": "The documentation cannot be loaded right now.",
+      "search": "Search the guide…",
+      "toc": "Contents",
+      "noResult": "No section matches your search."
     }
   }
 }

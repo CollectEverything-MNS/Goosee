@@ -21,7 +21,9 @@ async function bootstrap() {
   const logger = new Logger('AssistantService');
   logger.log(`Assistant Service is running on http://localhost:${port}`);
   if (!process.env.GEMINI_API_KEY) {
-    logger.warn('GEMINI_API_KEY absente : les requetes repondront 503 tant que la cle n\'est pas renseignee');
+    logger.warn(
+      "GEMINI_API_KEY absente : les requetes repondront 503 tant que la cle n'est pas renseignee"
+    );
   }
 }
 

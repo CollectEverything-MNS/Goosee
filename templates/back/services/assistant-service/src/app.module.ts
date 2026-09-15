@@ -7,6 +7,7 @@ import { ASSISTANT_MODEL } from './shared/assistant-model';
 import { GeminiClient } from './shared/gemini.client';
 import { AskAssistantController } from './usecases/ask-assistant/ask-assistant.controller';
 import { AskAssistantUseCase } from './usecases/ask-assistant/ask-assistant.usecase';
+import { GetGuideController } from './usecases/get-guide/get-guide.controller';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { AskAssistantUseCase } from './usecases/ask-assistant/ask-assistant.usec
       isGlobal: true,
     }),
   ],
-  controllers: [HealthController, AskAssistantController],
+  controllers: [HealthController, AskAssistantController, GetGuideController],
   providers: [
     KnowledgeBaseService,
     {

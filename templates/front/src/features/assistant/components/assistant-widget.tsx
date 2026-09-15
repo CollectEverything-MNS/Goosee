@@ -6,6 +6,7 @@ import { Loader2, Send, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { MarkdownContent } from '@/components/markdown-content';
 import { useAskAssistant } from '../usecases/use-ask-assistant';
 import { ChatMessage } from '../data/assistant.types';
 
@@ -96,7 +97,11 @@ export function AssistantWidget() {
             <Bubble role="assistant">{t('welcome')}</Bubble>
             {messages.map((message, index) => (
               <Bubble key={index} role={message.role}>
-                {message.content}
+                {message.role === 'assistant' ? (
+                  <MarkdownContent compact>{message.content}</MarkdownContent>
+                ) : (
+                  message.content
+                )}
               </Bubble>
             ))}
             {isPending && (

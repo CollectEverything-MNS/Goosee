@@ -13,7 +13,7 @@ describe('AskAssistantUseCase', () => {
     usecase = new AskAssistantUseCase(model, knowledgeBase as unknown as KnowledgeBaseService);
   });
 
-  it('envoie le prompt systeme, l\'historique et la question au modele', async () => {
+  it("envoie le prompt systeme, l'historique et la question au modele", async () => {
     const result = await usecase.execute({
       question: '  Comment ajouter un produit ?  ',
       history: [
@@ -33,7 +33,7 @@ describe('AskAssistantUseCase', () => {
     expect(result).toEqual({ answer: 'Voici la reponse.', model: 'test-model' });
   });
 
-  it('ne garde que les 10 derniers messages de l\'historique et ignore les messages vides', async () => {
+  it("ne garde que les 10 derniers messages de l'historique et ignore les messages vides", async () => {
     const history = Array.from({ length: 14 }, (_, i) => ({
       role: (i % 2 === 0 ? 'user' : 'assistant') as ChatMessage['role'],
       content: `message ${i}`,
@@ -56,7 +56,7 @@ describe('AskAssistantUseCase', () => {
     expect(messages).toEqual([{ role: 'user', content: 'Ou sont les statistiques ?' }]);
   });
 
-  it('propage l\'erreur du modele', async () => {
+  it("propage l'erreur du modele", async () => {
     model.generate.mockRejectedValueOnce(new Error('quota'));
 
     await expect(usecase.execute({ question: 'Test' })).rejects.toThrow('quota');

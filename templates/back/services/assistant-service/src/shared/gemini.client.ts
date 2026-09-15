@@ -61,7 +61,10 @@ export class GeminiClient implements AssistantModel {
     }
 
     if (response.status === 429) {
-      throw new HttpException('Quota Gemini atteint, reessayez dans une minute', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        'Quota Gemini atteint, reessayez dans une minute',
+        HttpStatus.TOO_MANY_REQUESTS
+      );
     }
 
     const data = (await response.json().catch(() => ({}))) as GeminiResponse;
@@ -75,9 +78,12 @@ export class GeminiClient implements AssistantModel {
       return 'Je ne peux pas repondre a cette demande.';
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('').trim();
+    const text = data.candidates?.[0]?.content?.parts
+      ?.map((p) => p.text ?? '')
+      .join('')
+      .trim();
     if (!text) {
-      throw new BadGatewayException('Reponse vide de l\'assistant');
+      throw new BadGatewayException("Reponse vide de l'assistant");
     }
     return text;
   }

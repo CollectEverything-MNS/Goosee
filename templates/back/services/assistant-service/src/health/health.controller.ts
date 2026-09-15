@@ -6,7 +6,7 @@ import { KnowledgeBaseService } from '../shared/knowledge-base.service';
 export class HealthController {
   constructor(
     private readonly config: ConfigService,
-    private readonly knowledgeBase: KnowledgeBaseService,
+    private readonly knowledgeBase: KnowledgeBaseService
   ) {}
 
   @Get()

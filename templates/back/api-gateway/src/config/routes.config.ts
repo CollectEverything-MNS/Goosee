@@ -367,5 +367,9 @@ export const routesConfig = {
       path: `${assistantBasePath}/ask`,
       link: (serviceUrl: string) => `${serviceUrl}${assistantBasePath}/ask`,
     },
+    guide: {
+      path: `${assistantBasePath}/guide`,
+      link: (serviceUrl: string) => `${serviceUrl}${assistantBasePath}/guide`,
+    },
   },
 };

@@ -8,7 +8,7 @@ const configWith = (values: Record<string, string | undefined>) =>
   ({ get: (key: string) => values[key] }) as unknown as ConfigService;
 
 describe('KnowledgeBaseService', () => {
-  it('charge le document depuis ASSISTANT_KNOWLEDGE_PATH et l\'injecte dans le prompt systeme', () => {
+  it("charge le document depuis ASSISTANT_KNOWLEDGE_PATH et l'injecte dans le prompt systeme", () => {
     const dir = mkdtempSync(join(tmpdir(), 'goosee-kb-'));
     const path = join(dir, 'guide.md');
     writeFileSync(path, '# Guide\n\nPour ajouter un produit, ouvrez Produits.');
@@ -31,7 +31,9 @@ describe('KnowledgeBaseService', () => {
   });
 
   it('laisse le document vide si le fichier est introuvable', () => {
-    const service = new KnowledgeBaseService(configWith({ ASSISTANT_KNOWLEDGE_PATH: '/chemin/inexistant.md' }));
+    const service = new KnowledgeBaseService(
+      configWith({ ASSISTANT_KNOWLEDGE_PATH: '/chemin/inexistant.md' })
+    );
     service.onModuleInit();
 
     expect(service.getDocument()).toBe('');

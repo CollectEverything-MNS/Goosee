@@ -14,7 +14,7 @@ export interface AskAssistantResult {
 export class AskAssistantUseCase {
   constructor(
     @Inject(ASSISTANT_MODEL) private readonly model: AssistantModel,
-    private readonly knowledgeBase: KnowledgeBaseService,
+    private readonly knowledgeBase: KnowledgeBaseService
   ) {}
 
   async execute(payload: AskAssistantDto): Promise<AskAssistantResult> {
@@ -23,7 +23,10 @@ export class AskAssistantUseCase {
       .map((m) => ({ role: m.role, content: m.content.trim() }))
       .filter((m) => m.content.length > 0);
 
-    const messages: ChatMessage[] = [...history, { role: 'user', content: payload.question.trim() }];
+    const messages: ChatMessage[] = [
+      ...history,
+      { role: 'user', content: payload.question.trim() },
+    ];
 
     const answer = await this.model.generate(this.knowledgeBase.buildSystemPrompt(), messages);
 

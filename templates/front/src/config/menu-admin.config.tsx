@@ -2,6 +2,7 @@
 
 import {
   BarChart3,
+  BookOpen,
   Boxes,
   Layers,
   LayoutDashboard,
@@ -144,6 +145,12 @@ export function getAdminMenu(): AdminMenuSection[] {
           path: routes.gooseeAdmin.logs.getHref(locale),
           icon: ScrollText,
           pageKey: 'logs',
+        },
+        {
+          name: 'admin.sidebar.documentation',
+          path: routes.gooseeAdmin.documentation.getHref(locale),
+          icon: BookOpen,
+          pageKey: 'dashboard',
         },
       ],
     },
