@@ -20,6 +20,9 @@ export const ADMIN_PAGE_GROUPS: AdminPageGroup[] = [
     pages: [
       { key: 'clients', label: 'Clients' },
       { key: 'return-clients', label: 'Retours clients' },
+      // Habilitation d'action, sans ecran dedie : elle ouvre l'export et
+      // l'effacement RGPD depuis la fiche client.
+      { key: 'rgpd', label: 'Données personnelles (RGPD)' },
     ],
   },
   {

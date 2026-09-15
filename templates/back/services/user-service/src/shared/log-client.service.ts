@@ -10,9 +10,16 @@ export enum LogLevel {
   DEBUG = 'DEBUG',
 }
 
+// Une trace de cette categorie enregistre un traitement, pas l'activite d'une
+// personne : l'article 5.2 demande de pouvoir demontrer qu'un effacement a eu
+// lieu. La purge RGPD de log-service l'ecarte, sans quoi rejouer un effacement
+// detruirait la preuve du precedent — constate a l'execution le 15/09.
+export const CATEGORIE_PREUVE_RGPD = 'rgpd-preuve';
+
 export type EmitLogPayload = {
   message: string;
   userId?: string;
+  categorie?: string;
 };
 
 const SERVICE_NAME = 'user-service';
@@ -54,6 +61,7 @@ export class LogClient {
         level,
         message: payload.message,
         userId: payload.userId,
+        categorie: payload.categorie,
       });
     } catch (err) {
       this.logger.error(

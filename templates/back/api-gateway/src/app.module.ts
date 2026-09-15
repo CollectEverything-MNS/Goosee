@@ -22,6 +22,7 @@ import { LogsModule } from './services/logs/logs.module';
 import { TicketsModule } from './services/tickets/tickets.module';
 import { StockModule } from './services/stock/stock.module';
 import { AssistantModule } from './services/assistant/assistant.module';
+import { RgpdModule } from './services/rgpd/rgpd.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { AssistantModule } from './services/assistant/assistant.module';
     TicketsModule,
     StockModule,
     AssistantModule,
+    RgpdModule,
   ],
   controllers: [HealthController, MetricsController],
   providers: [{ provide: APP_INTERCEPTOR, useClass: HttpMetricsInterceptor }],

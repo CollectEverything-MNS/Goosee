@@ -53,6 +53,9 @@ export class Order {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column({ type: 'timestamp', nullable: true })
+  archivedAt?: Date | null;
+
   constructor(partial: Partial<Order>) {
     Object.assign(this, partial);
   }

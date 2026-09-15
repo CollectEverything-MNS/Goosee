@@ -22,6 +22,10 @@ import { DeleteTicketUseCase } from './usecases/delete-ticket/delete-ticket.usec
 import { DeleteTicketController } from './usecases/delete-ticket/delete-ticket.controller';
 import { GetTicketUseCase } from './usecases/get-ticket/get-ticket.usecase';
 import { GetTicketController } from './usecases/get-ticket/get-ticket.controller';
+import { RgpdEraseController } from './usecases/rgpd-erase/rgpd-erase.controller';
+import { RgpdEraseUseCase } from './usecases/rgpd-erase/rgpd-erase.usecase';
+import { RgpdExportController } from './usecases/rgpd-export/rgpd-export.controller';
+import { RgpdExportUseCase } from './usecases/rgpd-export/rgpd-export.usecase';
 
 @Module({
   imports: [
@@ -66,6 +70,8 @@ import { GetTicketController } from './usecases/get-ticket/get-ticket.controller
     ListTicketsController,
     DeleteTicketController,
     GetTicketController,
+    RgpdEraseController,
+    RgpdExportController,
   ],
   providers: [
     {
@@ -79,6 +85,8 @@ import { GetTicketController } from './usecases/get-ticket/get-ticket.controller
     ListTicketsUseCase,
     DeleteTicketUseCase,
     GetTicketUseCase,
+    RgpdEraseUseCase,
+    RgpdExportUseCase,
   ],
 })
 export class AppModule {}

@@ -20,6 +20,8 @@ import { RemoveItemController } from './usecases/remove-item/remove-item.control
 import { RemoveItemUseCase } from './usecases/remove-item/remove-item.usecase';
 import { ClearCartController } from './usecases/clear-cart/clear-cart.controller';
 import { ClearCartUseCase } from './usecases/clear-cart/clear-cart.usecase';
+import { RgpdEraseController } from './usecases/rgpd-erase/rgpd-erase.controller';
+import { RgpdEraseUseCase } from './usecases/rgpd-erase/rgpd-erase.usecase';
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import { ClearCartUseCase } from './usecases/clear-cart/clear-cart.usecase';
     UpdateItemController,
     RemoveItemController,
     ClearCartController,
+    RgpdEraseController,
   ],
   providers: [
     {
@@ -63,6 +66,7 @@ import { ClearCartUseCase } from './usecases/clear-cart/clear-cart.usecase';
     UpdateItemUseCase,
     RemoveItemUseCase,
     ClearCartUseCase,
+    RgpdEraseUseCase,
   ],
 })
 export class AppModule {}

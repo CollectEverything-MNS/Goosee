@@ -5,4 +5,7 @@ export abstract class IOrderRepository {
   abstract findById(id: string): Promise<Order | null>;
   abstract list(): Promise<Order[]>;
   abstract findByCustomer(customerId: string): Promise<Order[]>;
+  abstract archiveByCustomerId(customerId: string, at: Date): Promise<number>;
+  abstract listArchived(): Promise<Order[]>;
+  abstract findByCustomerIncludingArchived(customerId: string): Promise<Order[]>;
 }

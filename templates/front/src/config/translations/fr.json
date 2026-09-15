@@ -670,6 +670,33 @@
         "confirm": "Supprimer",
         "success": "Client supprimé avec succès",
         "error": "Erreur lors de la suppression"
+      },
+      "rgpd": {
+        "export": {
+          "action": "Exporter les données (RGPD)",
+          "success": "Export téléchargé",
+          "error": "Erreur lors de l'export"
+        },
+        "erase": {
+          "action": "Effacer les données (RGPD)",
+          "title": "Effacer les données du client",
+          "subtitle": "Droit à l'effacement — article 17 du RGPD.",
+          "warning": "Les données de {name} seront effacées dans tous les services : compte, identifiants, panier et journaux. Les commandes sont archivées pour répondre aux obligations comptables. Cette action est irréversible.",
+          "continue": "Continuer",
+          "cancel": "Annuler",
+          "back": "Retour",
+          "confirmLabel": "Saisissez l'adresse e-mail du client pour confirmer l'effacement.",
+          "confirmPlaceholder": "client@mail.com",
+          "confirmMismatch": "L'adresse saisie ne correspond pas à celle du client.",
+          "confirm": "Effacer définitivement",
+          "reportTitle": "Bilan de l'effacement",
+          "reportSubtitle": "Conservez ce bilan : c'est la preuve de l'effacement, service par service.",
+          "reportHint": "Un service en échec n'a pas effacé ses données. Relancez l'effacement une fois le service rétabli.",
+          "close": "Fermer",
+          "success": "Données du client effacées",
+          "partial": "Effacement partiel : au moins un service a échoué",
+          "error": "Erreur lors de l'effacement"
+        }
       }
     },
     "pageBuilder": {

@@ -1,66 +1,63 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SoftDeleteUseCase } from './soft-delete.usecase';
 import { IAuthRepository } from '../../repositories/auth.repository';
-import { SoftDeleteDto } from './soft-delete.dto';
+import { IAuthTokenRepository } from '../../repositories/auth-token.repository';
 
 describe('SoftDeleteUseCase', () => {
   let usecase: SoftDeleteUseCase;
-  let authRepo: jest.Mocked<IAuthRepository>;
-
   const mockAuthRepo = {
-    findByEmail: jest.fn(),
     save: jest.fn(),
+    findByEmail: jest.fn(),
     findById: jest.fn(),
     softDeleteById: jest.fn(),
+    eraseById: jest.fn(),
+  };
+  const mockTokenRepo = {
+    save: jest.fn(),
+    findByToken: jest.fn(),
+    findByAuthId: jest.fn(),
+    deleteByAuthId: jest.fn(),
+    deleteByToken: jest.fn(),
+    updateExpiredAt: jest.fn(),
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SoftDeleteUseCase,
-        {
-          provide: IAuthRepository,
-          useValue: mockAuthRepo,
-        },
+        { provide: IAuthRepository, useValue: mockAuthRepo },
+        { provide: IAuthTokenRepository, useValue: mockTokenRepo },
       ],
     }).compile();
-
     usecase = module.get<SoftDeleteUseCase>(SoftDeleteUseCase);
-    authRepo = module.get(IAuthRepository);
-
-    jest.clearAllMocks();
   });
 
-  describe('execute', () => {
-    const softDeleteDto: SoftDeleteDto = {
-      authId: 'id1',
-    };
+  it('efface reellement la ligne au lieu de poser un drapeau', async () => {
+    await usecase.execute({ authId: 'auth-1' });
 
-    it('devrait supprimer un utilisateur en soft delete', async () => {
-      authRepo.softDeleteById.mockResolvedValue(undefined);
+    expect(mockAuthRepo.eraseById).toHaveBeenCalledWith('auth-1');
+    expect(mockAuthRepo.softDeleteById).not.toHaveBeenCalled();
+  });
 
-      const result = await usecase.execute(softDeleteDto);
+  it('est idempotent : un second appel ne leve pas', async () => {
+    await usecase.execute({ authId: 'auth-1' });
+    await expect(usecase.execute({ authId: 'auth-1' })).resolves.toBeUndefined();
+  });
 
-      expect(authRepo.softDeleteById).toHaveBeenCalledWith(softDeleteDto.authId);
-      expect(authRepo.softDeleteById).toHaveBeenCalledTimes(1);
-      expect(result).toBeUndefined();
+  it('retire les jetons avant la ligne auth', async () => {
+    const ordre: string[] = [];
+    mockTokenRepo.deleteByAuthId.mockImplementation(() => {
+      ordre.push('jetons');
+      return Promise.resolve();
+    });
+    mockAuthRepo.eraseById.mockImplementation(() => {
+      ordre.push('auth');
+      return Promise.resolve();
     });
 
-    it('devrait appeler le repository avec le bon authId', async () => {
-      authRepo.softDeleteById.mockResolvedValue(undefined);
+    await usecase.execute({ authId: 'auth-1' });
 
-      await usecase.execute(softDeleteDto);
-
-      expect(authRepo.softDeleteById).toHaveBeenCalledWith('id1');
-    });
-
-    it('devrait gérer différentes valeurs de authId', async () => {
-      const differentDto: SoftDeleteDto = { authId: 'id999' };
-      authRepo.softDeleteById.mockResolvedValue(undefined);
-
-      await usecase.execute(differentDto);
-
-      expect(authRepo.softDeleteById).toHaveBeenCalledWith('id999');
-    });
+    expect(ordre).toEqual(['jetons', 'auth']);
   });
 });
