@@ -1,5 +1,8 @@
 # Goosee Generator
 
+[![CI](https://github.com/CollectEverything-MNS/Goosee/actions/workflows/ci.yml/badge.svg)](https://github.com/CollectEverything-MNS/Goosee/actions/workflows/ci.yml)
+[![Sécurité](https://github.com/CollectEverything-MNS/Goosee/actions/workflows/security.yml/badge.svg)](https://github.com/CollectEverything-MNS/Goosee/actions/workflows/security.yml)
+
 **Template d'un site e-commerce multi-tenant** : une pile microservices complète (front
 Next.js + API Gateway + microservices NestJS + infra) qui sert de **site généré** pour
 chaque client de la plateforme Goosee. Déployable en **Docker** (forfait standard) ou en
