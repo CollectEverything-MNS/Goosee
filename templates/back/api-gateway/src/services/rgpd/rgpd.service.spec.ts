@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Logger } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { of, throwError } from 'rxjs';
@@ -48,6 +48,19 @@ describe('RgpdService', () => {
       .mockReturnValue(of({ data: { commandes: [] } }));
 
     await expect(service.export('c-1')).rejects.toThrow('service injoignable');
+  });
+
+  // Constate a l'execution le 15/09 : l'export d'un acheteur efface rendait un 500
+  // opaque, le NotFoundException amont traversant le Promise.all sans traduction.
+  it("l export d un acheteur efface rend un 404, pas un 500", async () => {
+    const erreur404 = Object.assign(new Error('Request failed with status code 404'), {
+      response: { status: 404 },
+    });
+    mockHttp.get
+      .mockReturnValueOnce(throwError(() => erreur404))
+      .mockReturnValue(of({ data: { commandes: [] } }));
+
+    await expect(service.export('c-1')).rejects.toThrow(NotFoundException);
   });
 
   // ticket-service n'est deploye que dans la pile de developpement : le declarer

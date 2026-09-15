@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { AxiosError, AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { serviceUrl } from '../../config/services.config';
 
@@ -96,13 +97,24 @@ export class RgpdService {
     // le service n'existe pas dans une pile de tenant.
     const cibles = [urls.user, urls.order];
 
-    const reponses = await Promise.all(
-      cibles.map((url) =>
-        firstValueFrom(
-          this.http.get(`${url}/internal/rgpd/export`, { headers, params: { customerId } }),
+    let reponses: AxiosResponse[];
+    try {
+      reponses = await Promise.all(
+        cibles.map((url) =>
+          firstValueFrom(
+            this.http.get(`${url}/internal/rgpd/export`, { headers, params: { customerId } }),
+          ),
         ),
-      ),
-    );
+      );
+    } catch (err) {
+      // Un 404 amont n'est pas une panne : l'acheteur a ete efface, il n'y a plus
+      // rien a porter. Sans cette traduction le marchand recevait un 500 opaque.
+      // Les pieces comptables restent lisibles par /admin/rgpd/archived-orders.
+      if ((err as AxiosError).response?.status === 404) {
+        throw new NotFoundException('Acheteur introuvable');
+      }
+      throw err;
+    }
 
     return Object.assign(
       { exporteLe: new Date().toISOString() },
