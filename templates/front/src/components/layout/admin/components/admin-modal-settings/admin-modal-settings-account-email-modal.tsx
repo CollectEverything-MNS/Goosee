@@ -81,8 +81,9 @@ export function AdminModalSettingsAccountChangeEmailModal({ open, onOpenChange }
         {step === 'currentEmail' && (
           <form onSubmit={handleSubmit(handleCurrentEmailSubmit)} className="space-y-4">
             <div>
-              <Label>{t('currentEmail')}</Label>
+              <Label htmlFor="account-current-email">{t('currentEmail')}</Label>
               <Input
+                id="account-current-email"
                 type="email"
                 {...register('email', { required: t('required') })}
               />
@@ -107,6 +108,7 @@ export function AdminModalSettingsAccountChangeEmailModal({ open, onOpenChange }
                   render={({ field }) => (
                     <Input
                       {...field}
+                      aria-label={`${t('otp')} ${index + 1}/6`}
                       maxLength={1}
                       className="w-10 text-center border-primary"
                       onChange={(e) => {
@@ -128,8 +130,9 @@ export function AdminModalSettingsAccountChangeEmailModal({ open, onOpenChange }
         {step === 'newEmail' && (
           <form onSubmit={handleSubmit(handleNewEmailSubmit)} className="space-y-4">
             <div>
-              <Label>{t('newEmail')}</Label>
+              <Label htmlFor="account-new-email">{t('newEmail')}</Label>
               <Input
+                id="account-new-email"
                 type="email"
                 {...register('newEmail', { required: t('required') })}
               />

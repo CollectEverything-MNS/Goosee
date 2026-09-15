@@ -61,7 +61,7 @@ export function AnalyticsFilters({
   return (
     <div className="flex flex-wrap items-center gap-3">
       <Select value={period} onValueChange={(v) => onPeriodChange(v as AnalyticsPeriod)}>
-        <SelectTrigger className="w-[200px]">
+        <SelectTrigger className="w-[200px]" aria-label={t('period')}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

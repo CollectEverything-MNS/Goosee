@@ -304,6 +304,7 @@ function StackBlock({ component, isSelected, onSelect, onEdit, onDuplicate, onDe
           {...listeners}
           onClick={(e) => e.stopPropagation()}
           title={t('actions.move')}
+          aria-label={t('actions.move')}
         >
           <GripVertical className="h-3.5 w-3.5" />
         </Button>
@@ -324,6 +325,7 @@ function StackBlock({ component, isSelected, onSelect, onEdit, onDuplicate, onDe
             onEdit();
           }}
           title={t('actions.edit')}
+          aria-label={t('actions.edit')}
         >
           <Pencil className="h-3.5 w-3.5" />
         </Button>
@@ -336,6 +338,7 @@ function StackBlock({ component, isSelected, onSelect, onEdit, onDuplicate, onDe
             onDuplicate();
           }}
           title={t('actions.duplicate')}
+          aria-label={t('actions.duplicate')}
         >
           <Copy className="h-3.5 w-3.5" />
         </Button>
@@ -348,6 +351,7 @@ function StackBlock({ component, isSelected, onSelect, onEdit, onDuplicate, onDe
             onDelete();
           }}
           title={t('actions.delete')}
+          aria-label={t('actions.delete')}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>

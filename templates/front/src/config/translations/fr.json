@@ -335,7 +335,8 @@
           "last30": "30 derniers jours",
           "month": "Ce mois-ci",
           "custom": "Personnalisé"
-        }
+        },
+        "period": "Période"
       },
       "kpis": {
         "revenue": "Chiffre d'affaires",
@@ -1058,6 +1059,11 @@
         "CRITICAL": "Critique",
         "DEBUG": "Débogage"
       }
+    },
+    "a11y": {
+      "back": "Retour",
+      "previewPage": "Aperçu de la page",
+      "pageStatus": "Statut de la page"
     }
   }
 }

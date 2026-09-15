@@ -126,6 +126,7 @@ export function BlockPicker({ open, onClose, onPick }: Props) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('picker.searchPlaceholder')}
+              aria-label={t('picker.searchPlaceholder')}
               className="h-10 pl-9"
             />
           </div>

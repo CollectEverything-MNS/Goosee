@@ -109,6 +109,7 @@ export function FileUpload({
                 size="icon"
                 onClick={handleRemove}
                 disabled={disabled}
+                aria-label="Retirer le fichier"
               >
                 <X className="h-4 w-4" />
               </Button>

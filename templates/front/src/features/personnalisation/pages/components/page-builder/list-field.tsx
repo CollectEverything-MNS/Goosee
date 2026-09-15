@@ -197,6 +197,7 @@ function ItemCard({
                 onClick={onMoveUp}
                 disabled={isFirst}
                 title="Monter"
+                aria-label="Monter"
               >
                 <ChevronDown className="h-3.5 w-3.5 rotate-180" />
               </Button>
@@ -208,6 +209,7 @@ function ItemCard({
                 onClick={onMoveDown}
                 disabled={isLast}
                 title="Descendre"
+                aria-label="Descendre"
               >
                 <ChevronDown className="h-3.5 w-3.5" />
               </Button>
@@ -246,7 +248,7 @@ function FieldEditor({
         <Label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           {field.label}
         </Label>
-        <Textarea
+        <Textarea aria-label={field.label}
           rows={3}
           value={String(v)}
           placeholder={field.placeholder}
@@ -262,7 +264,7 @@ function FieldEditor({
         <Label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           {field.label}
         </Label>
-        <Input
+        <Input aria-label={field.label}
           type="number"
           value={typeof v === 'number' ? v : Number(v) || 0}
           placeholder={field.placeholder}
@@ -313,7 +315,7 @@ function FieldEditor({
           {field.label}
         </Label>
         <Select value={String(v)} onValueChange={onChange}>
-          <SelectTrigger className="h-9">
+          <SelectTrigger aria-label={field.label} className="h-9">
             <SelectValue>
               {current ? (
                 <div className="flex items-center gap-2">
@@ -345,7 +347,7 @@ function FieldEditor({
       <Label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
         {field.label}
       </Label>
-      <Input
+      <Input aria-label={field.label}
         type={field.type === 'url' ? 'url' : 'text'}
         value={String(v)}
         placeholder={field.placeholder}

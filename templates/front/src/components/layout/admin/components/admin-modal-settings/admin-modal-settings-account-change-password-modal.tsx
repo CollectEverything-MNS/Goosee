@@ -45,8 +45,9 @@ export function AdminModalSettingsAccountChangePasswordModal({ open, onOpenChang
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label>{t('currentPassword')}</Label>
+            <Label htmlFor="account-current-password">{t('currentPassword')}</Label>
             <Input
+              id="account-current-password"
               type="password"
               {...register('currentPassword', { required: t('required') })}
             />
@@ -56,8 +57,9 @@ export function AdminModalSettingsAccountChangePasswordModal({ open, onOpenChang
           </div>
 
           <div>
-            <Label>{t('newPassword')}</Label>
+            <Label htmlFor="account-new-password">{t('newPassword')}</Label>
             <Input
+              id="account-new-password"
               type="password"
               {...register('newPassword', { required: t('required') })}
             />
@@ -67,8 +69,9 @@ export function AdminModalSettingsAccountChangePasswordModal({ open, onOpenChang
           </div>
 
           <div>
-            <Label>{t('confirmPassword')}</Label>
+            <Label htmlFor="account-confirm-password">{t('confirmPassword')}</Label>
             <Input
+              id="account-confirm-password"
               type="password"
               {...register('confirmPassword', {
                 required: t('required'),

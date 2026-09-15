@@ -223,6 +223,7 @@ export function RoleFormDialog() {
                                     className="flex cursor-pointer items-center gap-2 text-sm"
                                   >
                                     <Checkbox
+                                      aria-label={page.label}
                                       checked={checked}
                                       onCheckedChange={() =>
                                         field.onChange(togglePage(page.key, field.value))

@@ -336,7 +336,8 @@
           "last30": "Last 30 days",
           "month": "This month",
           "custom": "Custom"
-        }
+        },
+        "period": "Period"
       },
       "kpis": {
         "revenue": "Revenue",
@@ -1059,6 +1060,11 @@
         "CRITICAL": "Critical",
         "DEBUG": "Debug"
       }
+    },
+    "a11y": {
+      "back": "Back",
+      "previewPage": "Preview page",
+      "pageStatus": "Page status"
     }
   }
 }

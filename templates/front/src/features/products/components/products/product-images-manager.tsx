@@ -105,6 +105,7 @@ export function ProductImagesManager({ productId }: { productId: string }) {
                     variant="secondary"
                     className="h-8 w-8"
                     title="Définir comme principale"
+                    aria-label="Définir comme image principale"
                     onClick={() => handleSetMain(image.id)}
                     disabled={setMainMutation.isPending}
                   >
@@ -117,6 +118,7 @@ export function ProductImagesManager({ productId }: { productId: string }) {
                   variant="destructive"
                   className="h-8 w-8"
                   title="Supprimer"
+                  aria-label="Supprimer l'image"
                   onClick={() => handleDelete(image.id)}
                   disabled={deleteMutation.isPending || images.length === 1}
                 >
@@ -139,7 +141,7 @@ export function ProductImagesManager({ productId }: { productId: string }) {
           'hover:border-primary/50',
         )}
       >
-        <input {...getInputProps()} />
+        <input {...getInputProps()} aria-label="Ajouter des images" />
         {uploading ? (
           <>
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

@@ -39,6 +39,7 @@ export function PageEditor({ page }: PageEditorProps) {
   const router = useRouter();
   const t = useTranslations('admin.pageBuilder.pageEditor');
   const tStatus = useTranslations('admin.pages.status');
+  const tA11y = useTranslations('admin.a11y');
   const [components, setComponents] = useState<PageComponent[]>(page?.components || []);
   const [status, setStatus] = useState<PageStatus>(page?.status || PageStatus.DRAFT);
   const [title, setTitle] = useState(page?.title || '');
@@ -116,7 +117,7 @@ export function PageEditor({ page }: PageEditorProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href={`/${locale}/goosee-admin/pages`}>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" aria-label={tA11y('back')}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
@@ -133,7 +134,7 @@ export function PageEditor({ page }: PageEditorProps) {
         <div className="flex items-center gap-2">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" aria-label={t('pageSettings')}>
                 <Settings className="h-4 w-4" />
               </Button>
             </SheetTrigger>
@@ -164,7 +165,7 @@ export function PageEditor({ page }: PageEditorProps) {
                 <div className="space-y-2">
                   <Label htmlFor="type">{t('type')}</Label>
                   <Select value={type} onValueChange={(value) => setType(value as PageType)}>
-                    <SelectTrigger>
+                    <SelectTrigger id="type">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -207,13 +208,14 @@ export function PageEditor({ page }: PageEditorProps) {
                 href={`/${locale}/${slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={tA11y('previewPage')}
               >
                 <ExternalLink className="h-4 w-4" />
               </a>
             </Button>
           )}
           <Select value={status} onValueChange={(value) => setStatus(value as PageStatus)}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px]" aria-label={tA11y('pageStatus')}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
