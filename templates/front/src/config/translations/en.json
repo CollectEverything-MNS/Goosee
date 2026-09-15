@@ -1032,6 +1032,18 @@
         "CRITICAL": "Critical",
         "DEBUG": "Debug"
       }
+    },
+    "assistant": {
+      "title": "Goosee Assistant",
+      "subtitle": "Answers from the user guide",
+      "open": "Open the assistant",
+      "close": "Close the assistant",
+      "placeholder": "Ask your question…",
+      "send": "Send",
+      "welcome": "Hello! I answer questions about running your shop: pages, products, orders, roles, analytics… What would you like to know?",
+      "thinking": "The assistant is thinking…",
+      "error": "The assistant is unavailable right now. Please try again shortly.",
+      "poweredBy": "Powered by Gemini · answers based on the user guide"
     }
   }
 }

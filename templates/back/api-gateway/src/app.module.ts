@@ -21,6 +21,7 @@ import { TagsModule } from './services/tags/tags.module';
 import { LogsModule } from './services/logs/logs.module';
 import { TicketsModule } from './services/tickets/tickets.module';
 import { StockModule } from './services/stock/stock.module';
+import { AssistantModule } from './services/assistant/assistant.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { StockModule } from './services/stock/stock.module';
     InternalModule,
     TicketsModule,
     StockModule,
+    AssistantModule,
   ],
   controllers: [HealthController, MetricsController],
   providers: [{ provide: APP_INTERCEPTOR, useClass: HttpMetricsInterceptor }],

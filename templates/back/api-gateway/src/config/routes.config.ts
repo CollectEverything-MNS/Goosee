@@ -11,6 +11,7 @@ const cartBasePath = '/cart';
 const paymentsBasePath = '/payments';
 const ticketsBasePath = '/tickets';
 const stockBasePath = '/stock';
+const assistantBasePath = '/assistant';
 
 export const routesConfig = {
   upload: {
@@ -358,6 +359,13 @@ export const routesConfig = {
     listStockMovements: {
       path: `${stockBasePath}/:id/movements`,
       link: (serviceUrl: string, id: string) => `${serviceUrl}${stockBasePath}/${id}/movements`,
+    },
+  },
+
+  assistant: {
+    ask: {
+      path: `${assistantBasePath}/ask`,
+      link: (serviceUrl: string) => `${serviceUrl}${assistantBasePath}/ask`,
     },
   },
 };

@@ -1031,6 +1031,18 @@
         "CRITICAL": "Critique",
         "DEBUG": "Débogage"
       }
+    },
+    "assistant": {
+      "title": "Assistant Goosee",
+      "subtitle": "Répond à partir du guide utilisateur",
+      "open": "Ouvrir l'assistant",
+      "close": "Fermer l'assistant",
+      "placeholder": "Posez votre question…",
+      "send": "Envoyer",
+      "welcome": "Bonjour ! Je réponds à vos questions sur l'administration de votre boutique : pages, produits, commandes, rôles, statistiques… Que souhaitez-vous savoir ?",
+      "thinking": "L'assistant réfléchit…",
+      "error": "L'assistant est indisponible pour le moment. Réessayez dans un instant.",
+      "poweredBy": "Propulsé par Gemini · réponses basées sur le guide utilisateur"
     }
   }
 }
