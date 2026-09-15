@@ -38,7 +38,7 @@ export default function Page() {
   if (isAuthenticated) return null;
 
   return (
-    <div className="grid min-h-svh lg:grid-cols-[1.1fr_1fr]">
+    <main className="grid min-h-svh lg:grid-cols-[1.1fr_1fr]">
       {/* Panel branding (gauche, sombre) */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-foreground p-10 text-background lg:flex">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.12),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(250,204,21,0.06),transparent_50%)]" />
@@ -91,6 +91,6 @@ export default function Page() {
           {t('footer', { year })}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -255,6 +255,7 @@ export function PageBuilder({ components, onChange }: PageBuilderProps) {
         {selectedComponent && (
           <PageBuilderComponentEditor
             component={selectedComponent}
+            allComponents={debouncedComponents}
             onUpdate={(props) => handleUpdateComponent(selectedComponent.id, props)}
             onClose={() => setSelectedComponentId(null)}
           />

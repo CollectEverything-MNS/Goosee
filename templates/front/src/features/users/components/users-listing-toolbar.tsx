@@ -46,7 +46,7 @@ export function UsersListingToolbar({ table }: Props) {
           placeholder={t('admin.users.searchPlaceholder')}
           value={(table.getState().globalFilter as string) ?? ''}
           onChange={(e) => table.setGlobalFilter(e.target.value)}
-          className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-foreground/20 focus:outline-none"
+          className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
     </div>

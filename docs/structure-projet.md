@@ -10,6 +10,12 @@ GOOSEE/
 │           ├── auth-service/               # Authentification, JWT, sessions
 │           ├── user-service/               # Gestion des utilisateurs
 │           ├── page-service/               # Pages, menus, settings, uploads
+│           ├── product-service/            # Produits, categories, tags, images
+│           ├── order-service/              # Commandes clients
+│           ├── cart-service/               # Panier d'achat
+│           ├── payment-service/            # Paiement (Stripe, mode test)
+│           ├── stock-service/              # Gestion des stocks
+│           ├── ticket-service/             # Tickets de support
 │           ├── notifier-service/           # Envoi d'emails, SMS, push
 │           └── log-service/                # Centralisation des logs (RabbitMQ)
 │
@@ -37,7 +43,7 @@ GOOSEE/
 
 ## Stack technique
 
-- **Frontend** : Next.js 15, React 19, TailwindCSS, Shadcn/ui, MobX, React Query
+- **Frontend** : Next.js 15, React 19, TailwindCSS, Shadcn/ui, React Query (MobX figure dans les dépendances mais n'est utilisé nulle part dans le code, dépendance morte)
 - **Backend** : NestJS 11, TypeORM, PostgreSQL (une DB par microservice)
 - **Communication inter-services** : RabbitMQ (`@EventPattern` + `@MessagePattern`)
 - **Stockage objets** : MinIO (uploads d'images, fichiers)
