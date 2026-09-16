@@ -1074,6 +1074,7 @@
       "setMainImage": "Définir comme image principale",
       "deleteImage": "Supprimer l'image",
       "addImages": "Ajouter des images"
+    },
     "assistant": {
       "title": "Assistant Goosee",
       "subtitle": "Répond à partir du guide utilisateur",
