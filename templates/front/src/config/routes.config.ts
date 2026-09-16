@@ -77,5 +77,8 @@ export const routes = {
     logs: {
       getHref: (locale: string) => `/${locale}/goosee-admin/logs`,
     },
+    documentation: {
+      getHref: (locale: string) => `/${locale}/goosee-admin/documentation`,
+    },
   },
 } as const
