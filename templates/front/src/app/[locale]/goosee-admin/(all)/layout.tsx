@@ -8,6 +8,7 @@ import { routes } from '@/config/routes.config';
 import { getPageKeyFromPathname } from '@/config/page-keys.config';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { AssistantWidget } from '@/features/assistant/components/assistant-widget';
 
 export default function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated, canAccess } = useAuth();
@@ -49,5 +50,10 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
   const pageKey = getPageKeyFromPathname(pathname);
   if (pageKey && !canAccess(pageKey)) return null;
 
-  return <AdminThemeProvider>{children}</AdminThemeProvider>;
+  return (
+    <AdminThemeProvider>
+      {children}
+      <AssistantWidget />
+    </AdminThemeProvider>
+  );
 }

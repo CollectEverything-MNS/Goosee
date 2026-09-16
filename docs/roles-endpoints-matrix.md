@@ -96,6 +96,15 @@ La gestion d'acces est dynamique:
 | `GET`   | `/menus`            | Public |
 | `GET`   | `/settings`         | Public |
 
+### `assistant`
+
+| Methode | Path             | Acces                                              |
+| ------- | ---------------- | -------------------------------------------------- |
+| `POST`  | `/assistant/ask` | JWT + `dashboard` (limite : 20 requetes/min par IP) |
+| `GET`   | `/assistant/guide` | JWT + `dashboard` |
+
+Le chatbot d'aide repond a partir de `docs/guide-utilisateur.md` (copie embarquee dans `assistant-service`). Le modele est appele via l'API Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`).
+
 ## Regles metier importantes
 
 - Apres modification des roles d'un utilisateur, il doit se reconnecter pour obtenir un nouveau JWT.

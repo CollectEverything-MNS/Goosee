@@ -16,6 +16,7 @@ GOOSEE/
 │           ├── payment-service/            # Paiement (Stripe, mode test)
 │           ├── stock-service/              # Gestion des stocks
 │           ├── ticket-service/             # Tickets de support
+│           ├── assistant-service/          # Chatbot d'aide (Gemini) base sur docs/guide-utilisateur.md
 │           ├── notifier-service/           # Envoi d'emails, SMS, push
 │           └── log-service/                # Centralisation des logs (RabbitMQ)
 │

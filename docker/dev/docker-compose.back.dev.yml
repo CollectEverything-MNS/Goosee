@@ -32,6 +32,8 @@ services:
       TICKET_SERVICE_PORT: ${TICKET_SERVICE_PORT}
       STOCK_SERVICE_HOST: goosee-stock-service-dev
       STOCK_SERVICE_PORT: ${STOCK_SERVICE_PORT}
+      ASSISTANT_SERVICE_HOST: goosee-assistant-service-dev
+      ASSISTANT_SERVICE_PORT: ${ASSISTANT_SERVICE_PORT}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
       NEXT_PUBLIC_WEB_URL: ${NEXT_PUBLIC_WEB_URL}
     depends_on:
@@ -390,6 +392,28 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost ${STOCK_SERVICE_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - goosee_net
+
+  goosee-assistant-service-dev:
+    container_name: goosee-assistant-service-dev
+    build:
+      context: ../..
+      dockerfile: templates/back/services/assistant-service/Dockerfile.dev
+    command: yarn dev
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      ASSISTANT_SERVICE_PORT: ${ASSISTANT_SERVICE_PORT}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL}
+    expose:
+      - "${ASSISTANT_SERVICE_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${ASSISTANT_SERVICE_PORT}"]
       interval: 5s
       timeout: 3s
       retries: 10
