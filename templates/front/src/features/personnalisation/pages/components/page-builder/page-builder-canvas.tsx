@@ -45,6 +45,7 @@ function SortableComponent({
   onDeleteChild,
   selectedChildId,
 }: SortableComponentProps) {
+  const t = useTranslations('admin.pageBuilder');
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: component.id,
   });

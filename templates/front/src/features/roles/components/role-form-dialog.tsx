@@ -37,7 +37,7 @@ import { useUpdateRole } from '../usecases/use-update-role';
 const formSchema = z.object({
   name: z.string().min(2).max(64),
   description: z.string().max(255).optional().or(z.literal('')),
-  pageKeys: z.array(z.string()).default([]),
+  pageKeys: z.array(z.string()),
 });
 
 type FormValues = z.infer<typeof formSchema>;

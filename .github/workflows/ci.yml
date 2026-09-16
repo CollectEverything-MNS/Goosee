@@ -27,11 +27,7 @@ jobs:
         with:
           node-version: 22
 
-      # yarn.lock n'est pas versionné (cf. .gitignore) : on ne peut utiliser ni
-      # `cache: yarn` de setup-node (clé calculée sur le lockfile) ni
-      # `--frozen-lockfile`. On met seulement en cache le dossier de tarballs de
-      # yarn : `yarn install` reconstruit node_modules à chaque run, mais sans
-      # aucun téléchargement réseau. Cache invalidé dès qu'un package.json change.
+      # Cache des téléchargements, invalidé dès que le lockfile change.
       - name: Resolve yarn cache dir
         id: yarn-cache
         run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
@@ -40,12 +36,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
-          key: yarn-cache-${{ runner.os }}-node22-${{ hashFiles('**/package.json') }}
+          key: yarn-cache-${{ runner.os }}-node22-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             yarn-cache-${{ runner.os }}-node22-
 
       - name: Install dependencies
-        run: yarn install --non-interactive
+        run: yarn install --frozen-lockfile --non-interactive
 
       # turbo run test:ci ne cible que les workspaces qui déclarent le script test:ci.
       # Chaque service lance `jest --coverage --ci` : le job échoue si un test casse
