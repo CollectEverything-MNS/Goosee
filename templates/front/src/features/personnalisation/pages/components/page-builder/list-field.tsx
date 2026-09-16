@@ -77,7 +77,6 @@ interface ListFieldProps {
 
 export function ListField({ label, value, onChange, componentType }: ListFieldProps) {
   const t = useTranslations('admin.pageBuilder.editor.lists');
-  const tA11y = useTranslations('admin.a11y');
   const schema = useSchema(componentType);
 
   const items = useMemo<Record<string, unknown>[]>(() => {
@@ -169,6 +168,7 @@ function ItemCard({
   onMoveUp: () => void;
   onMoveDown: () => void;
 }) {
+  const tA11y = useTranslations('admin.a11y');
   const title = (item[schema.titleKey] as string | undefined)?.trim() || `${schema.fallback} ${index + 1}`;
 
   return (

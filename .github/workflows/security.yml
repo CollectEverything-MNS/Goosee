@@ -40,20 +40,16 @@ jobs:
         with:
           node-version: 22
 
-      # ⚠️ yarn.lock n'est pas versionné dans ce dépôt (cf. .gitignore), donc :
-      #   — ni `cache: yarn` de setup-node, ni `--frozen-lockfile` ;
-      #   — et surtout, l'audit porte sur les versions résolues AU MOMENT DU RUN, pas sur
-      #     celles réellement déployées. L'analyse est donc indicative tant que le
-      #     verrouillage n'est pas committé. Voir l'anomalie correspondante au registre.
+      # Le lockfile versionné garantit que l'audit porte sur les versions du build.
       - name: Cache des tarballs yarn
         uses: actions/cache@v4
         with:
           path: ~/.cache/yarn
-          key: yarn-cache-${{ runner.os }}-node22-${{ hashFiles('**/package.json') }}
+          key: yarn-cache-${{ runner.os }}-node22-${{ hashFiles('yarn.lock') }}
           restore-keys: yarn-cache-${{ runner.os }}-node22-
 
       - name: Installation
-        run: yarn install --non-interactive
+        run: yarn install --frozen-lockfile --non-interactive
 
       # Masque de bits yarn 1 : 8 = élevé, 16 = critique. On échoue sur critique seulement,
       # les élevées étant collectées et triées au registre (cf. en-tête du fichier).
