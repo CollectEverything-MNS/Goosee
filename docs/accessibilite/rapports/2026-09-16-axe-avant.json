@@ -1,0 +1,126 @@
+[
+  {
+    "url": "http://localhost:3000/fr",
+    "timestamp": "2026-09-15T22:04:31.320Z",
+    "axeVersion": "4.13.0",
+    "counts": {
+      "violations": 2,
+      "passes": 34,
+      "incomplete": 1
+    },
+    "violations": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": [
+          [
+            "html"
+          ]
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": [
+          [
+            "html"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "url": "http://localhost:3000/fr/contact",
+    "timestamp": "2026-09-15T22:04:34.681Z",
+    "axeVersion": "4.13.0",
+    "counts": {
+      "violations": 2,
+      "passes": 34,
+      "incomplete": 1
+    },
+    "violations": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": [
+          [
+            "html"
+          ]
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": [
+          [
+            "html"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "url": "http://localhost:3000/fr/checkout",
+    "timestamp": "2026-09-15T22:04:44.807Z",
+    "axeVersion": "4.13.0",
+    "counts": {
+      "violations": 0,
+      "passes": 40,
+      "incomplete": 1
+    },
+    "violations": []
+  },
+  {
+    "url": "http://localhost:3000/fr/goosee-admin/login",
+    "timestamp": "2026-09-15T22:04:45.723Z",
+    "axeVersion": "4.13.0",
+    "counts": {
+      "violations": 0,
+      "passes": 36,
+      "incomplete": 0
+    },
+    "violations": []
+  },
+  {
+    "url": "http://localhost:3000/fr/goosee-admin/forgot-password",
+    "timestamp": "2026-09-15T22:04:48.908Z",
+    "axeVersion": "4.13.0",
+    "counts": {
+      "violations": 4,
+      "passes": 32,
+      "incomplete": 0
+    },
+    "violations": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": [
+          [
+            "html"
+          ]
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": [
+          [
+            ".text-center.items-center.flex-col"
+          ],
+          [
+            ".grid.gap-2"
+          ],
+          [
+            ".text-center.text-sm"
+          ]
+        ]
+      }
+    ]
+  }
+]

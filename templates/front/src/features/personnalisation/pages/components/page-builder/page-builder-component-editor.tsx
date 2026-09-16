@@ -71,6 +71,7 @@ function ImageField({
   onUpload: (file: File) => Promise<{ url: string }>
   uploadPlaceholder: string
 }) {
+  const tA11y = useTranslations('admin.a11y')
   return (
     <div className="min-w-0 space-y-2">
       <Label className="text-xs font-medium">{label}</Label>
@@ -83,6 +84,7 @@ function ImageField({
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <Input
               type="url"
+              aria-label={label}
               placeholder="https://..."
               value={value}
               onChange={(e) => onChange(e.target.value)}
@@ -96,6 +98,7 @@ function ImageField({
             className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
             onClick={() => onChange('')}
             title="Retirer"
+            aria-label={tA11y('removeImage')}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -104,6 +107,7 @@ function ImageField({
         <div className="space-y-2">
           <Input
             type="url"
+            aria-label={label}
             placeholder="https://..."
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
@@ -141,6 +145,7 @@ export function PageBuilderComponentEditor({
   const tEditor = useTranslations('admin.pageBuilder.editor')
   const tLabels = useTranslations('admin.pageBuilder.editor.labels')
   const tOptions = useTranslations('admin.pageBuilder.editor.options')
+  const tA11y = useTranslations('admin.a11y')
   const uploadMutation = useUploadFile()
   const { data: categories = [] } = useListCategories()
 
@@ -206,7 +211,7 @@ export function PageBuilderComponentEditor({
             value={value ? (value as string) : ALL}
             onValueChange={(v) => handleChange(key, v === ALL ? '' : v)}
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label={tA11y('category')}>
               <SelectValue placeholder="Toutes les catégories" />
             </SelectTrigger>
             <SelectContent>
@@ -231,7 +236,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={(value as string) || 'recent'} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -281,7 +286,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -320,7 +325,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -339,7 +344,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -358,7 +363,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -379,7 +384,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -399,7 +404,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={String(value)} onValueChange={(v) => handleChange(key, Number(v))}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -423,7 +428,7 @@ export function PageBuilderComponentEditor({
           <div key={key} className="space-y-2">
             <Label>{formatLabel(key)}</Label>
             <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-              <SelectTrigger>
+              <SelectTrigger aria-label={formatLabel(key)}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -441,7 +446,7 @@ export function PageBuilderComponentEditor({
           <div key={key} className="space-y-2">
             <Label>{formatLabel(key)}</Label>
             <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-              <SelectTrigger>
+              <SelectTrigger aria-label={formatLabel(key)}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -461,7 +466,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -480,7 +485,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -499,7 +504,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -519,7 +524,7 @@ export function PageBuilderComponentEditor({
         <div key={key} className="space-y-2">
           <Label>{formatLabel(key)}</Label>
           <Select value={value as string} onValueChange={(v) => handleChange(key, v)}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={formatLabel(key)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -540,6 +545,7 @@ export function PageBuilderComponentEditor({
           <div className="flex gap-2">
             <Input
               type="color"
+              aria-label={formatLabel(key)}
               value={(value as string) || '#000000'}
               onChange={(e) => handleChange(key, e.target.value)}
               className="h-10 w-14 cursor-pointer p-1"
@@ -548,6 +554,7 @@ export function PageBuilderComponentEditor({
               value={value as string}
               onChange={(e) => handleChange(key, e.target.value)}
               placeholder="#000000"
+              aria-label={`${formatLabel(key)} (hexadécimal)`}
               className="flex-1"
             />
           </div>
@@ -663,7 +670,7 @@ export function PageBuilderComponentEditor({
             </h3>
             <p className="text-xs text-muted-foreground">{tEditor('editComponent')}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={tEditor('close')}>
             <X className="h-4 w-4" />
           </Button>
         </div>

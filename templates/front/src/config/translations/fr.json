@@ -337,7 +337,8 @@
           "last30": "30 derniers jours",
           "month": "Ce mois-ci",
           "custom": "Personnalisé"
-        }
+        },
+        "period": "Période"
       },
       "kpis": {
         "revenue": "Chiffre d'affaires",
@@ -1061,6 +1062,18 @@
         "DEBUG": "Débogage"
       }
     },
+    "a11y": {
+      "back": "Retour",
+      "previewPage": "Aperçu de la page",
+      "pageStatus": "Statut de la page",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "removeImage": "Retirer l'image",
+      "category": "Catégorie",
+      "addAttribute": "Ajouter la caractéristique",
+      "setMainImage": "Définir comme image principale",
+      "deleteImage": "Supprimer l'image",
+      "addImages": "Ajouter des images"
     "assistant": {
       "title": "Assistant Goosee",
       "subtitle": "Répond à partir du guide utilisateur",

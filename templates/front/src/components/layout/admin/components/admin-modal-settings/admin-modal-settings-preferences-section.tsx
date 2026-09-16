@@ -77,7 +77,7 @@ export function AdminModalSettingsPreferencesSection() {
               </div>
             </div>
             <Select value={currentLocale} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger aria-label={t('language')} className="w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -110,7 +110,7 @@ export function AdminModalSettingsPreferencesSection() {
               </div>
             </div>
             <Select value={theme} onValueChange={handleThemeChange}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger aria-label={t('theme')} className="w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

@@ -22,6 +22,7 @@ export function DataTableSearch({ table }: Props) {
     <Input
       type="text"
       placeholder={t('admin.search.placeholder')}
+      aria-label={t('admin.search.placeholder')}
       value={value}
       onChange={(e) => setValue(e.target.value)}
       className="h-8 w-64 bg-card"

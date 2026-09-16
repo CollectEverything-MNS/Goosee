@@ -65,7 +65,7 @@ export function PreferencesForm() {
           </div>
         </div>
         <Select value={currentLocale} onValueChange={handleLanguageChange}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger aria-label="Langue" className="w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -89,7 +89,7 @@ export function PreferencesForm() {
             <p className="text-xs text-muted-foreground">Recevoir nos offres et nouveautés par email</p>
           </div>
         </div>
-        <Switch checked={newsletter} onCheckedChange={handleNewsletter} />
+        <Switch aria-label="Newsletter" checked={newsletter} onCheckedChange={handleNewsletter} />
       </div>
 
       <div className="flex items-center justify-between gap-4 border-t pt-6">
@@ -100,7 +100,7 @@ export function PreferencesForm() {
             <p className="text-xs text-muted-foreground">Alertes sur le suivi de mes commandes</p>
           </div>
         </div>
-        <Switch checked={notifications} onCheckedChange={handleNotifications} />
+        <Switch aria-label="Notifications" checked={notifications} onCheckedChange={handleNotifications} />
       </div>
     </div>
   );

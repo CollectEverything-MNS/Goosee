@@ -301,6 +301,7 @@ export function SettingsForm() {
                         value={field.value || FALLBACK_COLOR}
                         onChange={field.onChange}
                         placeholder={FALLBACK_COLOR}
+                        aria-label={`${t('form.primaryColor')} (hex)`}
                         className="h-10 max-w-[180px] font-mono text-xs uppercase"
                       />
                       <span

@@ -209,7 +209,10 @@ export function OrderDetailDialog() {
                   onValueChange={(v) => handleStatusChange(v as OrderStatus)}
                   disabled={updateStatus.isPending}
                 >
-                  <SelectTrigger className="h-10 w-56 border-primary/40 bg-background font-medium shadow-sm hover:border-primary focus:ring-primary/30">
+                  <SelectTrigger
+                    aria-label={t('detail.statusLabel')}
+                    className="h-10 w-56 border-primary/40 bg-background font-medium shadow-sm hover:border-primary focus:ring-primary/30"
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

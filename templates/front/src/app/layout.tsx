@@ -3,15 +3,17 @@ import type { Metadata } from 'next'
 import React from 'react'
 import './globals.css'
 import { NextIntlClientProvider } from 'next-intl'
+import { getLocale } from 'next-intl/server'
 
 export const metadata: Metadata = {
   title: 'Goosee - App',
   description: 'develop',
 }
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale()
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider>
           <ClientProvider>{children}</ClientProvider>

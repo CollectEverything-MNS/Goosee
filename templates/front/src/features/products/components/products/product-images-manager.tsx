@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useDropzone } from 'react-dropzone';
 import { CheckCircle2, Loader2, Star, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,6 +18,7 @@ import {
 const MAX_SIZE = 5 * 1024 * 1024;
 
 export function ProductImagesManager({ productId }: { productId: string }) {
+  const tA11y = useTranslations('admin.a11y');
   const { data: images = [], isLoading } = useProductImages(productId);
   const addMutation = useAddProductImage(productId);
   const deleteMutation = useDeleteProductImage(productId);
@@ -105,6 +107,7 @@ export function ProductImagesManager({ productId }: { productId: string }) {
                     variant="secondary"
                     className="h-8 w-8"
                     title="Définir comme principale"
+                    aria-label={tA11y('setMainImage')}
                     onClick={() => handleSetMain(image.id)}
                     disabled={setMainMutation.isPending}
                   >
@@ -117,6 +120,7 @@ export function ProductImagesManager({ productId }: { productId: string }) {
                   variant="destructive"
                   className="h-8 w-8"
                   title="Supprimer"
+                  aria-label={tA11y('deleteImage')}
                   onClick={() => handleDelete(image.id)}
                   disabled={deleteMutation.isPending || images.length === 1}
                 >
@@ -139,7 +143,7 @@ export function ProductImagesManager({ productId }: { productId: string }) {
           'hover:border-primary/50',
         )}
       >
-        <input {...getInputProps()} />
+        <input {...getInputProps()} aria-label={tA11y('addImages')} />
         {uploading ? (
           <>
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

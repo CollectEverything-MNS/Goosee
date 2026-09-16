@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,6 +14,7 @@ import {
 } from '../../usecases/use-product-attributes';
 
 export function ProductAttributesManager({ productId }: { productId: string }) {
+  const tA11y = useTranslations('admin.a11y');
   const { data: attributes = [], isLoading } = useProductAttributes(productId);
   const addMutation = useAddProductAttribute(productId);
   const deleteMutation = useDeleteProductAttribute(productId);
@@ -71,6 +73,7 @@ export function ProductAttributesManager({ productId }: { productId: string }) {
                 className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
                 onClick={() => handleDelete(attr.id)}
                 disabled={deleteMutation.isPending}
+                aria-label={`Supprimer la caractéristique ${attr.key}`}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -83,8 +86,9 @@ export function ProductAttributesManager({ productId }: { productId: string }) {
 
       <div className="flex items-end gap-2">
         <div className="flex-1 space-y-1">
-          <label className="text-[11px] font-medium text-muted-foreground">Nom</label>
+          <label htmlFor="attribute-key" className="text-[11px] font-medium text-muted-foreground">Nom</label>
           <Input
+            id="attribute-key"
             value={key}
             onChange={(e) => setKey(e.target.value)}
             placeholder="Poids, Allergènes..."
@@ -95,8 +99,9 @@ export function ProductAttributesManager({ productId }: { productId: string }) {
           />
         </div>
         <div className="flex-1 space-y-1">
-          <label className="text-[11px] font-medium text-muted-foreground">Valeur</label>
+          <label htmlFor="attribute-value" className="text-[11px] font-medium text-muted-foreground">Valeur</label>
           <Input
+            id="attribute-value"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="250 g, Gluten..."
@@ -112,6 +117,7 @@ export function ProductAttributesManager({ productId }: { productId: string }) {
           className="h-9 w-9 shrink-0"
           onClick={handleAdd}
           disabled={addMutation.isPending}
+          aria-label={tA11y('addAttribute')}
         >
           {addMutation.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />

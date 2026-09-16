@@ -72,6 +72,7 @@ function SortableComponent({
           className="h-6 w-6 cursor-grab"
           {...attributes}
           {...listeners}
+          aria-label={t('actions.move')}
         >
           <GripVertical className="h-3 w-3" />
         </Button>
@@ -86,6 +87,7 @@ function SortableComponent({
             e.stopPropagation();
             onDuplicate();
           }}
+          aria-label={t('actions.duplicate')}
         >
           <Copy className="h-3 w-3" />
         </Button>
@@ -97,6 +99,7 @@ function SortableComponent({
             e.stopPropagation();
             onDelete();
           }}
+          aria-label={t('actions.delete')}
         >
           <Trash2 className="h-3 w-3" />
         </Button>
@@ -126,6 +129,7 @@ interface GridDropZoneProps {
 }
 
 function GridDropZone({ gridId, gridChildren = [], getComponentLabel, emptyText, onSelectChild, onDeleteChild, selectedChildId }: GridDropZoneProps) {
+  const t = useTranslations('admin.pageBuilder');
   const { setNodeRef, isOver } = useDroppable({
     id: `grid-${gridId}`,
     data: {
@@ -167,6 +171,7 @@ function GridDropZone({ gridId, gridChildren = [], getComponentLabel, emptyText,
                     e.stopPropagation();
                     onDeleteChild?.(child.id);
                   }}
+                  aria-label={`${t('actions.delete')} ${getComponentLabel(child.type)}`}
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>

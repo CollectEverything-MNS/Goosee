@@ -40,8 +40,8 @@ export function AdminModalSettingsAccountSection() {
         </div>
 
         <div className="max-w-sm">
-          <Label>{t('name')}</Label>
-          <Input className="mt-1" defaultValue={user ? `${user.firstName} ${user.lastName}`.trim() : ''} readOnly />
+          <Label htmlFor="account-name">{t('name')}</Label>
+          <Input id="account-name" className="mt-1" defaultValue={user ? `${user.firstName} ${user.lastName}`.trim() : ''} readOnly />
         </div>
       </section>
 

@@ -338,7 +338,8 @@
           "last30": "Last 30 days",
           "month": "This month",
           "custom": "Custom"
-        }
+        },
+        "period": "Period"
       },
       "kpis": {
         "revenue": "Revenue",
@@ -1062,6 +1063,18 @@
         "DEBUG": "Debug"
       }
     },
+    "a11y": {
+      "back": "Back",
+      "previewPage": "Preview page",
+      "pageStatus": "Page status",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removeImage": "Remove image",
+      "category": "Category",
+      "addAttribute": "Add attribute",
+      "setMainImage": "Set as main image",
+      "deleteImage": "Delete image",
+      "addImages": "Add images"
     "assistant": {
       "title": "Goosee Assistant",
       "subtitle": "Answers from the user guide",
