@@ -7,6 +7,7 @@
 - [Plan de démonstration](plan-demo-infra.md) : périmètre réalisé et limites.
 - [Fonctionnement](fonctionnement.md) et [structure](structure-projet.md) : vue du dépôt.
 - [Architecture](architecture/README.md) : diagrammes Mermaid et modèle de données.
+- [Résilience et reprise après panne](architecture/resilience-reprise.md) : protections présentes, limites et procédure de vérification.
 - [Guide utilisateur](guide-utilisateur.md) : boutique, administration et chatbot.
 - [Matrice des accès](roles-endpoints-matrix.md) : 99 routes et gardes déclarées.
 - [Postman](postman/procedure-tests-roles-dynamiques.md) : configuration et requêtes manuelles.

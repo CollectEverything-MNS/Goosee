@@ -166,6 +166,9 @@ Voir le [guide de démo](../demo-infra.md) pour les commandes.
 
 ## Où regarder dans le dépôt
 
+La [page résilience et reprise après panne](resilience-reprise.md) détaille les sondes,
+les volumes persistants, les limites de disponibilité et les essais de récupération.
+
 | Élément | Fichier |
 | --- | --- |
 | Compose d'un tenant | `docker/tenant/docker-compose.tenant.yml` |

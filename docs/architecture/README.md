@@ -19,6 +19,7 @@ C'est la mise en œuvre de la décision n° 8 de l'[audit du SI](../audit-si.md#
 | [Composants d'un site généré](c4-composants-tenant.md) | Ce qu'il y a dans un site client, et comment ses services communiquent entre eux |
 | [Déploiement](deploiement.md) | Comment un site est réellement déployé, et **en quoi les deux forfaits diffèrent** |
 | [Séquences](sequences.md) | Parcours d'achat, provisionnement d'un client, auto-connexion à l'administration |
+| [Résilience et reprise](resilience-reprise.md) | Redémarrage des services, conservation des données, limites et essais de panne à exécuter |
 | [Modèle de données](modele-donnees.md) | Les entités de chaque service, et pourquoi il n'y a aucune clé étrangère entre services |
 
 ## Convention de lecture
