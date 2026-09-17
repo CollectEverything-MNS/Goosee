@@ -57,7 +57,7 @@ sequenceDiagram
     P->>O: HTTP PATCH statut paid
     O-)B: order.paid
     B-)ST: Confirme la réservation
-    Note over O,ST: order.cancelled libère la réservation ; expiration selon TTL
+    Note over O,ST: order.cancelled libère la réservation, expiration selon TTL
 ```
 
 Le stock est réservé à la **création de la commande**, avant le paiement. Le panier
