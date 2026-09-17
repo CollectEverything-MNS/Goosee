@@ -1,0 +1,11 @@
+# Overlay POC : conserve les alertes locales sans notification externe.
+services:
+  goosee-prometheus:
+    extra_hosts:
+      - 'api.mode-bob.127.0.0.1.nip.io:host-gateway'
+      - 'api.tech-bob.127.0.0.1.nip.io:host-gateway'
+      - 'api.deco-bob.127.0.0.1.nip.io:host-gateway'
+      - 'api.sport-bob.127.0.0.1.nip.io:host-gateway'
+  goosee-alertmanager:
+    volumes:
+      - ./alertmanager.demo.yml:/etc/alertmanager/alertmanager.yml:ro

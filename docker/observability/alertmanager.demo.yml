@@ -1,0 +1,4 @@
+route:
+  receiver: local-demo
+receivers:
+  - name: local-demo

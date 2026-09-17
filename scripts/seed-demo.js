@@ -69,15 +69,13 @@ ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, role = EXCLUDED.
 function upsertSite(owner, { slug, plan, infra, label }) {
   psql(
     'orchestrator_db',
-    `DELETE FROM tenants WHERE slug = '${esc(slug)}';
-INSERT INTO tenants (slug, "ownerEmail", "ownerFirstName", "ownerLastName", plan, infra, status, "instanceUrl", "apiUrl")
-VALUES ('${esc(slug)}', '${esc(owner.email)}', '${esc(owner.firstName)}', '${esc(owner.lastName)}', '${plan}', '${infra}', 'STOPPED', '${instanceUrl(slug, infra)}', '${apiUrl(slug, infra)}');`
+    `INSERT INTO tenants (slug, "ownerEmail", "ownerFirstName", "ownerLastName", plan, infra, status, "instanceUrl", "apiUrl")
+VALUES ('${esc(slug)}', '${esc(owner.email)}', '${esc(owner.firstName)}', '${esc(owner.lastName)}', '${plan}', '${infra}', 'STOPPED', '${instanceUrl(slug, infra)}', '${apiUrl(slug, infra)}') ON CONFLICT (slug) DO UPDATE SET "ownerEmail" = EXCLUDED."ownerEmail", "ownerFirstName" = EXCLUDED."ownerFirstName", "ownerLastName" = EXCLUDED."ownerLastName";`
   );
   psql(
     'vitrine_db',
-    `DELETE FROM projects WHERE subdomain = '${esc(slug)}';
-INSERT INTO projects ("userId", "businessName", subdomain, "domainType", plan, status, infra, "instanceUrl")
-VALUES ((SELECT id FROM users WHERE email = '${esc(owner.email)}'), '${esc(label)}', '${esc(slug)}', 'subdomain', '${plan}', 'STOPPED', '${infra}', '${instanceUrl(slug, infra)}');`
+    `INSERT INTO projects ("userId", "businessName", subdomain, "domainType", plan, status, infra, "instanceUrl")
+SELECT (SELECT id FROM users WHERE email = '${esc(owner.email)}'), '${esc(label)}', '${esc(slug)}', 'subdomain', '${plan}', 'STOPPED', '${infra}', '${instanceUrl(slug, infra)}' WHERE NOT EXISTS (SELECT 1 FROM projects WHERE subdomain = '${esc(slug)}');`
   );
 }
 

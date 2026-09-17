@@ -24,33 +24,33 @@ const crypto = require('crypto');
 const { execSync, spawn } = require('child_process');
 const bcrypt = require('bcryptjs');
 
+const HOST_ENV = { ...process.env };
 const ROOT = path.join(__dirname, '..');
 const VITRINE = path.join(ROOT, '..', 'goosee-vitrine');
 
 // Charge env/.env.dev dans process.env (sans écraser les variables déjà définies dans le shell)
 // pour piloter la démo depuis un .env : PRESENTATION_K8S_COUNT, PRESENTATION_DOCKER_COUNT, etc.
 (function loadEnvDev() {
-  try {
-    const content = fs.readFileSync(path.join(ROOT, 'env', '.env.dev'), 'utf8');
-    for (const line of content.split(/\r?\n/)) {
-      const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
-      if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
-    }
-  } catch {
-    /* env/.env.dev absent : on garde les valeurs du shell */
-  }
+  const file = path.join(ROOT, 'env', '.env.dev');
+  if (!fs.existsSync(file)) return;
+  const parsed = require('dotenv').parse(fs.readFileSync(file));
+  for (const [key, value] of Object.entries(parsed)) if (process.env[key] === undefined) process.env[key] = value;
 })();
 
 const BASE_DOMAIN = process.env.TENANT_BASE_DOMAIN || '127.0.0.1.nip.io';
 const K8S_PORT = process.env.K8S_INGRESS_PORT || '8081';
 // Nombre de sites K8s de Bob réellement déployés (réglable dans env/.env.dev). Défaut : 2.
-const K8S_COUNT = Math.min(Number(process.env.PRESENTATION_K8S_COUNT || 2), 4);
+const K8S_COUNT = Math.min(Number(process.env.PRESENTATION_K8S_COUNT ?? 1), 4);
 const CLUSTER = 'goosee';
 const DEMO_PW = 'Demo#2026';
 const CHART = path.join(ROOT, 'k8s', 'goosee-tenant');
 const TENANT_COMPOSE = path.join(ROOT, 'docker', 'tenant', 'docker-compose.tenant.yml');
 const TRAEFIK_COMPOSE = path.join(ROOT, 'docker', 'tenant', 'docker-compose.traefik.yml');
 const OBS_COMPOSE = path.join(ROOT, 'docker', 'observability', 'docker-compose.observability.yml');
+const OBS_DEMO = path.join(ROOT, 'docker', 'observability', 'docker-compose.demo.yml');
+const TENANTS_ONLY = process.argv.includes('--tenants-only');
+const ASSISTANT = process.env.PRESENTATION_ASSISTANT !== '0';
+const COMPOSE_PROFILE = ASSISTANT ? '--profile assistant' : '';
 const DYNAMIC_DIR = path.join(ROOT, 'docker', 'tenant', 'dynamic');
 const ENVS_DIR = path.join(ROOT, 'docker', 'tenant', 'envs');
 const TARGETS_DIR = path.join(ROOT, 'docker', 'observability', 'targets');
@@ -59,8 +59,8 @@ const PG = 'goosee-postgres-dev';
 const { buildImages, images: IMAGES } = require('./build-demo-images');
 
 // Sous-ensemble réellement déployé + peuplé (le reste reste registre/STOPPED, démarrable
-// à la demande). Défaut : 1 site Docker + 2 sites K8s (réglable dans env/.env.dev).
-const DOCKER_COUNT = Math.min(Number(process.env.PRESENTATION_DOCKER_COUNT || 1), 2);
+// à la demande). Défaut : 1 site Docker + 1 site K8s (réglable dans env/.env.dev).
+const DOCKER_COUNT = Math.min(Number(process.env.PRESENTATION_DOCKER_COUNT ?? 1), 2);
 // Nom réel du propriétaire de chaque site (seedé comme OWNER dans le site généré → l'admin
 // affiche « Alice Martin »/« Bob Durand » et non un générique « Admin Goosee »).
 const OWNERS = {
@@ -91,7 +91,7 @@ function run(cmd, opts = {}) {
   return execSync(cmd, {
     cwd: opts.cwd || ROOT,
     stdio: opts.capture ? 'pipe' : 'inherit',
-    env: { ...process.env, MSYS_NO_PATHCONV: '1' },
+    env: { ...HOST_ENV, MSYS_NO_PATHCONV: '1' },
     encoding: 'utf8',
     shell: true,
     ...opts,
@@ -122,6 +122,24 @@ function tenantSecrets(slug) {
     MINIO_ROOT_USER: `tenant_${slug.replace(/-/g, '_')}`, MINIO_ROOT_PASSWORD: rand(),
   };
 }
+function savedSecrets(slug) {
+  fs.mkdirSync(ENVS_DIR, { recursive: true });
+  const file = path.join(ENVS_DIR, slug + '.env');
+  if (fs.existsSync(file)) {
+    const saved = Object.fromEntries(fs.readFileSync(file, 'utf8').trim().split(/\r?\n/).map((line) => { const i = line.indexOf('='); return [line.slice(0, i), line.slice(i + 1)]; }));
+    if (saved.DB_PASSWORD) return saved;
+    // Ancien fichier Kubernetes : seul le jeton interne était conservé.
+    // Ne régénérer qu'après confirmation de l'absence du namespace.
+    const namespace = run('kubectl --context k3d-goosee get namespace tenant-' + slug + ' --ignore-not-found -o name', { capture: true }).trim();
+    if (namespace) throw new Error('Secrets incomplets pour ' + slug + ' : récupérer les secrets du namespace existant.');
+    const restored = { ...tenantSecrets(slug), ...saved };
+    fs.writeFileSync(file, Object.entries(restored).map(([k,v]) => k + '=' + v).join('\n') + '\n');
+    return restored;
+  }
+  const secrets = tenantSecrets(slug);
+  fs.writeFileSync(file, Object.entries(secrets).map(([k,v]) => k + '=' + v).join('\n') + '\n');
+  return secrets;
+}
 const envDevValue = (key) => {
   try {
     const m = fs.readFileSync(path.join(ROOT, 'env', '.env.dev'), 'utf8').match(new RegExp(`^${key}=(.*)$`, 'm'));
@@ -138,13 +156,14 @@ const k8sApiUrl = (slug) => `http://api.${slug}.${BASE_DOMAIN}:${K8S_PORT}`;
 // ---------------------------------------------------------------- Setup
 
 function preflight() {
+  if (![DOCKER_COUNT, K8S_COUNT].every(Number.isInteger) || DOCKER_COUNT < 0 || K8S_COUNT < 0) throw new Error('Nombre de tenants invalide');
+  if (ASSISTANT && !process.env.GEMINI_API_KEY) throw new Error('PRESENTATION_ASSISTANT=1 nécessite GEMINI_API_KEY');
+  if (!TENANTS_ONLY && !fs.existsSync(path.join(VITRINE, 'package.json'))) throw new Error('Dépôt goosee-vitrine absent');
   log('Préflight');
   // Commandes de version SANS connectivité (le cluster n'existe pas encore).
   const tools = {
     docker: 'docker --version',
-    k3d: 'k3d version',
-    helm: 'helm version',
-    kubectl: 'kubectl version --client',
+    ...(K8S_COUNT ? { k3d: 'k3d version', helm: 'helm version', kubectl: 'kubectl version --client' } : {}),
   };
   for (const [t, cmd] of Object.entries(tools)) {
     if (!cap(cmd)) throw new Error(`${t} introuvable sur le PATH.`);
@@ -152,6 +171,9 @@ function preflight() {
   }
 }
 function ensureImages() {
+  if (process.argv.includes('--skip-build')) { for (const image of IMAGES) run(`docker image inspect ${image}`, { capture: true }); return; }
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = '';
+  process.env.NEXT_PUBLIC_DEMO_PAYMENT = 'true';
   buildImages();
 }
 function ensureCluster() {
@@ -159,46 +181,77 @@ function ensureCluster() {
   log('Cluster k3d');
   const list = cap('k3d cluster list --no-headers');
   if (!list.split('\n').some((l) => l.startsWith(CLUSTER))) {
-    run(`k3d cluster create ${CLUSTER} --api-port 127.0.0.1:6445 -p "${K8S_PORT}:80@loadbalancer" -p "8443:443@loadbalancer" --agents 0`);
+    run(`k3d cluster create ${CLUSTER} --api-port 127.0.0.1:6445 -p "${K8S_PORT}:80@loadbalancer" -p "8443:443@loadbalancer" --agents 0 --servers-memory 5g`);
     ok('cluster créé');
-  } else ok('cluster déjà présent');
-  log('Import des images dans k3d'); run(`k3d image import -c ${CLUSTER} ${IMAGES.join(' ')}`);
+  } else {
+    run(`k3d cluster start ${CLUSTER}`);
+    ok('cluster déjà présent');
+  }
+  run('docker update --cpus 2 k3d-goosee-server-0', { capture: true });
+  const cachePath = path.join(ENVS_DIR, 'image-cache.json');
+  const clusterId = cap('docker inspect k3d-goosee-server-0 --format "{{.Id}}"');
+  const current = Object.fromEntries(IMAGES.map((image) => [image, cap('docker image inspect ' + image + ' --format "{{.Id}}"')]));
+  let previous = {};
+  try { previous = JSON.parse(fs.readFileSync(cachePath, 'utf8')); } catch { /* premier import */ }
+  const changed = IMAGES.filter((image) => previous.clusterId !== clusterId || previous.images?.[image] !== current[image]);
+  if (changed.length) {
+    log('Import de ' + changed.length + ' images dans k3d');
+    run(`k3d image import -c ${CLUSTER} ${changed.join(' ')}`);
+    fs.mkdirSync(ENVS_DIR, { recursive: true });
+    fs.writeFileSync(cachePath, JSON.stringify({ clusterId, images: current }));
+  } else ok('Images déjà importées');
 }
 function ensurePlatform() {
   log('Plateforme : Traefik + Prometheus');
   run(`docker compose -f "${TRAEFIK_COMPOSE}" up -d`);
-  run(`docker compose -f "${OBS_COMPOSE}" up -d`);
+  run(`docker compose -f "${OBS_COMPOSE}" -f "${OBS_DEMO}" up -d`);
   ok('Traefik (:80) + Prometheus (:9090)');
 }
 
 // ---------------------------------------------------------------- Vitrine
 
-function startVitrine() {
+async function startVitrine() {
   log('Vitrine (portail + control plane)');
-  run('docker compose -f docker-compose.dev.yml up -d', { cwd: VITRINE });
-  run('corepack yarn install', { cwd: VITRINE, capture: true });
-  run('corepack yarn workspace api migration:run', { cwd: VITRINE, capture: true });
-  run('corepack yarn workspace orchestrator migration:run', { cwd: VITRINE, capture: true });
-  // Le front est servi en PRODUCTION (build + next start) : `next dev` est instable sous
-  // Windows avec next-intl (chunks vendor @formatjs manquants → 500 + recompilations qui
-  // rament). On repart d'un .next propre puis on build une fois.
-  log('Build du front (prod, ~30-60s)');
-  fs.rmSync(path.join(VITRINE, 'apps', 'web', '.next'), { recursive: true, force: true });
-  run('corepack yarn workspace web build', { cwd: VITRINE });
-
+  const vitrineEnv = { ...HOST_ENV, NEXT_TELEMETRY_DISABLED: '1', UV_THREADPOOL_SIZE: '2' };
+  for (const line of fs.readFileSync(path.join(VITRINE, '.env'), 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+    if (match) vitrineEnv[match[1]] = match[2];
+  }
+  const opts = { cwd: VITRINE, env: vitrineEnv };
+  run('docker compose -f docker-compose.dev.yml up -d --wait --wait-timeout 90', opts);
+  if (!fs.existsSync(path.join(VITRINE, 'node_modules'))) run('corepack yarn install --frozen-lockfile', opts);
+  run('corepack yarn workspace api migration:run', opts);
+  run('corepack yarn workspace orchestrator migration:run', opts);
   const logsDir = path.join(VITRINE, '.presentation-logs');
   fs.mkdirSync(logsDir, { recursive: true });
-  // api/orchestrateur en dev (légers), front en prod (stable).
-  const procs = [['orchestrator', 'dev'], ['api', 'dev'], ['web', 'start']];
-  for (const [app, mode] of procs) {
-    const out = fs.openSync(path.join(logsDir, `${app}.log`), 'a');
-    const child = spawn('corepack', ['yarn', 'workspace', app, mode], {
+  const webPort = Number(new URL(vitrineEnv.CORS_ORIGIN || 'http://localhost:3100').port || 80);
+  vitrineEnv.PORT = String(webPort);
+  vitrineEnv.RAYON_NUM_THREADS = '2';
+  const apps = [['orchestrator', Number(vitrineEnv.ORCHESTRATOR_PORT || 4000), '/health'], ['api', Number(vitrineEnv.GOOSEE_PORT || 3102), '/health'], ['web', webPort, '/fr']];
+  for (const [app, port, route] of apps) {
+    const listening = await new Promise((resolve) => {
+      const socket = require('net').connect({ host: '127.0.0.1', port });
+      socket.setTimeout(1000);
+      socket.on('connect', () => { socket.destroy(); resolve(true); });
+      socket.on('error', () => resolve(false));
+      socket.on('timeout', () => { socket.destroy(); resolve(false); });
+    });
+    if (listening) { ok(app + ' déjà à l’écoute sur ' + port); continue; }
+    const appEnv = { ...vitrineEnv, ...(app === 'web' ? { NODE_ENV: 'production' } : {}) };
+    run('corepack yarn workspace ' + app + ' build', { ...opts, env: appEnv });
+    const out = fs.openSync(path.join(logsDir, app + '.log'), 'a');
+    const child = spawn('corepack', ['yarn', 'workspace', app, app === 'web' ? 'start' : 'start:prod'], {
       cwd: VITRINE, detached: true, stdio: ['ignore', out, out], shell: true,
-      env: { ...process.env, MSYS_NO_PATHCONV: '1' },
+      windowsHide: true, env: appEnv,
     });
     child.unref();
+    fs.closeSync(out);
+    await retry(async () => {
+      const response = await fetch('http://localhost:' + port + route, { signal: AbortSignal.timeout(5000) });
+      if (response.status >= 500) throw new Error(app + ' pas prêt');
+    }, app + ' démarrage', 40);
   }
-  ok('Vitrine démarrée : web :3000 (prod) · api :3002 · orchestrateur :4000 (logs: .presentation-logs/)');
+  ok('Vitrine : ' + vitrineEnv.CORS_ORIGIN + ' ; logs dans goosee-vitrine/.presentation-logs');
 }
 
 function seedAccounts() {
@@ -208,78 +261,7 @@ function seedAccounts() {
 
 // ---------------------------------------------------------------- Données d'un tenant (via gateway)
 
-async function api(method, base, route, token, body) {
-  const res = await fetch(`${base}${route}`, {
-    method,
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`${method} ${route} -> ${res.status}`);
-  return res.status === 204 ? {} : res.json();
-}
-
-// Attend que l'API du tenant soit prête (gateway + auth-service up) puis renvoie un token.
-// Les services jouent leurs migrations au boot : un 503/refus est normal au début.
-async function loginWithRetry(base, email, password) {
-  for (let i = 1; i <= 60; i += 1) {
-    try {
-      const r = await api('POST', base, '/auth/login', null, { email, password });
-      if (r.accessToken) return r.accessToken;
-    } catch (e) {
-      if (!/(\b50[234]\b|fetch failed|ECONNREFUSED|ENOTFOUND|EAI_AGAIN)/i.test(e.message)) throw e;
-    }
-    process.stdout.write(`  … API du tenant pas prête (${i}/60)\r`);
-    await sleep(3000);
-  }
-  throw new Error('API du tenant non prête (login en échec après ~3 min)');
-}
-
-// Peuple un site : clients, catégorie, produits, commandes (dont payées) → KPI non nuls.
-async function seedTenantData(base, ownerEmail, ownerPassword) {
-  const token = await loginWithRetry(base, ownerEmail, ownerPassword);
-
-  // Clients (s'inscrivent sur le site)
-  const customers = [
-    { firstName: 'Léa', lastName: 'Bernard', email: `lea@${rand(3)}.test` },
-    { firstName: 'Marc', lastName: 'Petit', email: `marc@${rand(3)}.test` },
-    { firstName: 'Sofia', lastName: 'Rossi', email: `sofia@${rand(3)}.test` },
-  ];
-  for (const c of customers) {
-    await api('POST', base, '/auth/register', null, { ...c, password: 'Client#2026' }).catch(() => undefined);
-  }
-
-  const cat = await api('POST', base, '/categories', token, { name: 'Boutique' });
-  const catId = cat.category?.id ?? cat.id;
-  const defs = [
-    { name: 'Café signature', price: 3.5, stock: 120 },
-    { name: 'Thé bio', price: 4.2, stock: 80 },
-    { name: 'Cookie maison', price: 2.8, stock: 200 },
-    { name: 'Formule déjeuner', price: 12.9, stock: 60 },
-  ];
-  const products = [];
-  for (const d of defs) {
-    const r = await api('POST', base, '/products', token, { ...d, categoryId: catId });
-    const p = r.product ?? r;
-    products.push({ id: p.id, name: d.name, cents: Math.round(d.price * 100) });
-  }
-
-  // Commandes (quelques-unes marquées payées → CA)
-  let paid = 0;
-  for (let i = 0; i < 5; i += 1) {
-    const picks = products.slice(0, 1 + (i % 3)).map((p) => ({
-      productId: p.id, name: p.name, unitPriceCents: p.cents, quantity: 1 + (i % 2),
-    }));
-    const ord = await api('POST', base, '/orders', null, {
-      customerEmail: customers[i % customers.length].email, items: picks,
-    });
-    const oid = ord.order?.id ?? ord.id;
-    if (oid && i % 2 === 0) {
-      await api('PATCH', base, `/orders/${oid}/status`, token, { status: 'paid' }).catch(() => undefined);
-      paid += 1;
-    }
-  }
-  ok(`données seedées (${customers.length} clients, ${products.length} produits, 5 commandes dont ${paid} payées)`);
-}
+const { seedTenantData, retry } = require('./demo-data');
 
 // ---------------------------------------------------------------- Provisioning Docker
 
@@ -294,7 +276,7 @@ async function seedOwnerDocker(slug, email, password, firstName = 'Admin', lastN
   );
   const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
   for (let i = 1; i <= 40; i += 1) {
-    const out = cap(`docker compose -p ${project} exec -T auth-db psql -U postgres -d auth_db -tA < "${tmp}-auth.sql"`);
+    const out = cap(`docker compose -p ${project} --env-file "${path.join(ENVS_DIR, slug + '.env')}" -f "${TENANT_COMPOSE}" exec -T auth-db psql -U postgres -v ON_ERROR_STOP=1 -d auth_db -tA < "${tmp}-auth.sql"`);
     // psql renvoie l'id RETURNING + le tag de commande (« INSERT 0 1 ») : n'extraire que l'UUID,
     // sinon il finit dans user.authId et /users/me (lookup par authId) renvoie 404.
     const authId = (out.match(UUID_RE) || [])[0];
@@ -304,7 +286,7 @@ async function seedOwnerDocker(slug, email, password, firstName = 'Admin', lastN
         `INSERT INTO "user" ("authId", email, "firstName", "lastName", role) VALUES ('${authId}', '${esc(email)}', '${esc(firstName)}', '${esc(lastName)}', '{OWNER}') ON CONFLICT (email) DO UPDATE SET "authId" = EXCLUDED."authId", "firstName" = EXCLUDED."firstName", "lastName" = EXCLUDED."lastName", role = EXCLUDED.role;`,
         'utf8'
       );
-      run(`docker compose -p ${project} exec -T user-db psql -U postgres -d user_db < "${tmp}-user.sql"`, { capture: true });
+      run(`docker compose -p ${project} --env-file "${path.join(ENVS_DIR, slug + '.env')}" -f "${TENANT_COMPOSE}" exec -T user-db psql -U postgres -v ON_ERROR_STOP=1 -d user_db < "${tmp}-user.sql"`, { capture: true });
       return true;
     }
     process.stdout.write(`  … schéma ${slug} pas prêt (${i}/40)\r`);
@@ -317,7 +299,7 @@ async function provisionDocker(site) {
   const { slug, owner, firstName, lastName } = site;
   log(`Site Docker : ${slug}`);
   const project = `tenant-${slug}`;
-  const secrets = tenantSecrets(slug);
+  const secrets = savedSecrets(slug);
   fs.mkdirSync(ENVS_DIR, { recursive: true });
   const envPath = path.join(ENVS_DIR, `${slug}.env`);
   fs.writeFileSync(
@@ -325,12 +307,13 @@ async function provisionDocker(site) {
     [
       `TENANT_SLUG=${slug}`, 'JWT_ACCESS_EXPIRES_IN=15m', 'JWT_REFRESH_EXPIRES_IN=7d',
       ...Object.entries(secrets).map(([k, v]) => `${k}=${v}`),
-      `STRIPE_SECRET_KEY=${envDevValue('STRIPE_SECRET_KEY')}`,
-      `STRIPE_WEBHOOK_SECRET=${envDevValue('STRIPE_WEBHOOK_SECRET')}`,
+      'STRIPE_SECRET_KEY=', 'STRIPE_WEBHOOK_SECRET=',
+      `GEMINI_API_KEY=${ASSISTANT ? process.env.GEMINI_API_KEY : ''}`,
+      `GEMINI_MODEL=${process.env.GEMINI_MODEL || 'gemini-2.5-flash'}`,
     ].join('\n') + '\n',
     'utf8'
   );
-  run(`docker compose -p ${project} --env-file "${envPath}" -f "${TENANT_COMPOSE}" up -d`);
+  run(`docker compose --parallel 1 -p ${project} --env-file "${envPath}" -f "${TENANT_COMPOSE}" ${COMPOSE_PROFILE} up -d --wait --wait-timeout 300`);
 
   fs.mkdirSync(DYNAMIC_DIR, { recursive: true });
   fs.writeFileSync(path.join(DYNAMIC_DIR, `${slug}.yml`), traefikRoute(slug), 'utf8');
@@ -344,8 +327,8 @@ async function provisionDocker(site) {
 
   ok('stack démarrée, seed OWNER…');
   const seeded = await seedOwnerDocker(slug, owner, DEMO_PW, firstName, lastName);
-  if (!seeded) { warn('seed OWNER non confirmé'); return { slug, owner, infra: 'docker', url: dockerInstanceUrl(slug), seeded: false }; }
-  await seedTenantData(dockerApiUrl(slug), owner, DEMO_PW).catch((e) => warn(`données: ${e.message}`));
+  if (!seeded) throw new Error('Seed OWNER non confirmé : ' + slug);
+  await seedTenantData(dockerApiUrl(slug), owner, DEMO_PW);
   activate(slug, 'docker', envPath);
   return { slug, owner, infra: 'docker', url: dockerInstanceUrl(slug), seeded: true };
 }
@@ -389,10 +372,11 @@ function toYaml(obj, indent = 0) {
 async function provisionK8s(site) {
   const { slug, owner, firstName, lastName } = site;
   log(`Site Kubernetes : ${slug}`);
-  const secrets = tenantSecrets(slug);
+  const secrets = savedSecrets(slug);
   const hash = bcrypt.hashSync(DEMO_PW, 12);
   const values = {
-    tenant: { slug, domain: BASE_DOMAIN },
+    tenant: { slug, domain: BASE_DOMAIN, publicPort: K8S_PORT },
+    image: { revision: crypto.createHash('sha256').update(IMAGES.map((image) => cap('docker image inspect ' + image + ' --format "{{.Id}}"')).join('')).digest('hex').slice(0,16) },
     secrets: {
       dbPassword: secrets.DB_PASSWORD, jwtSecret: secrets.JWT_SECRET,
       jwtAccessSecret: secrets.JWT_ACCESS_SECRET, jwtRefreshSecret: secrets.JWT_REFRESH_SECRET,
@@ -400,19 +384,23 @@ async function provisionK8s(site) {
       minioRootPassword: secrets.MINIO_ROOT_PASSWORD,
       // Sans la clé secrète, le payment-service tombe en mode mock et le front (clé publique
       // inlinée au build) échoue à confirmer le paiement Stripe.
-      stripeSecretKey: envDevValue('STRIPE_SECRET_KEY') || '',
-      stripeWebhookSecret: envDevValue('STRIPE_WEBHOOK_SECRET') || '',
+      stripeSecretKey: '', stripeWebhookSecret: '',
+      geminiApiKey: ASSISTANT ? process.env.GEMINI_API_KEY : '',
     },
+    resources: { app: { requests: { cpu: "100m", memory: "96Mi" } } },
+    assistant: { enabled: ASSISTANT, model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' },
     owner: { email: owner, passwordHash: hash, firstName, lastName },
   };
   const valuesPath = path.join(os.tmpdir(), `goosee-values-${slug}.yaml`);
   fs.writeFileSync(valuesPath, toYaml(values), 'utf8');
-  run(`helm upgrade --install ${slug} "${CHART}" -n tenant-${slug} --create-namespace --wait --timeout 6m -f "${valuesPath}"`);
+  run(`helm --kube-context k3d-goosee upgrade --install ${slug} "${CHART}" -n tenant-${slug} --create-namespace --wait --timeout 12m -f "${valuesPath}"`);
   // env file pour la supervision (jeton interne)
   fs.mkdirSync(ENVS_DIR, { recursive: true });
   const envPath = path.join(ENVS_DIR, `${slug}.env`);
-  fs.writeFileSync(envPath, `INTERNAL_API_TOKEN=${secrets.INTERNAL_API_TOKEN}\n`, 'utf8');
-  await seedTenantData(k8sApiUrl(slug), owner, DEMO_PW).catch((e) => warn(`données: ${e.message}`));
+  fs.rmSync(valuesPath, { force: true });
+  fs.mkdirSync(TARGETS_DIR, { recursive: true });
+  fs.writeFileSync(path.join(TARGETS_DIR, slug + '.json'), JSON.stringify([{targets: [new URL(k8sApiUrl(slug)).host], labels: {tenant: slug, infra: 'k8s'}}]));
+  await seedTenantData(k8sApiUrl(slug), owner, DEMO_PW);
   activate(slug, 'k8s', envPath);
   return { slug, owner, infra: 'k8s', url: k8sInstanceUrl(slug), seeded: true };
 }
@@ -420,6 +408,7 @@ async function provisionK8s(site) {
 // ---------------------------------------------------------------- Statut + résumé + teardown
 
 function activate(slug, infra, secretsRef) {
+  if (TENANTS_ONLY) return;
   const instUrl = infra === 'k8s' ? k8sInstanceUrl(slug) : dockerInstanceUrl(slug);
   const aUrl = infra === 'k8s' ? k8sApiUrl(slug) : dockerApiUrl(slug);
   const ref = secretsRef.replace(/\\/g, '/');
@@ -428,29 +417,23 @@ function activate(slug, infra, secretsRef) {
 }
 
 function down() {
-  log('Démontage');
-  // cap() : tolère l'absence d'un site (jamais déployé) sans interrompre le démontage.
-  for (const s of ALL_DOCKER) {
-    cap(`docker compose -p tenant-${s.slug} down -v`);
-    fs.rmSync(path.join(DYNAMIC_DIR, `${s.slug}.yml`), { force: true });
-    fs.rmSync(path.join(TARGETS_DIR, `${s.slug}.json`), { force: true });
+  log('Arrêt de la démo (données conservées)');
+  for (const site of ALL_DOCKER) {
+    const envPath = path.join(ENVS_DIR, site.slug + '.env');
+    if (fs.existsSync(envPath)) run(`docker compose -p tenant-${site.slug} --env-file "${envPath}" -f "${TENANT_COMPOSE}" --profile assistant stop`);
   }
-  for (const s of ALL_K8S) {
-    cap(`helm uninstall ${s.slug} -n tenant-${s.slug}`);
-    cap(`kubectl delete namespace tenant-${s.slug} --ignore-not-found`);
-  }
-  cap(`docker compose -f "${OBS_COMPOSE}" down`);
-  cap(`docker compose -f "${TRAEFIK_COMPOSE}" down`);
-  // Vitrine (apps détachées) : à fermer manuellement (logs dans goosee-vitrine/.presentation-logs)
-  ok('Tenants + plateforme arrêtés. Vitrine : fermer les process (ports 3000/3002/4000) si besoin.');
+  if (cap('k3d cluster list --no-headers').split('\n').some((line) => line.startsWith(CLUSTER))) run('k3d cluster stop ' + CLUSTER);
+  run(`docker compose -f "${OBS_COMPOSE}" -f "${OBS_DEMO}" stop`);
+  run(`docker compose -f "${TRAEFIK_COMPOSE}" stop`);
+  ok('Tenants et supervision arrêtés, volumes conservés. Vitrine laissée disponible.');
 }
 
 function summary(sites) {
   console.log('\n\x1b[1m═══════════════ PRÉSENTATION GOOSEE PRÊTE ═══════════════\x1b[0m');
-  console.log('\n  \x1b[1mPortail vitrine\x1b[0m : http://localhost:3000');
+  if (!TENANTS_ONLY) console.log('\n  \x1b[1mPortail vitrine\x1b[0m : http://localhost:3100');
   console.log('    superadmin@goosee.dev / Superadmin#2026  (→ /fr/superadmin)');
   console.log('    alice@goosee.dev / Demo#2026  · bob@goosee.dev / Demo#2026');
-  console.log('    Charlie : à créer en live (scénario 3) — mot de passe au choix.');
+  console.log('    Paiements simulés ; chatbot Gemini activé si configuré.');
   console.log('\n  \x1b[1mSites déployés + peuplés\x1b[0m (OWNER = e-mail vitrine / Demo#2026) :');
   for (const s of sites) {
     console.log(`    ${s.slug} (${s.infra}) — ${s.url}  · admin: ${s.url}/fr/goosee-admin  · owner: ${s.owner}`);
@@ -463,13 +446,14 @@ function summary(sites) {
 async function main() {
   if (process.argv.includes('--down')) { down(); return; }
   preflight();
+  if (process.argv.includes('--preflight')) return;
   ensureImages();
   ensureCluster();
   ensurePlatform();
-  startVitrine();
-  // Laisse l'orchestrateur/api démarrer + Postgres prêt avant le seed.
-  await sleep(8000);
-  seedAccounts();
+  if (!TENANTS_ONLY) {
+    await startVitrine();
+    seedAccounts();
+  }
 
   const sites = [];
   for (const s of DOCKER_SITES) sites.push(await provisionDocker(s));
