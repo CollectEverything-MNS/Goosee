@@ -56,10 +56,7 @@ const ENVS_DIR = path.join(ROOT, 'docker', 'tenant', 'envs');
 const TARGETS_DIR = path.join(ROOT, 'docker', 'observability', 'targets');
 const PG = 'goosee-postgres-dev';
 
-const IMAGES = [
-  'api-gateway', 'front', 'auth-service', 'user-service', 'page-service', 'log-service',
-  'product-service', 'order-service', 'cart-service', 'payment-service', 'notifier-service',
-].map((n) => `goosee/${n}:local`);
+const { buildImages, images: IMAGES } = require('./build-demo-images');
 
 // Sous-ensemble réellement déployé + peuplé (le reste reste registre/STOPPED, démarrable
 // à la demande). Défaut : 1 site Docker + 2 sites K8s (réglable dans env/.env.dev).
@@ -154,30 +151,8 @@ function preflight() {
     ok(`${t} disponible`);
   }
 }
-const BUILD = [
-  ['api-gateway', 'templates/back/api-gateway/Dockerfile'],
-  ['auth-service', 'templates/back/services/auth-service/Dockerfile'],
-  ['user-service', 'templates/back/services/user-service/Dockerfile'],
-  ['page-service', 'templates/back/services/page-service/Dockerfile'],
-  ['log-service', 'templates/back/services/log-service/Dockerfile'],
-  ['product-service', 'templates/back/services/product-service/Dockerfile'],
-  ['order-service', 'templates/back/services/order-service/Dockerfile'],
-  ['cart-service', 'templates/back/services/cart-service/Dockerfile'],
-  ['payment-service', 'templates/back/services/payment-service/Dockerfile'],
-  ['notifier-service', 'templates/back/services/notifier-service/Dockerfile'],
-  ['front', 'templates/front/Dockerfile'],
-];
-
 function ensureImages() {
-  log('Images du site généré (build — cache Docker si inchangé)');
-  // Build en Node (pas de dépendance à bash) : garantit des images à jour (routes
-  // order/cart/payment, storefront + clé Stripe). Cache Docker → rapide si inchangé.
-  const stripePk = envDevValue('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY');
-  for (const [name, dockerfile] of BUILD) {
-    const arg = name === 'front' ? `--build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${stripePk}` : '';
-    run(`docker build ${arg} -f "${dockerfile}" -t "goosee/${name}:local" .`);
-  }
-  ok('images goosee/*:local à jour');
+  buildImages();
 }
 function ensureCluster() {
   if (!K8S_SITES.length) return;

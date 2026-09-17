@@ -3,6 +3,7 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  experimental: { cpus: 1 },
   compiler: {
     removeConsole: true,
   },

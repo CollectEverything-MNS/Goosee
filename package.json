@@ -18,7 +18,7 @@
     "infra:status": "docker compose --env-file env/.env.dev -f docker/dev/docker-compose.infra.dev.yml ps",
     "init:user": "dotenv -e env/.env.dev -- node scripts/init-user.js",
     "provision": "node scripts/provision.js",
-    "build:images": "bash scripts/build-images.sh",
+    "build:images": "node scripts/build-demo-images.js",
     "observability": "docker compose -f docker/observability/docker-compose.observability.yml up -d",
     "observability:down": "docker compose -f docker/observability/docker-compose.observability.yml down",
     "presentation": "node scripts/presentation.js",
