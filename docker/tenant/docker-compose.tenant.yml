@@ -1,10 +1,5 @@
-# Pile complète et ISOLÉE d'un tenant (un site généré). Déployée par l'orchestrateur :
-#   docker compose -p tenant-<slug> --env-file <env généré> -f docker-compose.tenant.yml up -d
-#
-# Tout est interne au réseau du projet (préfixé par -p) ; seules la gateway et le front
-# rejoignent le réseau partagé goosee_platform avec un alias <slug>-gateway / <slug>-front,
-# que Traefik cible via un fichier de routage. NODE_ENV=production : migrations jouées au
-# boot + garde-fous secrets actifs (d'où des secrets générés, non par défaut).
+# Tenant POC : docker compose -p tenant-<slug> --env-file <env> -f <ce fichier> up -d
+# Gemini facultatif : --profile assistant et GEMINI_API_KEY.
 services:
   front:
     image: goosee/front:local
@@ -12,10 +7,11 @@ services:
     environment:
       NODE_ENV: production
     networks:
-      tenant_net:
+      tenant_net: null
       goosee_platform:
-        aliases: ['${TENANT_SLUG}-front']
-
+        aliases:
+          - ${TENANT_SLUG}-front
+    cpus: '0.50'
   gateway:
     image: goosee/api-gateway:local
     restart: unless-stopped
@@ -42,13 +38,40 @@ services:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-      NEXT_PUBLIC_WEB_URL: 'http://${TENANT_SLUG}.127.0.0.1.nip.io'
-    depends_on: [auth, user, page, log, product, order, cart, payment]
+      NEXT_PUBLIC_WEB_URL: http://${TENANT_SLUG}.127.0.0.1.nip.io
+      STOCK_SERVICE_HOST: stock
+      STOCK_SERVICE_PORT: 3011
+      TICKET_SERVICE_HOST: ticket
+      TICKET_SERVICE_PORT: 3010
+      ASSISTANT_SERVICE_HOST: assistant
+      ASSISTANT_SERVICE_PORT: 3012
+    depends_on:
+      - auth
+      - user
+      - page
+      - log
+      - product
+      - order
+      - cart
+      - payment
+      - stock
+      - ticket
     networks:
-      tenant_net:
+      tenant_net: null
       goosee_platform:
-        aliases: ['${TENANT_SLUG}-gateway']
-
+        aliases:
+          - ${TENANT_SLUG}-gateway
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   auth:
     image: goosee/auth-service:local
     restart: unless-stopped
@@ -66,12 +89,24 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
-      # Pour valider l'endpoint interne /internal/issue-session (auto-connexion SSO).
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-      NEXT_PUBLIC_API_URL: 'http://api.${TENANT_SLUG}.127.0.0.1.nip.io'
-    depends_on: [auth-db, rabbitmq]
-    networks: [tenant_net]
-
+      NEXT_PUBLIC_API_URL: http://api.${TENANT_SLUG}.127.0.0.1.nip.io
+    depends_on:
+      - auth-db
+      - rabbitmq
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3003/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   user:
     image: goosee/user-service:local
     restart: unless-stopped
@@ -85,9 +120,22 @@ services:
       USER_DB_PASSWORD: ${DB_PASSWORD}
       USER_DB_NAME: user_db
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-    depends_on: [user-db, rabbitmq]
-    networks: [tenant_net]
-
+    depends_on:
+      - user-db
+      - rabbitmq
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3002/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   page:
     image: goosee/page-service:local
     restart: unless-stopped
@@ -106,10 +154,24 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: goosee-uploads
-      MINIO_PUBLIC_URL: 'http://${TENANT_SLUG}.127.0.0.1.nip.io'
-    depends_on: [page-db, rabbitmq, minio]
-    networks: [tenant_net]
-
+      MINIO_PUBLIC_URL: http://${TENANT_SLUG}.127.0.0.1.nip.io
+    depends_on:
+      - page-db
+      - rabbitmq
+      - minio
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3004/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   log:
     image: goosee/log-service:local
     restart: unless-stopped
@@ -123,9 +185,22 @@ services:
       LOG_DB_PASSWORD: ${DB_PASSWORD}
       LOG_DB_NAME: log_db
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-    depends_on: [log-db, rabbitmq]
-    networks: [tenant_net]
-
+    depends_on:
+      - log-db
+      - rabbitmq
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3005/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   product:
     image: goosee/product-service:local
     restart: unless-stopped
@@ -144,11 +219,25 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: goosee-uploads
-      MINIO_PUBLIC_URL: 'http://${TENANT_SLUG}.127.0.0.1.nip.io'
+      MINIO_PUBLIC_URL: http://${TENANT_SLUG}.127.0.0.1.nip.io
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-    depends_on: [product-db, rabbitmq, minio]
-    networks: [tenant_net]
-
+    depends_on:
+      - product-db
+      - rabbitmq
+      - minio
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3006/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   order:
     image: goosee/order-service:local
     restart: unless-stopped
@@ -161,9 +250,28 @@ services:
       ORDER_DB_PASSWORD: ${DB_PASSWORD}
       ORDER_DB_NAME: order_db
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-    depends_on: [order-db]
-    networks: [tenant_net]
-
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      STOCK_SERVICE_HOST: stock
+      STOCK_SERVICE_PORT: 3011
+      PRODUCT_SERVICE_HOST: product
+      PRODUCT_SERVICE_PORT: 3006
+    depends_on:
+      - order-db
+      - stock
+      - rabbitmq
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3007/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   cart:
     image: goosee/cart-service:local
     restart: unless-stopped
@@ -176,9 +284,21 @@ services:
       CART_DB_PASSWORD: ${DB_PASSWORD}
       CART_DB_NAME: cart_db
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
-    depends_on: [cart-db]
-    networks: [tenant_net]
-
+    depends_on:
+      - cart-db
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3008/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   payment:
     image: goosee/payment-service:local
     restart: unless-stopped
@@ -192,9 +312,23 @@ services:
       PAYMENT_DB_NAME: payment_db
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-    depends_on: [payment-db]
-    networks: [tenant_net]
-
+      ORDER_SERVICE_HOST: order
+      ORDER_SERVICE_PORT: 3007
+    depends_on:
+      - payment-db
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3009/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   notifier:
     image: goosee/notifier-service:local
     restart: unless-stopped
@@ -206,10 +340,13 @@ services:
       SMTP_SECURE: 'false'
       SMTP_USER: ''
       SMTP_PASSWORD: ''
-      SMTP_FROM: 'no-reply@${TENANT_SLUG}.anaduck.fr'
-    depends_on: [rabbitmq, mailhog]
-    networks: [tenant_net]
-
+      SMTP_FROM: no-reply@${TENANT_SLUG}.anaduck.fr
+    depends_on:
+      - rabbitmq
+      - mailhog
+    networks:
+      - tenant_net
+    cpus: '0.50'
   auth-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -217,9 +354,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: auth_db
-    volumes: ['auth_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   user-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -227,9 +366,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: user_db
-    volumes: ['user_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   page-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -237,9 +378,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: page_db
-    volumes: ['page_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - page_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   log-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -247,9 +390,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: log_db
-    volumes: ['log_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - log_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   product-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -257,9 +402,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: product_db
-    volumes: ['product_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   order-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -267,9 +414,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: order_db
-    volumes: ['order_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   cart-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -277,9 +426,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: cart_db
-    volumes: ['cart_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - cart_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   payment-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -287,15 +438,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: payment_db
-    volumes: ['payment_db_data:/var/lib/postgresql/data']
-    networks: [tenant_net]
-
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   rabbitmq:
     image: rabbitmq:management
     restart: unless-stopped
-    volumes: ['rabbitmq_data:/var/lib/rabbitmq']
-    networks: [tenant_net]
-
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - tenant_net
+    cpus: '0.50'
   minio:
     image: minio/minio:latest
     restart: unless-stopped
@@ -303,27 +458,126 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    volumes: ['minio_data:/data']
-    networks: [tenant_net]
-
+    volumes:
+      - minio_data:/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
   mailhog:
     image: mailhog/mailhog:v1.0.1
     restart: unless-stopped
-    networks: [tenant_net]
-
+    networks:
+      - tenant_net
+    cpus: '0.50'
+  stock:
+    image: goosee/stock-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      STOCK_SERVICE_PORT: 3011
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      STOCK_DB_HOST: stock-db
+      STOCK_DB_PORT: 5432
+      STOCK_DB_USER: postgres
+      STOCK_DB_PASSWORD: ${DB_PASSWORD}
+      STOCK_DB_NAME: stock_db
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+    depends_on:
+      - stock-db
+      - rabbitmq
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3011/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+  stock-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: stock_db
+    volumes:
+      - stock_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
+  ticket:
+    image: goosee/ticket-service:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      TICKET_SERVICE_PORT: 3010
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      TICKET_DB_HOST: ticket-db
+      TICKET_DB_PORT: 5432
+      TICKET_DB_USER: postgres
+      TICKET_DB_PASSWORD: ${DB_PASSWORD}
+      TICKET_DB_NAME: ticket_db
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+    depends_on:
+      - ticket-db
+      - rabbitmq
+    networks:
+      - tenant_net
+    cpus: '0.50'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - fetch('http://localhost:3010/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+  ticket-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ticket_db
+    volumes:
+      - ticket_db_data:/var/lib/postgresql/data
+    networks:
+      - tenant_net
+    cpus: '0.50'
+  assistant:
+    image: goosee/assistant-service:local
+    profiles:
+      - assistant
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      ASSISTANT_SERVICE_PORT: 3012
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    networks:
+      - tenant_net
+    cpus: '0.50'
 networks:
-  tenant_net:
+  tenant_net: null
   goosee_platform:
     external: true
-
 volumes:
-  auth_db_data:
-  user_db_data:
-  page_db_data:
-  log_db_data:
-  product_db_data:
-  order_db_data:
-  cart_db_data:
-  payment_db_data:
-  rabbitmq_data:
-  minio_data:
+  auth_db_data: null
+  user_db_data: null
+  page_db_data: null
+  log_db_data: null
+  product_db_data: null
+  order_db_data: null
+  cart_db_data: null
+  payment_db_data: null
+  rabbitmq_data: null
+  minio_data: null
+  stock_db_data: null
+  ticket_db_data: null

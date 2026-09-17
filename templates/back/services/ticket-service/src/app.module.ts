@@ -1,3 +1,4 @@
+import { HealthController } from './health/health.controller';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -43,6 +44,8 @@ import { RgpdExportUseCase } from './usecases/rgpd-export/rgpd-export.usecase';
         password: configService.get<string>('TICKET_DB_PASSWORD'),
         database: configService.get<string>('TICKET_DB_NAME'),
         entities: [Ticket],
+        migrations: ['dist/migrations/*.js'],
+        migrationsRun: configService.get<string>('NODE_ENV') !== 'development',
         synchronize: configService.get<string>('NODE_ENV') === 'development',
       }),
     }),
@@ -63,6 +66,7 @@ import { RgpdExportUseCase } from './usecases/rgpd-export/rgpd-export.usecase';
     ]),
   ],
   controllers: [
+    HealthController,
     CreateTicketController,
     AssignTicketController,
     UpdateTicketStatusController,

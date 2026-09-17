@@ -28,6 +28,7 @@ describe('RoleSeederService', () => {
       .map(([role]: [Role]) => role)
       .find((role) => role.name === 'OWNER');
     expect(owner?.pageKeys).toContain('rgpd');
+    expect(owner?.pageKeys).toContain('tickets');
   });
 
   it("le role CUSTOMER ne recoit aucune habilitation", async () => {
@@ -53,6 +54,7 @@ describe('RoleSeederService', () => {
     await service.onApplicationBootstrap();
 
     expect(existant.pageKeys).toContain('rgpd');
+    expect(existant.pageKeys).toContain('tickets');
     expect(mockRepo.save).toHaveBeenCalledWith(existant);
   });
 });
