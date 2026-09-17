@@ -36,6 +36,10 @@ yarn load:navigation
 
 ### Choisir le profil
 
+`poc` limite le scénario à deux utilisateurs simultanés sur 30 secondes.
+Pour les tenants de démonstration et un conteneur k6 plafonné à 0,5 CPU / 256 Mio,
+voir les [commandes et résultats de validation](../docs/validation-poc-tests.md).
+
 `smoke` (défaut) valide juste que le script et la cible répondent. `load` monte
 jusqu'à 50 VUs sur ~7 min.
 

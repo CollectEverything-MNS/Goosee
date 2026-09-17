@@ -90,6 +90,9 @@ réutilise les processus déjà à l'écoute pour éviter des doublons.
 
 ## Résultats de répétition
 
+La passe complète de tests unitaires, intégration, E2E et charge légère est consignée
+dans [validation-poc-tests.md](validation-poc-tests.md).
+
 Validé le 17 septembre 2026 :
 
 - Construction des 14 images ; lint Helm et rendu avec/sans assistant ; configuration Compose.
