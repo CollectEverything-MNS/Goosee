@@ -37,6 +37,7 @@ secrets:
   minioRootPassword: changeme-minio
   stripeSecretKey: ''
   stripeWebhookSecret: ''
+  geminiApiKey: ''
 
 # Gateway HTTP (seule porte d'entrée API) et front Next.js.
 # readyPath : la gateway n'a que /health ; les microservices ont /health/ready (check DB).
@@ -98,6 +99,12 @@ backendServices:
   - { name: order, image: goosee/order-service, port: 3007 }
   - { name: cart, image: goosee/cart-service, port: 3008 }
   - { name: payment, image: goosee/payment-service, port: 3009 }
+  - { name: stock, image: goosee/stock-service, port: 3011 }
+  - { name: ticket, image: goosee/ticket-service, port: 3010 }
+
+assistant:
+  enabled: false
+  model: gemini-2.5-flash
 
 # Notifier : RMQ uniquement, pas de port HTTP ni de base.
 notifier:
@@ -114,6 +121,8 @@ databases:
   - { name: order-db, db: order_db }
   - { name: cart-db, db: cart_db }
   - { name: payment-db, db: payment_db }
+  - { name: stock-db, db: stock_db }
+  - { name: ticket-db, db: ticket_db }
 
 postgres:
   image: postgres:16-alpine

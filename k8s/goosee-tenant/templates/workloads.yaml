@@ -3,7 +3,11 @@
 {{- $envFrom := list (dict "configMapRef" (dict "name" "goosee-env")) (dict "secretRef" (dict "name" "goosee-secrets")) }}
 
 # ----- Gateway (seule porte d'entrée HTTP) + microservices internes -----
-{{- range concat (list .Values.gateway) .Values.backendServices }}
+{{- $services := concat (list .Values.gateway) .Values.backendServices }}
+{{- if .Values.assistant.enabled }}
+{{- $services = append $services (dict "name" "assistant" "image" "goosee/assistant-service" "port" 3012) }}
+{{- end }}
+{{- range $services }}
 ---
 apiVersion: v1
 kind: Service
@@ -33,6 +37,8 @@ spec:
       app.kubernetes.io/name: {{ .name }}
   template:
     metadata:
+      annotations:
+        goosee/image-revision: {{ $.Values.image.revision | default "local" | quote }}
       labels:
         {{- include "goosee.labels" $ | nindent 8 }}
         app.kubernetes.io/name: {{ .name }}
@@ -80,6 +86,8 @@ spec:
       app.kubernetes.io/name: {{ .Values.notifier.name }}
   template:
     metadata:
+      annotations:
+        goosee/image-revision: {{ $.Values.image.revision | default "local" | quote }}
       labels:
         {{- include "goosee.labels" . | nindent 8 }}
         app.kubernetes.io/name: {{ .Values.notifier.name }}
@@ -126,6 +134,8 @@ spec:
       app.kubernetes.io/name: {{ .Values.front.name }}
   template:
     metadata:
+      annotations:
+        goosee/image-revision: {{ $.Values.image.revision | default "local" | quote }}
       labels:
         {{- include "goosee.labels" . | nindent 8 }}
         app.kubernetes.io/name: {{ .Values.front.name }}

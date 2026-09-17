@@ -1,7 +1,11 @@
 # Autoscaling horizontal des charges HTTP (gateway + microservices + front) sur l'usage CPU.
 # Nécessite metrics-server (fourni par k3s) et des requests.cpu sur les pods.
 {{- if .Values.hpa.enabled }}
-{{- range concat (list .Values.gateway .Values.front) .Values.backendServices }}
+{{- $services := concat (list .Values.gateway .Values.front) .Values.backendServices }}
+{{- if .Values.assistant.enabled }}
+{{- $services = append $services (dict "name" "assistant" "image" "goosee/assistant-service" "port" 3012) }}
+{{- end }}
+{{- range $services }}
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

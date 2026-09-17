@@ -28,6 +28,14 @@ data:
   PAYMENT_SERVICE_HOST: payment
   PAYMENT_SERVICE_PORT: "3009"
 
+  STOCK_SERVICE_HOST: stock
+  STOCK_SERVICE_PORT: "3011"
+  TICKET_SERVICE_HOST: ticket
+  TICKET_SERVICE_PORT: "3010"
+  ASSISTANT_SERVICE_HOST: assistant
+  ASSISTANT_SERVICE_PORT: "3012"
+  GEMINI_MODEL: {{ .Values.assistant.model | quote }}
+
   # RabbitMQ
   RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
 
@@ -65,6 +73,15 @@ data:
   PAYMENT_DB_USER: postgres
   PAYMENT_DB_NAME: payment_db
 
+  STOCK_DB_HOST: stock-db
+  STOCK_DB_PORT: "5432"
+  STOCK_DB_USER: postgres
+  STOCK_DB_NAME: stock_db
+  TICKET_DB_HOST: ticket-db
+  TICKET_DB_PORT: "5432"
+  TICKET_DB_USER: postgres
+  TICKET_DB_NAME: ticket_db
+
   # JWT (durées ; les secrets sont dans le Secret)
   JWT_ACCESS_EXPIRES_IN: 15m
   JWT_REFRESH_EXPIRES_IN: 7d
@@ -74,7 +91,7 @@ data:
   MINIO_PORT: "9000"
   MINIO_USE_SSL: "false"
   MINIO_BUCKET: {{ .Values.minio.bucket }}
-  MINIO_PUBLIC_URL: http://{{ include "goosee.host" . }}
+  MINIO_PUBLIC_URL: http://{{ include "goosee.host" . }}{{ if .Values.tenant.publicPort }}:{{ .Values.tenant.publicPort }}{{ end }}
 
   # SMTP (Mailhog)
   SMTP_HOST: mailhog
@@ -85,5 +102,5 @@ data:
   SMTP_FROM: no-reply@{{ include "goosee.host" . }}
 
   # URLs publiques (dérivées du domaine du tenant)
-  NEXT_PUBLIC_API_URL: http://{{ include "goosee.apiHost" . }}
-  NEXT_PUBLIC_WEB_URL: http://{{ include "goosee.host" . }}
+  NEXT_PUBLIC_API_URL: http://{{ include "goosee.apiHost" . }}{{ if .Values.tenant.publicPort }}:{{ .Values.tenant.publicPort }}{{ end }}
+  NEXT_PUBLIC_WEB_URL: http://{{ include "goosee.host" . }}{{ if .Values.tenant.publicPort }}:{{ .Values.tenant.publicPort }}{{ end }}
