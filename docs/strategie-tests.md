@@ -1,94 +1,71 @@
-# Stratégie de tests & couverture
+# Stratégie de tests et couverture
 
-> Périmètre couvert par ce document : tests **unitaires** des microservices métier et
-> **portail bloquant en CI**. La suite end-to-end et la campagne de charge font l'objet
-> de documents séparés (`cahier-de-recette.md`, `analyse-performance.md`).
+Référence mise à jour le 17 septembre 2026. Les résultats exécutés sont consignés dans
+[validation-poc-tests.md](validation-poc-tests.md).
 
-## 1. Ce qui est testé
+## Périmètre
 
-Les microservices suivent une architecture _clean_ : toute la logique métier vit dans
-`src/usecases/<nom>/<nom>.usecase.ts`, isolée derrière des interfaces (repositories,
-providers, clients HTTP/AMQP). Les tests unitaires portent **exclusivement sur ces
-usecases**, avec toutes les dépendances mockées (aucune base de données, aucun réseau).
+Les tests unitaires Jest portent sur les usecases et, selon le service, les clients,
+les gardes auxiliaires, les DTO, les seeders ou les contrôleurs. Les dépendances externes
+sont simulées ; cette suite ne requiert pas de stack Docker.
 
-| Service           | Usecases testés                                                    |
-| ----------------- | ------------------------------------------------------------------ |
-| `payment-service` | `create-payment`, `get-payment`, `handle-webhook`                  |
-| `order-service`   | `create-order`, `update-order-status`, `get-order`, `list-orders`  |
-| `cart-service`    | `add-item`, `update-item`, `remove-item`, `clear-cart`, `get-cart` |
-| `product-service` | les 24 usecases produits, catégories, tags, attributs et images    |
+| Workspaces | Passage en CI | Seuil de couverture |
+|---|---|---|
+| product, order, cart, payment | Oui | 70 % branches, fonctions, lignes et instructions |
+| assistant | Oui | 70 % branches, fonctions, lignes et instructions |
+| api-gateway, auth, user, stock, log, ticket | Oui | Aucun seuil configuré |
+| page | Tests présents, mais pas de script test:ci | Aucun seuil configuré |
+| front, notifier | Aucune suite unitaire existante | Sans objet |
 
-### Services techniques : tests joués en CI, sans seuil de couverture
+Les noms des services ci-dessus correspondent aux workspaces suffixés par `-service` ;
+la gateway utilise `api-gateway-goosee`. Le périmètre de couverture est défini dans
+`jest.collectCoverageFrom` du package de chaque workspace. Les quatre services commerce
+avec seuil mesurent leurs usecases ; assistant mesure aussi `shared/**/*.ts`.
+Le seuil est appliqué à chaque service concerné, sans moyenne globale entre services.
 
-`api-gateway`, `stock-service`, `auth-service` et `user-service` ne suivent pas
-l'architecture usecase pure ci-dessus (gateway : controllers/interceptors ; les autres :
-`collectCoverageFrom` couvre tout `src/**/*.(t|j)s`, pas seulement les usecases). Leurs
-tests existants sont joués en CI (`"test:ci": "jest --coverage --ci"`, sans
-`coverageThreshold`), pour qu'un test qui casse fasse échouer la CI — mais sans imposer
-un seuil de 70 % qui n'a pas de sens tant que la mesure porte sur tout le code plutôt que
-sur la seule logique métier (ex. gateway : 1,1 % de couverture globale même avec ses
-tests existants tous verts, car controllers/modules/proxy sont comptés).
+## Commandes
 
-Les fichiers hors logique métier ne sont **pas** dans le périmètre de mesure :
-`*.controller.ts` (délégation pure vers le usecase), `*.dto.ts` (déclaratif),
-`*.entity.ts`, `*.module.ts`, `main.ts`, migrations, `config/`. Cf. `collectCoverageFrom`
-dans le `package.json` de chaque service : `["usecases/**/*.usecase.ts"]`.
+| Commande | Effet |
+|---|---|
+| `yarn test` | Suites unitaires des workspaces déclarant test |
+| `yarn test:ci` | Suites déclarant test:ci, avec couverture et seuils configurés |
+| `yarn workspace page-service test --runInBand` | Tests de page, absents de la commande CI |
+| `yarn e2e` | Parcours d'achat HTTP sur une stack démarrée |
+| `yarn workspace product-service test:integration` | Repositories et migration sur une base PostgreSQL de test |
+| `yarn workspace product-service test:e2e` | Contrôleurs catégories sur une base PostgreSQL de test |
+| `node scripts/check-demo.js --chatbot` | Contrôle des deux tenants de démo avec appels Gemini réels |
 
-## 2. Le seuil : 70 % par service
+Pour limiter le CPU et la mémoire, exécuter les suites successivement :
 
-La CI échoue si **un** service métier passe sous **70 %** de couverture (branches,
-fonctions, lignes, instructions), mesuré sur le périmètre ci-dessus. Configuré via
-`jest.coverageThreshold.global` dans le `package.json` de chaque service — Jest sort en
-code ≠ 0 tout seul, il n'y a pas de script de vérification maison.
+```powershell
+$env:NODE_OPTIONS='--max-old-space-size=1536'
+(Get-Process -Id $PID).ProcessorAffinity = 3
+yarn test:ci --concurrency=1 -- --runInBand
+yarn workspace page-service test --runInBand
+```
 
-### Pourquoi 70 % et pas 100 %
+Les tests PostgreSQL exigent une base jetable dont le nom contient `test` : ils
+synchronisent et vident les tables. Configurer les variables PRODUCT_DB_* pour cette base.
+Ne pas les pointer vers les bases de la démo.
 
-- **Rendements décroissants.** Passer de ~80 % à 100 % oblige à tester des branches
-  défensives (`if (!x) throw`), des cas d'erreur rares et du code trivial : beaucoup
-  d'effort, très peu de bugs attrapés en plus.
-- **Effet pervers sur la qualité des tests.** Un objectif de 100 % pousse à écrire des
-  tests qui _exécutent_ les lignes sans réellement _vérifier_ le comportement, juste
-  pour le chiffre.
-- **Coût de maintenance.** Chaque refactoring casse alors des tests à faible valeur, et
-  on finit par parsemer le code de `/* istanbul ignore */`.
-- **CI bloquante pour de mauvaises raisons.** Une PR légitime se retrouve rejetée parce
-  qu'une ligne de log ou une garde improbable n'est pas couverte.
+## Intégration continue
 
-### Par service et non agrégé
+Le [workflow CI](../.github/workflows/ci.yml) tourne sur push et pull request vers develop :
+Node 22, cache des téléchargements Yarn indexé par le hash de `yarn.lock`, installation
+`yarn install --frozen-lockfile --non-interactive`, puis `yarn test:ci`.
+Le lockfile est versionné. Un test en échec ou un seuil configuré non atteint bloque le job.
+Ajouter un service à cette suite nécessite son script `test:ci` ; un seuil se configure
+séparément selon le périmètre mesuré.
 
-Le seuil s'applique **service par service**. Une moyenne globale permettrait à un
-service bien testé (90 %) de masquer un service à 20 %. Chaque service doit tenir seul
-ses 70 %.
+## Intégration, E2E et charge
 
-## 3. Exécution
+Ces suites restent manuelles et ne sont pas lancées par le workflow unitaire :
 
-| Commande                        | Effet                                                                                                                                                                                                                                 |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `yarn test`                     | tous les tests de tous les workspaces (turbo), sans couverture                                                                                                                                                                        |
-| `yarn test:ci`                  | `turbo run test:ci` → `jest --coverage --ci` sur les services qui déclarent le script. Seuil 70 % appliqué pour payment/order/cart/product ; api-gateway, stock-service, auth-service et user-service jouent leurs tests sans seuil (voir §1) |
-| `yarn workspace <service> test` | tests d'un seul service                                                                                                                                                                                                               |
+- [E2E achat](../templates/back/api-gateway/test/README.md) : inscription, email MailHog,
+  connexion, panier, commande, paiement simulé et webhook. La cible est configurable.
+- [Charge](analyse-performance.md) : k6 lecture et navigation, profils poc/smoke/load.
+- [Validation POC](validation-poc-tests.md) : 312 unitaires, 29 intégration,
+  9 E2E catégories, 9 étapes d'achat sur chaque tenant et vérification navigateur.
 
-Localement, `yarn test:ci` reproduit exactement ce que fait la CI.
-
-## 4. Intégration continue
-
-Workflow : [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
-
-- **Déclencheurs** : `pull_request` vers `develop`, `push` sur `develop`.
-- **Étapes** : checkout → Node 22 → restauration du cache des tarballs yarn
-  (clé = hash des `package.json`) → `yarn install --non-interactive` → `yarn test:ci`.
-- **Critère d'échec** : un test qui casse **ou** un service sous 70 % de couverture.
-- Pas de base de données ni de conteneur de service : les tests unitaires mockent
-  toutes les I/O.
-
-> `yarn.lock` n'est pas versionné (`.gitignore`). La CI ne peut donc utiliser ni
-> `cache: yarn` de `setup-node` ni `--frozen-lockfile`. Elle met seulement en
-> cache le dossier de tarballs de yarn (`yarn cache dir`) : `yarn install`
-> reconstruit `node_modules` à chaque run mais sans téléchargement réseau. Le
-> cache est invalidé dès qu'un `package.json` change.
-
-`turbo run test:ci` ne cible que les workspaces déclarant le script `test:ci`. Ajouter
-un service au portail = ajouter `"test:ci": "jest --coverage --ci"` et le bloc
-`coverageThreshold` à son `package.json`.
-
-Le workflow `discord-commit.yml` est indépendant et n'est pas modifié.
+La vérification navigateur consignée dans ce dernier rapport a utilisé un script temporaire ;
+elle ne constitue pas encore une suite navigateur versionnée et branchée à la CI.

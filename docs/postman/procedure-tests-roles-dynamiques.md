@@ -85,7 +85,7 @@ Executer les requetes du dossier `00 - Setup` dans l'ordre:
 2. `Menus > Create Menu (Owner)` -> attendu `201/200`
 3. `Settings > Update Settings (Owner)` -> attendu `200`
 4. `Upload > Upload File (Owner)` -> attendu `201/200`
-5. Rejouer chacune avec `x-role=customer` -> attendu `403`
+5. Rejouer Pages et Upload avec `x-role=customer` -> attendu `403`. Les écritures Menus et Settings ne portent actuellement aucune garde JWT/pageKey ; ne pas attendre `403` sur ces routes. Voir la matrice pour cette limite.
 6. Pour les routes par id (`/pages/:id`, `/menus/:id`), renseigner `page_id` / `menu_id` manuellement
 
 ### 4) Cas tokens
@@ -109,3 +109,27 @@ Executer les requetes du dossier `00 - Setup` dans l'ordre:
 
 - verifier le `pageKey` du role en base (`/roles`)
 - verifier le `x-role` de la requete
+
+## Référence étendue et tenants de démonstration
+
+La collection contient également Products, Categories, Tags, Orders, Cart, Payments,
+Stock, Tickets, Assistant, RGPD, Internal, Health, Metrics et Logs. Les accès effectifs
+sont dans la [matrice](../roles-endpoints-matrix.md), y compris les routes sans garde.
+Le header x-role sert au script Postman à choisir le Bearer token ; il ne confère
+aucun rôle côté serveur.
+
+Pour la démo, remplacer base_url par http://api.atelier-alice.127.0.0.1.nip.io ou
+http://api.mode-bob.127.0.0.1.nip.io:8081. Utiliser respectivement alice@goosee.dev ou
+bob@goosee.dev, mot de passe Demo#2026, dans les variables de connexion OWNER.
+Les comptes manager/customer du setup historique doivent être préparés séparément.
+
+Exécuter les requêtes ajoutées individuellement. Renseigner les variables product_id,
+category_id, order_id, payment_id, ticket_id et customer_id avec les réponses obtenues.
+Ces exemples ne capturent pas automatiquement les identifiants et ne constituent pas
+une suite Runner prête à exécuter en bloc. Les suppressions et l'effacement RGPD doivent
+viser des données synthétiques de test. Le webhook JSON fourni est réservé au paiement
+simulé ; il ne remplace pas un webhook Stripe signé.
+
+La variable internal_api_token est vide par défaut : la renseigner localement pour les
+routes Internal, sans exporter ni versionner un secret. Gemini utilise la clé du tenant,
+pas une clé envoyée dans la requête Postman.

@@ -1,5 +1,8 @@
 # Audit du système d'information
 
+> Relevé historique des 12–13 septembre 2026. Les chiffres et statuts ci-dessous décrivent cette date, pas la version courante. Depuis, le lockfile est versionné, Gemini est intégré, les tenants Docker/k3s sont alignés et une campagne complète de tests a été réalisée. Les autres constats ne sont pas réputés clos par cette mise à jour.
+> État actuel : [plan de démo](plan-demo-infra.md), [guide infra](demo-infra.md), [validation des tests](validation-poc-tests.md).
+
 > Relevé des 12 et 13 septembre 2026, sur `develop` (`Goosee`) et `main` (`goosee-vitrine`).
 > Toutes les valeurs chiffrées de ce document ont été mesurées ; la commande de contrôle est
 > donnée pour chacune en annexe. Aucune n'est estimée.

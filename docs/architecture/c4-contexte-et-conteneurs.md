@@ -12,6 +12,7 @@ graph TB
 
     goosee["<b>Plateforme Goosee</b><br/><br/>Vend des forfaits, provisionne un site<br/>e-commerce isolé par client, et le supervise"]
 
+    gemini["<b>Gemini</b><br/>assistant du guide"]
     stripe["<b>Stripe</b><br/>paiement et webhooks"]
     smtp["<b>Serveur SMTP</b><br/>courriels transactionnels"]
     registre["<b>Registre npm</b><br/>dépendances des images"]
@@ -20,7 +21,8 @@ graph TB
     acheteur -->|"navigue et commande<br/>sur la boutique"| goosee
     superadmin -->|"supervise, alloue<br/>les ressources"| goosee
 
-    goosee -->|"intentions de paiement"| stripe
+    goosee -->|"question et guide"| gemini
+    goosee -->|"mode Stripe uniquement"| stripe
     stripe -->|"webhooks de confirmation"| goosee
     goosee -->|"vérification d'adresse,<br/>réinitialisation"| smtp
     goosee -->|"construction des images"| registre
@@ -30,7 +32,7 @@ graph TB
     classDef externe fill:#f0f0f0,stroke:#999,stroke-width:1px,color:#333
     class marchand,acheteur,superadmin acteur
     class goosee systeme
-    class stripe,smtp,registre externe
+    class stripe,smtp,registre,gemini externe
 ```
 
 **Trois acteurs, trois usages distincts.** Le commerçant est le client payant ; l'acheteur ne
@@ -51,8 +53,8 @@ graph TB
     superadmin(["Superadmin"])
 
     subgraph portail["Control plane — dépôt goosee-vitrine"]
-        web["<b>web</b> · Next.js 15<br/>:3000<br/>vitrine, espace client, superadmin"]
-        api["<b>api</b> · NestJS<br/>:3002<br/>comptes, projets, facturation"]
+        web["<b>web</b> · Next.js 15<br/>:3100 (démo)<br/>vitrine, espace client, superadmin"]
+        api["<b>api</b> · NestJS<br/>:3102 (démo)<br/>comptes, projets, facturation"]
         orch["<b>orchestrator</b> · NestJS<br/>:4000, boucle locale<br/>provisionne et supervise"]
         dbportail[("PostgreSQL<br/>portail")]
         dborch[("PostgreSQL<br/>registre des tenants")]
@@ -61,15 +63,16 @@ graph TB
     subgraph tenant["Site généré — dépôt Goosee, un déploiement par client"]
         front["<b>front</b> · Next.js 15<br/>:3000<br/>boutique + administration"]
         gw["<b>gateway</b> · NestJS<br/>:3001<br/>seule porte d'entrée"]
-        services["<b>11 microservices</b> · NestJS<br/>:3002 à :3011"]
-        dbs[("11 bases PostgreSQL<br/>une par service")]
+        services["<b>12 microservices</b> · NestJS<br/>:3002 à :3012, notifier sans HTTP"]
+        dbs[("10 bases PostgreSQL<br/>services persistants")]
         bus{{"RabbitMQ"}}
         minio[("MinIO<br/>fichiers")]
     end
 
     prom["<b>Prometheus</b><br/>+ Alertmanager"]
     traefik["<b>Traefik</b><br/>routage par sous-domaine"]
-    stripe["Stripe"]
+    gemini["Gemini"]
+    stripe["Stripe, hors paiement simulé"]
 
     marchand --> web
     superadmin --> web
@@ -91,9 +94,10 @@ graph TB
     services -.->|"AMQP"| bus
     bus -.-> services
     services --- minio
-    services -->|"HTTP direct,<br/>jamais par le bus"| stripe
+    services -->|"HTTP direct,<br/>mode Stripe"| stripe
+    services -->|"assistant, HTTPS"| gemini
 
-    gw -->|"/metrics"| prom
+    prom -->|"GET /metrics"| gw
 
     classDef acteur fill:#e8eef7,stroke:#3b5580,color:#1a2740
     classDef appli fill:#4a6fa5,stroke:#2f4870,color:#ffffff
@@ -102,19 +106,18 @@ graph TB
     class marchand,acheteur,superadmin acteur
     class web,api,orch,front,gw,services appli
     class dbportail,dborch,dbs,minio,bus donnees
-    class prom,traefik,stripe infra
+    class prom,traefik,stripe,gemini infra
 ```
 
 ### Ce que ce diagramme fixe
 
-**Une seule porte d'entrée par site.** Le front ne parle qu'à la passerelle ; aucun microservice
-n'est joignable directement. L'authentification, la validation et le contrôle de rôle vivent au
+**Une seule porte d'entrée par site.** Le front ne parle qu'à la passerelle ; les services internes ne sont pas exposés par une route publique dédiée. L'authentification, la validation et le contrôle de rôle vivent au
 même endroit.
 
-**Le control plane ne touche jamais aux données d'un client.** L'orchestrateur déploie et
-interroge des indicateurs agrégés via le jeton interne du tenant. Il ne lit aucune base
-métier — la supervision repose sur un point d'entrée `/internal/kpi` exposé par la passerelle,
-pas sur un accès direct.
+**La supervision utilise les endpoints internes du tenant.** L'orchestrateur déploie et
+interroge des indicateurs agrégés via le jeton interne du tenant. La collecte de KPI passe par `/internal/kpi`, sans lecture directe des bases métier.
+Le provisioning et les scripts de démonstration peuvent toutefois initialiser le compte
+propriétaire directement dans les bases : cette opération est distincte de la supervision.
 
 **L'orchestrateur n'écoute qu'en boucle locale.** Il exécute `docker`, `helm` et `kubectl` sur
 l'hôte : c'est le composant le plus privilégié de la plateforme, et le seul que l'API du portail
@@ -131,5 +134,9 @@ serait une commande encaissée sans trace, ou l'inverse.
 | `web`, `api`, `orchestrator` | `goosee-vitrine/apps/` |
 | `front` | `Goosee/templates/front/` |
 | `gateway` | `Goosee/templates/back/api-gateway/` |
-| Les 11 services | `Goosee/templates/back/services/` |
+| Les 12 services | `Goosee/templates/back/services/` |
 | Traefik, Prometheus | `Goosee/docker/tenant/`, `Goosee/docker/observability/` |
+
+Les ports vitrine 3100/3102 reflètent la configuration locale de la démonstration et
+restent configurables dans son .env. Les ports du tenant sont des ports internes.
+Le paiement de la démo est simulé ; Gemini est activé avec la clé locale.

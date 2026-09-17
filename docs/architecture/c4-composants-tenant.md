@@ -2,7 +2,7 @@
 
 Niveau 3 du modèle C4 : l'intérieur d'un site client.
 
-## Les onze services et leurs ports
+## Les douze services et leurs ports (assistant activé)
 
 ```mermaid
 graph LR
@@ -27,6 +27,7 @@ graph LR
     end
 
     subgraph support["Support et traces"]
+        assistant["assistant<br/>:3012, sans base"]
         ticket["ticket<br/>:3010"]
         log["log<br/>:3005"]
         notifier["notifier<br/>sans port HTTP"]
@@ -41,16 +42,21 @@ graph LR
     gw --> order
     gw --> payment
     gw --> stock
+    gw --> log
     gw --> ticket
+    gw --> assistant
+    order -->|HTTP, vérification| product
+    order -->|HTTP, réservation| stock
+    assistant -->|HTTPS| gemini["Gemini"]
 
     classDef porte fill:#3b5580,stroke:#26364f,color:#ffffff
     classDef service fill:#4a6fa5,stroke:#2f4870,color:#ffffff
     class front,gw porte
-    class auth,user,page,product,cart,order,payment,stock,ticket,log,notifier service
+    class auth,user,page,product,cart,order,payment,stock,ticket,log,notifier,assistant service
 ```
 
-`notifier-service` n'expose aucun port HTTP : il ne consomme que des événements. C'est le seul
-service sans persistance non plus — il transforme un message en courriel et s'arrête là.
+`notifier-service` n'expose aucun port HTTP : il ne consomme que des événements. Il transforme un message en notification. L'assistant est également sans base PostgreSQL :
+il charge le guide embarqué et appelle Gemini.
 
 ## La carte des événements
 
@@ -94,7 +100,8 @@ graph LR
 | `log.created` | plusieurs | log | Journalise |
 
 **Aucun de ces échanges ne passe par la passerelle.** Elle route les requêtes venant du
-navigateur ; la cohérence interne se fait par messages, sans qu'un service en attende un autre.
+navigateur. Ces événements complètent des appels HTTP synchrones : order attend product
+et stock lors de la création de commande.
 
 ## Trois décisions lisibles sur ces schémas
 
@@ -110,16 +117,15 @@ sans encaissement. La disponibilité du bus n'a pas à faire partie du chemin cr
 Le lien reste asynchrone du point de vue du client — `order` passe en `paid` sur réception du
 webhook, pas pendant la requête — mais le transport est direct et confirmé.
 
-### Le stock écoute plutôt qu'il n'est appelé
+### Le stock combine réservation synchrone et événements
 
-`stock-service` ne reçoit aucune commande de la passerelle sur son cycle métier : il réagit à
-`product.created`, `order.paid` et `order.cancelled`. Un pic de commandes ne le sature pas, il
-consomme à son rythme.
+À la création d'une commande, order appelle stock en HTTP avec l'identifiant de commande
+et les quantités. Un manque de stock ou un service indisponible fait échouer cette étape.
+L'ajout au panier ne réserve rien. Le stock réagit ensuite à product.created, order.paid
+et order.cancelled ; les réservations expirées sont libérées par une tâche périodique.
 
-Contrepartie assumée : la cohérence est **à terme**, pas immédiate. Entre le paiement et la
-confirmation de réservation, il existe une fenêtre où la commande est payée et le stock encore
-seulement réservé. C'est acceptable ici parce que la réservation a déjà eu lieu en amont, au
-moment de l'ajout au panier — le stock n'est jamais vendu deux fois.
+La confirmation après paiement est à terme : la commande peut être payée alors que sa
+réservation n'est pas encore confirmée. Le bus reste donc nécessaire pour cette étape.
 
 ### Un service qui tombe n'en fait pas tomber d'autres
 

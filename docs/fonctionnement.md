@@ -42,7 +42,7 @@ Il définit les standards techniques et structurels communs à toutes les instan
                       │  (RMQ)   │          │  :3005   │
                       └──────────┘          └──────────┘
 
-  Chaque microservice ↔ sa propre base PostgreSQL (database-per-service)
+  Dix services persistants ↔ dix bases PostgreSQL ; notifier et assistant sans base
 ```
 
 ---
@@ -50,16 +50,19 @@ Il définit les standards techniques et structurels communs à toutes les instan
 ## Principes directeurs
 
 ### 1. Database-per-service
-Chaque microservice possède sa propre base PostgreSQL. Aucun service ne lit la base d'un autre. Les références cross-services se font par UUID, sans foreign key.
+Chaque service persistant possède sa propre base PostgreSQL. Le tenant compte dix bases ; notifier et assistant ne possèdent pas de base. Aucun service ne lit la base d'un autre. Les références cross-services se font par UUID, sans foreign key.
 
 ### 2. Communication : HTTP pour la gateway, événements entre services
 - **Front → Gateway** et **Gateway → chaque microservice** : HTTP request/response (la gateway
   doit répondre au navigateur de façon synchrone).
 - **Service ↔ service** : les opérations sans réponse immédiate (notifications, logs,
   synchronisation user/auth) passent par **RabbitMQ** (`@EventPattern`/`@MessagePattern`).
-  Un service peut tomber sans bloquer les autres.
+  Les services asynchrones peuvent être découplés ; les appels HTTP synchrones restent dépendants de la disponibilité du destinataire.
 - **Exception paiement** : `payment-service` reste en **HTTP pur, sans event** (intention +
   webhook Stripe) — pour ne jamais risquer de perdre un paiement dans le bus asynchrone.
+
+La création de commande appelle product et stock en HTTP ; le stock est réservé à cette
+étape, puis confirmé ou libéré par événements.
 
 ### 3. Clean Architecture
 Chaque microservice suit la même structure : `entities` → `repositories` (interface + impl) → `usecases` → `controllers`. Voir [Étape 1](./back/1-structure-micro-service.md).
@@ -87,9 +90,20 @@ natif sur l'hôte via `yarn dev` (turbo), qui se connecte à cette infra dockeri
 | order-service    | 3007  | Commandes (statuts, KPI commandes/CA)             |
 | cart-service     | 3008  | Panier serveur (par sessionKey)                   |
 | payment-service  | 3009  | Paiement Stripe + webhook (HTTP pur, sans event)  |
+| ticket-service | 3010 | Tickets de support |
+| stock-service | 3011 | Stock, réservations de commandes, mouvements |
+| assistant-service | 3012 | Guide et chatbot Gemini, sans base |
 | notifier-service | —     | Envoi d'emails, SMS, push (RMQ-only, pas d'HTTP)  |
 
 ---
+
+## Démonstration et déploiement
+
+La démo lance un tenant Docker et un tenant k3s via k3d, avec 14 images applicatives
+(front, gateway et 12 microservices dont Gemini). Elle utilise des paiements simulés.
+Les procédures et limites sont dans [demo-infra.md](demo-infra.md). Le schéma initial
+ci-dessus illustre le socle identité/contenu ; l’inventaire complet est dans le tableau
+et les [diagrammes d’architecture](architecture/README.md).
 
 ## Pour aller plus loin
 

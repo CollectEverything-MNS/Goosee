@@ -1,7 +1,10 @@
 # Plan POC Goosee — feuille de route détaillée
 
+> Plan historique démarré le 16 juin 2026. L’état des lieux initial et les estimations ci-dessous sont conservés pour la traçabilité ; ils ne décrivent plus l’état actuel. Le périmètre de démonstration retenu utilise deux sites préchargés, le paiement simulé et Gemini.
+> État actuel : [plan de démo](plan-demo-infra.md), [guide infra](demo-infra.md), [validation des tests](validation-poc-tests.md).
+
 > Mis à jour le 2026-06-16.
-> Plan **vivant** : le statut de chaque tâche est mis à jour au fil des features
+> Plan initial : les statuts ci-dessous retracent les features
 > livrées (voir aussi `journal-dev.md`). Estimations en **jours-homme (j)** pour 1
 > développeur familier de la stack, fourchettes basse–haute, hors UI/UX (traité en
 > dernier, lot 8).

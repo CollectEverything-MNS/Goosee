@@ -1,5 +1,8 @@
 # Journal de développement — POC Goosee
 
+> Journal historique : chaque entrée décrit le contexte à sa date. Les anciennes mentions « reste à faire », ports ou nombres de services ne constituent pas une référence actuelle.
+> État actuel : [plan de démo](plan-demo-infra.md), [guide infra](demo-infra.md), [validation des tests](validation-poc-tests.md).
+
 > Documentation continue : **une entrée par feature livrée**, datée, complétée au
 > moment du commit. Format : date, ce qui a été fait, pourquoi, ce qui reste.
 > Voir le plan vivant dans [plan-poc.md](./plan-poc.md).
@@ -1021,15 +1024,11 @@ jeton interne via `secretsRef` renseigné par la présentation.
 
 **Reste :** Lot 8 (UI/UX).
 
+## 2026-09-17 — Réconciliation de la documentation
 
-
-
-
-
-
-
-
-
-
-
-
+Inventaire et diagrammes alignés sur les douze services (assistant activé) et dix bases.
+Parcours documenté : réservation à la commande, paiement simulé de démo, route /payments.
+La limite de revalidation des prix et les routes menus/settings sans garde sont explicites.
+Matrice des 99 routes, collection Postman étendue, guides de configuration et de tests
+actualisés ; résultats historiques conservés et signalés. Le guide utilisateur et sa
+copie embarquée pour Gemini restent identiques. Point d'entrée : [docs/README.md](README.md).

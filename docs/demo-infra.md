@@ -105,6 +105,6 @@ Validé le 17 septembre 2026 :
 - Arrêt/relance : identifiants des produits et commandes conservés, sans doublon.
 
 Les mises à jour des pods ne créent aucun pod supplémentaire pendant leur remplacement ;
-une interruption courte est possible. Le provisioning d'un troisième site en direct et
-la montée en charge n'ont pas été validés dans cette répétition.
+une interruption courte est possible. La charge légère est validée (deux utilisateurs) ;
+la saturation, l'autoscaling et le provisioning d'un troisième site en direct ne sont pas testés.
 Voir aussi le [plan réalisé](plan-demo-infra.md).

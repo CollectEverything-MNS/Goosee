@@ -1,5 +1,10 @@
 # 🚀 Créer une API Gateway NestJS (Goosee Project)
 
+> Exemple pédagogique simplifié, pas une copie de l'implémentation courante.
+> Pour ajouter un service au dépôt, suivre [la procédure monorepo](3-creation-micro-service-script.md).
+> Les Dockerfiles effectifs utilisent le contexte racine et les workspaces ; les secrets,
+> migrations, contrôles d'accès et endpoints de santé doivent suivre les services existants.
+
 Ce guide explique **pas à pas** comment créer une **API Gateway NestJS** moderne,
 qui centralise la communication HTTP entre ton frontend et tes microservices (User, Order, etc.).
 Elle servira aussi de point d’entrée unique pour Swagger et la configuration.

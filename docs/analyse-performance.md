@@ -29,6 +29,7 @@ Définis dans `load/profils.js`, choisis avec `-e SCENARIO=` :
 
 | Profil | Charge | Durée | Usage |
 | --- | --- | --- | --- |
+| `poc` | jusqu’à 2 VUs | 30 s | vérification locale à faible consommation |
 | `smoke` (défaut) | jusqu'à 5 VUs | ~1 min | valider que le script et la cible répondent |
 | `load` | paliers jusqu'à 50 VUs | ~7 min | comportement sous charge |
 
@@ -63,7 +64,8 @@ Un seuil dépassé fait sortir k6 en code non nul.
 | Métrique | Seuil |
 | --- | --- |
 | `http_req_failed` | < 1 % (lecture) · < 2 % (navigation) |
-| `GET /products`, `GET /products/:id` | p95 < 500 ms (lecture) · < 400 ms (navigation) |
+| `GET /products` | p95 < 500 ms (lecture) · < 400 ms (navigation) |
+| `GET /products/:id` | p95 < 400 ms (navigation) ; aucun seuil dédié en lecture |
 | `GET /health` | p95 < 200 ms |
 | `POST /cart/items` | p95 < 600 ms |
 
@@ -74,7 +76,7 @@ Pendant un run, les métriques RED de la gateway (`http_requests_total`,
 permettent de recouper la vue client (k6) et la vue serveur. Sortie k6 vers Prometheus :
 voir `load/README.md`.
 
-## 5. Résultats
+## 5. Résultats historiques du 8 septembre 2026
 
 Runs du 2026-09-08 (base `36e285c`). Latences en millisecondes, par endpoint (`p95` / `p99`).
 
@@ -104,3 +106,11 @@ latence quasi stable (p95 `/products` 8,9 → 10,0 ms ; p99 10,6 → 13,2 ms) : 
 saturation à cette charge. `POST /cart/:key/items` (seule écriture) reste le plus lent,
 sans dérive notable sous charge. `POST /auth/login` n'est pas mesuré : il est limité à
 5 requêtes/min (anti-force-brute) et le parcours de navigation est anonyme.
+
+## 6. Validation locale du 17 septembre 2026
+
+Le profil `poc` a été exécuté successivement sur Docker et k3s : lecture et navigation
+avec panier, 695 requêtes au total, aucune erreur HTTP et tous les seuils respectés.
+Les p95 globaux vont de 10,96 à 13,72 ms. k6 était plafonné à 0,5 CPU et 256 Mio.
+Cette passe vérifie une faible charge ; elle ne mesure ni la saturation ni l'autoscaling.
+Les résultats et commandes sont dans [validation-poc-tests.md](validation-poc-tests.md).

@@ -1,5 +1,10 @@
 # 🧩 Créer un Microservice NestJS à la main (Goosee Project)
 
+> Exemple pédagogique simplifié, pas une copie de l'implémentation courante.
+> Pour ajouter un service au dépôt, suivre [la procédure monorepo](3-creation-micro-service-script.md).
+> Les Dockerfiles effectifs utilisent le contexte racine et les workspaces ; les secrets,
+> migrations, contrôles d'accès et endpoints de santé doivent suivre les services existants.
+
 Ce guide explique **comment construire un microservice complet NestJS** à la main,  
 dans l’architecture Goosee (basée sur microservices).  
 Chaque microservice est **autonome**, contient son propre module, contrôleur, usecase, repository et configuration.  

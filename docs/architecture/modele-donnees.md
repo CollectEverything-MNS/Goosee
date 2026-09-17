@@ -1,9 +1,9 @@
 # Modèle de données
 
-**Une base PostgreSQL par service.** Aucune clé étrangère ne traverse une frontière de service :
+**Une base PostgreSQL par service persistant.** Aucune clé étrangère ne traverse une frontière de service :
 les références croisées sont des UUID nus, que rien ne contraint au niveau du moteur.
 
-Ce document montre donc **onze schémas séparés**, pas un schéma d'ensemble — parce qu'il n'en
+Ce document montre donc **dix bases métier séparées pour un tenant**, pas un schéma d'ensemble — parce qu'il n'en
 existe pas.
 
 ---
@@ -20,7 +20,7 @@ Ce que ça coûte, ce que ça achète :
 | **Coût** | Pas d'intégrité référentielle inter-services. Un `productId` peut pointer vers un produit supprimé. La cohérence est applicative, portée par les événements |
 | **Gain** | Chaque service évolue, migre et se déploie seul. Un verrou sur la table des produits ne bloque pas les commandes. Une panne de la base des logs n'empêche pas de vendre |
 
-Le compromis est assumé : c'est ce qui permet de déployer onze services indépendamment.
+Le compromis est assumé : c'est ce qui permet de déployer douze services indépendamment (dix avec une base, notifier et assistant sans base).
 
 ---
 
@@ -190,10 +190,11 @@ montant d'une facture déjà émise. La copie fige ce qui a été vendu, à quel
 
 **Pour le panier, c'est de la performance.** Afficher un panier ne demande aucun appel au
 service produit : tout est dans la ligne. Contrepartie assumée — un prix modifié pendant qu'un
-panier dort n'est pas répercuté. La revalidation se fait au passage en commande.
+panier dort n'est pas répercuté. À la création de la commande, le code vérifie la disponibilité des produits et réserve le stock, mais calcule le total avec les prix unitaires reçus dans la requête. Il ne relit pas le prix du catalogue pour le substituer : cette limite du POC reste à corriger dans le code.
 
-`stock_reservation` porte un `expiresAt` balayé périodiquement : un panier abandonné libère son
-stock au bout d'un délai, sans quoi quelques abandons suffiraient à épuiser un catalogue.
+`stock_reservation` porte un `expiresAt` balayé chaque minute. La réservation est liée à une
+commande créée au checkout, pas au panier ; elle expire après le délai configuré
+(`STOCK_RESERVATION_TTL_MINUTES`, 30 minutes par défaut).
 
 ---
 
@@ -285,3 +286,5 @@ find templates/back/services -name "*.entity.ts" | grep -v node_modules
 Les migrations TypeORM de chaque service sont dans `src/migrations/`. Le schéma n'est jamais
 créé par `synchronize` en production : chaque tenant démarre sur une base vierge dont le schéma
 est monté par migrations versionnées.
+
+Le service assistant ne possède pas de base PostgreSQL : il charge le guide embarqué et appelle Gemini.

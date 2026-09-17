@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "e8b2d57a-2d6a-4e12-9e66-7cc5bbf3a111",
     "name": "Goosee - API Gateway Endpoints",
-    "description": "Collection API Gateway avec setup automatique des tokens par role.",
+    "description": "Référence API Gateway mise à jour le 17 septembre 2026. Setup et requêtes par rôle existants, commerce, stock, tickets, Gemini, RGPD et supervision. Exécuter les requêtes individuellement ; renseigner les identifiants. Les corps sont des exemples, pas une suite E2E automatique.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -397,6 +397,24 @@
               "raw": "{\n  \"token\": \"{{customer_refresh_token}}\"\n}"
             }
           }
+        },
+        {
+          "name": "SSO (jeton signé requis)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/sso",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{sso_token}}\"\n}"
+            },
+            "description": "Jeton SSO signé fourni par la vitrine, avec expiration. Ne pas utiliser un access token comme jeton SSO."
+          }
         }
       ]
     },
@@ -521,6 +539,42 @@
               }
             ],
             "url": "{{base_url}}/users/delete-user/{{user_id}}"
+          }
+        },
+        {
+          "name": "GET /users/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/users/me",
+            "description": "JWT valide requis ; aucun pageKey supplémentaire."
+          }
+        },
+        {
+          "name": "PATCH /users/me",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/me",
+            "description": "JWT valide requis ; aucun pageKey supplémentaire.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Test\",\n  \"lastName\": \"Postman\"\n}"
+            }
           }
         }
       ]
@@ -858,6 +912,1134 @@
           }
         }
       ]
+    },
+    {
+      "name": "Products",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/products",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /products",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products",
+            "description": "Accès déclaré : JWT + products.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Article Postman\",\n  \"price\": 15,\n  \"categoryIds\": [\n    \"{{category_id}}\"\n  ],\n  \"initialStock\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /products/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}",
+            "description": "Accès déclaré : JWT + products."
+          }
+        },
+        {
+          "name": "GET /products/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/products/{{product_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "PATCH /products/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}",
+            "description": "Accès déclaré : JWT + products.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Article modifié\",\n  \"price\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /products/:id/attributes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/products/{{product_id}}/attributes",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /products/:id/attributes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}/attributes",
+            "description": "Accès déclaré : JWT + products.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"Origine\",\n  \"value\": \"France\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /products/:id/attributes/:attributeId",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}/attributes/{{attribute_id}}",
+            "description": "Accès déclaré : JWT + products."
+          }
+        },
+        {
+          "name": "GET /products/:id/attributes/:attributeId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/products/{{product_id}}/attributes/{{attribute_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "GET /products/:id/images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/products/{{product_id}}/images",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /products/:id/images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}/images",
+            "description": "Accès déclaré : JWT + products.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE /products/:id/images/:imageId",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}/images/{{image_id}}",
+            "description": "Accès déclaré : JWT + products."
+          }
+        },
+        {
+          "name": "PUT /products/:id/images/:imageId/main",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}/images/{{image_id}}/main",
+            "description": "Accès déclaré : JWT + products."
+          }
+        },
+        {
+          "name": "GET /products/:id/tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/products/{{product_id}}/tags",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /products/:id/tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}/tags",
+            "description": "Accès déclaré : JWT + products.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagId\": \"{{tag_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /products/:id/tags/:tagId",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/products/{{product_id}}/tags/{{tag_id}}",
+            "description": "Accès déclaré : JWT + products."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/categories",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /categories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categories",
+            "description": "Accès déclaré : JWT + categories.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Catégorie Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /categories/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/categories/{{category_id}}",
+            "description": "Accès déclaré : JWT + categories."
+          }
+        },
+        {
+          "name": "GET /categories/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/categories/{{category_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "PATCH /categories/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categories/{{category_id}}",
+            "description": "Accès déclaré : JWT + categories.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Catégorie modifiée\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /categories/:id/products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/categories/{{category_id}}/products",
+            "description": "Accès déclaré : Public."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tags",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tags",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tags",
+            "description": "Accès déclaré : JWT + products.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /tags/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/tags/{{tag_id}}",
+            "description": "Accès déclaré : JWT + products."
+          }
+        },
+        {
+          "name": "GET /tags/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tags/{{tag_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/orders",
+            "description": "Accès déclaré : JWT + orders."
+          }
+        },
+        {
+          "name": "POST /orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/orders",
+            "description": "Accès déclaré : Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerEmail\": \"postman@goosee.test\",\n  \"items\": [\n    {\n      \"productId\": \"{{product_id}}\",\n      \"name\": \"Article Postman\",\n      \"unitPriceCents\": 1500,\n      \"quantity\": 1\n    }\n  ],\n  \"billingAddress\": {\n    \"fullName\": \"Test Postman\",\n    \"line1\": \"1 rue du Test\",\n    \"postalCode\": \"57000\",\n    \"city\": \"Metz\",\n    \"country\": \"France\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /orders/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/orders/{{order_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "PATCH /orders/:id/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/orders/{{order_id}}/status",
+            "description": "Accès déclaré : JWT + orders.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "DELETE /cart/:sessionKey",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/cart/{{session_key}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "GET /cart/:sessionKey",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/cart/{{session_key}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /cart/:sessionKey/items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cart/{{session_key}}/items",
+            "description": "Accès déclaré : Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"name\": \"Article Postman\",\n  \"unitPriceCents\": 1500,\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /cart/:sessionKey/items/:productId",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/cart/{{session_key}}/items/{{product_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "PATCH /cart/:sessionKey/items/:productId",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cart/{{session_key}}/items/{{product_id}}",
+            "description": "Accès déclaré : Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "POST /payments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/payments",
+            "description": "Accès déclaré : Public.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"amountCents\": 1500,\n  \"currency\": \"eur\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /payments/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/payments/{{payment_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "POST /payments/webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/payments/webhook",
+            "description": "Accès déclaré : Public. Cet exemple JSON concerne uniquement le prestataire simulé. Stripe réel nécessite le payload et la signature Stripe.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerRef\": \"{{provider_ref}}\",\n  \"status\": \"succeeded\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/stock",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "GET /stock/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/stock/{{product_id}}",
+            "description": "Accès déclaré : Public."
+          }
+        },
+        {
+          "name": "PATCH /stock/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/stock/{{product_id}}",
+            "description": "Accès déclaré : JWT + stock.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /stock/:id/movements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/stock/{{product_id}}/movements",
+            "description": "Accès déclaré : JWT + stock."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/tickets",
+            "description": "Accès déclaré : JWT + tickets."
+          }
+        },
+        {
+          "name": "POST /tickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tickets",
+            "description": "Accès déclaré : JWT + tickets.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ticket Postman\",\n  \"description\": \"Demande de test\",\n  \"authorId\": \"{{customer_id}}\",\n  \"authorEmail\": \"postman@goosee.test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /tickets/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/tickets/{{ticket_id}}",
+            "description": "Accès déclaré : JWT + tickets."
+          }
+        },
+        {
+          "name": "GET /tickets/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/tickets/{{ticket_id}}",
+            "description": "Accès déclaré : JWT + tickets."
+          }
+        },
+        {
+          "name": "PATCH /tickets/:id/assign",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tickets/{{ticket_id}}/assign",
+            "description": "Accès déclaré : JWT + tickets.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignedTo\": \"{{assigned_user_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /tickets/:id/close",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tickets/{{ticket_id}}/close",
+            "description": "Accès déclaré : JWT + tickets.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"Résolu pendant le test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /tickets/:id/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tickets/{{ticket_id}}/status",
+            "description": "Accès déclaré : JWT + tickets.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assistant",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "POST /assistant/ask",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/assistant/ask",
+            "description": "Accès déclaré : JWT + dashboard.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Comment ajouter un produit ?\",\n  \"history\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /assistant/guide",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/assistant/guide",
+            "description": "Accès déclaré : JWT + dashboard."
+          }
+        }
+      ]
+    },
+    {
+      "name": "RGPD",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /admin/rgpd/archived-orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/admin/rgpd/archived-orders",
+            "description": "Accès déclaré : JWT + rgpd."
+          }
+        },
+        {
+          "name": "POST /admin/rgpd/erase/:customerId",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/admin/rgpd/erase/{{customer_id}}",
+            "description": "Accès déclaré : JWT + rgpd. Effacement de données : utiliser exclusivement un client synthétique préparé pour ce test."
+          }
+        },
+        {
+          "name": "GET /admin/rgpd/export/:customerId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-role",
+                "value": "owner"
+              }
+            ],
+            "url": "{{base_url}}/admin/rgpd/export/{{customer_id}}",
+            "description": "Accès déclaré : JWT + rgpd."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Internal",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /internal/kpi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{internal_api_token}}"
+              }
+            ],
+            "url": "{{base_url}}/internal/kpi",
+            "description": "Accès déclaré : Jeton interne."
+          }
+        },
+        {
+          "name": "POST /internal/rgpd/erase/:customerId",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{internal_api_token}}"
+              }
+            ],
+            "url": "{{base_url}}/internal/rgpd/erase/{{customer_id}}",
+            "description": "Accès déclaré : Jeton interne. Effacement de données : utiliser exclusivement un client synthétique préparé pour ce test."
+          }
+        },
+        {
+          "name": "GET /internal/rgpd/export/:customerId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{internal_api_token}}"
+              }
+            ],
+            "url": "{{base_url}}/internal/rgpd/export/{{customer_id}}",
+            "description": "Accès déclaré : Jeton interne."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/health",
+            "description": "Accès déclaré : Public."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/metrics",
+            "description": "Accès déclaré : Public."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "description": "Requêtes de référence à exécuter individuellement après préparation des variables. Accès alignés sur les contrôleurs ; voir docs/roles-endpoints-matrix.md.",
+      "item": [
+        {
+          "name": "GET /logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/logs",
+            "description": "Accès déclaré : Public."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "product_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tag_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "image_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "attribute_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "payment_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ticket_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customer_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "assigned_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "session_key",
+      "value": "postman-poc-session",
+      "type": "string"
+    },
+    {
+      "key": "provider_ref",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "internal_api_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sso_token",
+      "value": "",
+      "type": "string"
     }
   ]
 }

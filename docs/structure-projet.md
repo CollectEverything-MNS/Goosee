@@ -25,6 +25,9 @@ GOOSEE/
 │   │   ├── docker-compose.front.dev.yml
 │   │   ├── docker-compose.infra.dev.yml    # rabbitmq, minio, mailhog, adminer
 │   │   └── docker-compose.back.dev.yml     # api-gateway + microservices + dbs
+│   ├── tenant/                             # Compose isolé par boutique, routes Traefik
+│   ├── observability/                      # Prometheus, Alertmanager, cibles
+│   ├── buildkitd.toml                      # Limite de parallélisme du builder
 │   └── prod/                               # Compose pour l'environnement de prod
 │       ├── docker-compose.front.prod.yml
 │       ├── docker-compose.infra.prod.yml
@@ -34,6 +37,13 @@ GOOSEE/
 │   ├── .env.dev                            # Variables de dev (gitignored)
 │   ├── .env.prod                           # Variables de prod (gitignored)
 │   └── .env.example                        # Template versionné
+│
+├── k8s/goosee-tenant/                      # Chart Helm (k3s via k3d en local)
+├── scripts/                                # Builds, provisioning, démo, seed et contrôles
+├── load/                                   # Scénarios k6 et profils poc/smoke/load
+├── .github/workflows/                      # CI, sécurité et notifications
+├── yarn.lock                               # Dépendances figées, versionnées
+├── turbo.json                              # Orchestration des workspaces
 │
 ├── docs/                                   # Documentation technique (FR)
 │
@@ -45,8 +55,8 @@ GOOSEE/
 ## Stack technique
 
 - **Frontend** : Next.js 15, React 19, TailwindCSS, Shadcn/ui, React Query (MobX figure dans les dépendances mais n'est utilisé nulle part dans le code, dépendance morte)
-- **Backend** : NestJS 11, TypeORM, PostgreSQL (une DB par microservice)
-- **Communication inter-services** : RabbitMQ (`@EventPattern` + `@MessagePattern`)
+- **Backend** : NestJS 11, TypeORM, PostgreSQL (10 bases par tenant ; notifier et assistant sans base)
+- **Communication inter-services** : HTTP pour les échanges synchrones, RabbitMQ pour les événements
 - **Stockage objets** : MinIO (uploads d'images, fichiers)
 - **Mail** : Mailhog en dev, SMTP réel en prod
-- **Conteneurisation** : Docker Compose multi-fichiers
+- **Conteneurisation** : Docker Compose ou chart Helm sur Kubernetes (k3s en local)

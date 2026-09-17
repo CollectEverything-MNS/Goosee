@@ -114,15 +114,17 @@ Il n'est pas nécessaire d'avoir un compte pour remplir un panier ; il faudra en
 
 Le panier s'ouvre en glissant depuis le côté droit de l'écran, soit automatiquement après un ajout, soit en cliquant sur l'icône du panier. Pour chaque article : photo, nom (cliquable vers la fiche), prix unitaire, boutons − et + pour modifier la quantité, et une corbeille pour retirer l'article. Le total s'affiche en bas, avec le bouton « Passer commande ».
 
-Le panier est conservé sur votre appareil : vous le retrouvez si vous revenez plus tard. Les quantités ajoutées au panier sont réservées temporairement sur le stock du vendeur ; une réservation non confirmée par une commande est libérée automatiquement au bout d'une trentaine de minutes.
+Le panier est conservé sur votre appareil : vous le retrouvez si vous revenez plus tard. Ajouter au panier ne réserve pas le stock. La réservation intervient à la création de la commande au checkout ; une réservation expirée est libérée automatiquement (30 minutes par défaut).
 
 ### Passer une commande et payer
 
-La page « Finaliser la commande » se déroule en deux étapes. Le récapitulatif (articles avec leur photo, quantités, total) reste affiché sur le côté pendant tout le processus.
+Dans la démonstration POC, remplissez vos coordonnées puis cliquez sur **« Simuler le paiement (aucun débit) »**. Aucune carte bancaire ni transaction Stripe ne sont nécessaires ; la page de succès confirme la commande de test.
+
+En mode Stripe, la page « Finaliser la commande » se déroule en deux étapes. Le récapitulatif (articles avec leur photo, quantités, total) reste affiché sur le côté pendant tout le processus.
 
 **Étape 1 — Coordonnées et facturation**
 
-1. Adresse e-mail : c'est là que seront envoyés le récapitulatif et la facture. Elle est pré-remplie si vous êtes connecté.
+1. Adresse e-mail : elle identifie le destinataire de la commande et est pré-remplie si vous êtes connecté. L'envoi automatique d'un récapitulatif ou d'une facture n'est pas implémenté dans le parcours actuel.
 2. Adresse de facturation : nom complet, adresse, code postal, ville, pays. Tous les champs sont obligatoires (au moins 2 caractères chacun). Si vous êtes connecté et que votre profil contient une adresse, elle est pré-remplie.
 3. Cliquez sur « Continuer vers le paiement ». Un e-mail invalide ou une adresse incomplète bloque le passage à l'étape suivante avec un message explicite.
 
@@ -130,7 +132,7 @@ La page « Finaliser la commande » se déroule en deux étapes. Le récapitulat
 
 1. Le formulaire de carte bancaire s'affiche (paiement sécurisé par Stripe). Tant que le site est en mode test, utilisez la carte 4242 4242 4242 4242, une date d'expiration future et n'importe quel code CVC.
 2. Cliquez sur « Payer X € ». Un paiement refusé affiche le motif du refus et vous pouvez réessayer.
-3. Après validation, la page « Merci pour votre commande ! » affiche votre numéro de commande (par exemple CMD-A1B2C3D4). Le panier est vidé et un e-mail de confirmation vous est envoyé.
+3. Après validation, la page « Merci pour votre commande ! » affiche votre numéro de commande (par exemple CMD-A1B2C3D4). Le panier est vidé. Le parcours actuel n'envoie pas automatiquement d'e-mail de confirmation de commande.
 
 Un panier vide affiche « Votre panier est vide » avec un bouton de retour à la boutique.
 
@@ -333,7 +335,7 @@ Les catégories organisent le catalogue ; un produit doit appartenir à au moins
 L'écran « Stock » liste tous les produits du catalogue avec deux nombres :
 
 - **Quantité** : la quantité physique en stock ;
-- **Disponible** : ce qui peut encore être vendu, c'est-à-dire la quantité moins ce qui est réservé dans des paniers ou des commandes en cours. Une réservation de panier non transformée en commande est libérée automatiquement au bout d'une trentaine de minutes.
+- **Disponible** : ce qui peut encore être vendu, c'est-à-dire la quantité moins ce qui est réservé pour des commandes en attente. Une réservation expirée est libérée automatiquement (30 minutes par défaut).
 
 Un produit dont le stock n'a jamais été initialisé apparaît à 0.
 
@@ -575,7 +577,7 @@ Créez d'abord le produit, puis rouvrez-le avec « Modifier » : la section « I
 Désactivez « Produit disponible à la vente » dans sa fiche, ou ramenez son stock à zéro depuis l'écran Stock. Il apparaît alors « Épuisé » sur le site.
 
 **Pourquoi « Disponible » est inférieur à « Quantité » dans le stock ?**
-La différence correspond aux articles réservés dans des paniers ou des commandes en cours. Les réservations de panier non confirmées sont libérées automatiquement au bout d'une trentaine de minutes.
+La différence correspond aux articles réservés à la création des commandes. Les réservations expirées sont libérées automatiquement (30 minutes par défaut).
 
 **Comment corriger une erreur de stock ?**
 Écran Stock, « ⋯ » puis « Ajuster » : saisissez la variation (par exemple −2 pour retirer deux unités), jamais la quantité finale. Le mouvement apparaît dans l'historique comme « Correction manuelle ».

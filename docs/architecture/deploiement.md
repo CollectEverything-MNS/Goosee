@@ -26,15 +26,15 @@ graph TB
     end
 
     subgraph netA["tenant_net client A — isolé"]
-        svcA["11 microservices"]
-        dbA[("11 bases")]
+        svcA["12 microservices, assistant activé"]
+        dbA[("10 bases")]
         busA{{"RabbitMQ"}}
         minioA[("MinIO")]
     end
 
     subgraph netB["tenant_net client B — isolé"]
-        svcB["11 microservices"]
-        dbB[("11 bases")]
+        svcB["12 microservices, assistant activé"]
+        dbB[("10 bases")]
         busB{{"RabbitMQ"}}
         minioB[("MinIO")]
     end
@@ -91,7 +91,7 @@ graph TB
         npA["<b>NetworkPolicy</b><br/>ingress refusé hors namespace"]
         gwA["gateway<br/>HPA 1→N"]
         frontA["front<br/>HPA 1→N"]
-        svcA["11 microservices<br/>HPA 1→N"]
+        svcA["12 microservices, assistant activé<br/>HPA 1→N"]
         dbA[("bases · bus · MinIO")]
         rqA["ResourceQuota<br/>plafond CPU et mémoire"]
     end
@@ -100,7 +100,7 @@ graph TB
         direction TB
         npB["<b>NetworkPolicy</b><br/>ingress refusé hors namespace"]
         gwB["gateway"]
-        svcB["11 microservices"]
+        svcB["12 microservices, assistant activé"]
         dbB[("bases · bus · MinIO")]
     end
 
@@ -137,7 +137,7 @@ Trois garde-fous que le chemin Docker n'a pas :
 | --- | --- | --- |
 | Bases, bus, stockage | isolés | isolés |
 | **Réseau entre clients** | **partagé** | **refusé par NetworkPolicy** |
-| Plafond de ressources | aucun | `ResourceQuota` |
+| Plafond de ressources | 0,5 CPU par conteneur dans le Compose tenant ; pas de quota mémoire global par tenant | `ResourceQuota` |
 | Mise à l'échelle | manuelle | HPA automatique |
 | Mise en veille | `compose stop` | réplicas à zéro |
 
@@ -152,13 +152,17 @@ commerciale — et c'est le forfait le moins cher qui est le moins protégé.
 Prometheus, pour aligner le chemin Docker sur ce que la `NetworkPolicy` assure déjà côté
 Kubernetes. Décision n° 3 de l'[audit du SI](../audit-si.md#6-traçabilité--du-constat-à-la-décision-darchitecture).
 
-## Ce qui est cassé aujourd'hui
+## Construction et limites de la démo
 
-La construction d'images échoue en intégration continue : 26 des 30 Dockerfiles copient un
-`yarn.lock` que le dépôt ne versionne pas. Les images se construisent sur un poste de
-développement, où le fichier existe, et nulle part ailleurs.
+Le fichier `yarn.lock` est versionné et les images utilisent une installation figée.
+Les 14 images de la démo ont été construites et testées localement le 17 septembre 2026.
+L'ancien constat de lockfile absent reste consultable dans l'[audit historique](../audit-si.md).
 
-Détail et mesures dans l'[audit du SI, §4.4](../audit-si.md#44-reproductibilité-des-livrables).
+Le launcher construit les images successivement avec un builder limité à 2 CPU et 4 Go.
+Le serveur k3d est limité à 2 CPU et 5 Gio ; cela ne plafonne pas la consommation totale
+hôte + Docker + vitrine. Les mises à jour des applications Helm utilisent `maxSurge: 0`
+et `maxUnavailable: 1` : elles peuvent interrompre brièvement le service.
+Voir le [guide de démo](../demo-infra.md) pour les commandes.
 
 ## Où regarder dans le dépôt
 
