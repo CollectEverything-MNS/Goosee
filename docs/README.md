@@ -2,12 +2,17 @@
 
 ## Références actuelles
 
+Les pages d'architecture décrivent l'hébergement des sites en production et
+signalent les mécanismes restant à implémenter. Les guides de démonstration et les
+résultats du POC décrivent uniquement la validation locale ; ils ne constituent
+pas un dimensionnement ni une validation de production.
+
 - [Démonstration infra](demo-infra.md) : lancement, comptes, ressources et arrêt.
 - [Validation POC](validation-poc-tests.md) : tests réellement exécutés le 17 septembre 2026.
 - [Plan de démonstration](plan-demo-infra.md) : périmètre réalisé et limites.
 - [Fonctionnement](fonctionnement.md) et [structure](structure-projet.md) : vue du dépôt.
 - [Architecture](architecture/README.md) : diagrammes Mermaid et modèle de données.
-- [Résilience et reprise après panne](architecture/resilience-reprise.md) : protections présentes, limites et procédure de vérification.
+- [Résilience et reprise après panne](architecture/resilience-reprise.md) : exploitation en production et cible de sauvegarde des bases des sites vers Cloudflare R2.
 - [Guide utilisateur](guide-utilisateur.md) : boutique, administration et chatbot.
 - [Matrice des accès](roles-endpoints-matrix.md) : 99 routes et gardes déclarées.
 - [Postman](postman/procedure-tests-roles-dynamiques.md) : configuration et requêtes manuelles.

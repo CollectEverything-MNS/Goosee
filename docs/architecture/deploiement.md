@@ -4,6 +4,12 @@ Le forfait choisi détermine la cible d'infrastructure. Un seul orchestrateur pi
 derrière la même interface — mais **les deux ne se valent pas**, et ce document existe surtout
 pour rendre cet écart visible.
 
+Le cadre cible est un hébergement de production sur serveurs : Docker Compose
+pour les tenants standard, Kubernetes/k3s pour les tenants du forfait scalable.
+Le nombre d'hôtes et la topologie du stockage ne sont pas fixés par ces schémas.
+Les valeurs plafonnées pour le portable et le cluster k3d décrivent seulement
+la démonstration, pas le dimensionnement de production.
+
 ```
 planInfra(plan) = plan === 'enterprise' ? 'k8s' : 'docker'
 ```
@@ -168,6 +174,8 @@ Voir le [guide de démo](../demo-infra.md) pour les commandes.
 
 La [page résilience et reprise après panne](resilience-reprise.md) détaille les sondes,
 les volumes persistants, les limites de disponibilité et les essais de récupération.
+Elle décrit aussi la cible de sauvegarde des seules bases des sites vers Cloudflare
+R2, qui reste à implémenter et à valider par une restauration.
 
 | Élément | Fichier |
 | --- | --- |

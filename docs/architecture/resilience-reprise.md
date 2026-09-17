@@ -1,16 +1,16 @@
-# Résilience et reprise après panne
+# Résilience et reprise après panne en production
 
-État du POC au 17 septembre 2026 : Docker Compose pour Atelier Alice et k3s/k3d
-pour Mode Bob, sur le même ordinateur. Le socle permet de redémarrer des processus
-et de réutiliser leurs données persistantes. **Il ne garantit pas une disponibilité
-continue ni une récupération après perte du disque.**
+Cette page décrit les sites clients hébergés sur des serveurs Docker Compose ou
+un cluster Kubernetes/k3s. Elle ne suppose pas un hébergement sur un PC.
+Les commandes propres à la démonstration sont dans une
+[annexe locale](reprise-tests-locaux.md).
 
-Cette page décrit les mécanismes présents dans les manifests et une procédure de
-vérification. Les essais de panne ci-dessous sont **à exécuter** : les tests
-[déjà consignés](../validation-poc-tests.md) couvrent le fonctionnement et une charge
-légère, pas la récupération après panne. Aucun délai de reprise n'a été mesuré.
+**Statut au 17 septembre 2026 :** les sondes, redémarrages et volumes décrits
+ci-dessous existent dans les manifests. La sauvegarde des bases vers Cloudflare R2
+est la cible retenue, mais aucun job de sauvegarde ni restauration R2 n’est encore
+livré dans le dépôt. Les tests locaux consignés ne certifient pas la production.
 
-## Ce qui est en place
+## Mécanismes présents dans les manifests
 
 | Mécanisme | Docker Compose | k3s |
 | --- | --- | --- |
@@ -52,6 +52,8 @@ Avec un seul réplica, une interruption est possible pendant la reprise. Le HPA
 ajuste la capacité selon le CPU ; il ne remplace pas une stratégie de haute
 disponibilité. Les mises à jour utilisent `maxSurge: 0` et `maxUnavailable: 1`,
 ce qui privilégie la mémoire disponible et peut également interrompre le service.
+Ces valeurs viennent du profil de démonstration : le dimensionnement et la stratégie
+de mise à jour de production doivent être définis pour le niveau de disponibilité visé.
 
 ## Reprise d'une base avec son stockage conservé
 
@@ -78,106 +80,164 @@ Ce n'est pas une sauvegarde : suppression du volume, corruption ou perte du disq
 restent hors de cette protection. Conserver également les secrets associés,
 notamment les fichiers de `docker/tenant/envs/`, sans les commiter ni les afficher.
 
-## Limites assumées pour la démonstration
+## Sauvegardes des bases des sites vers Cloudflare R2
 
-- L'ordinateur, Docker Desktop et le cluster local sont des points de panne communs.
-  Aucun basculement vers une autre machine n'est configuré.
-- Les bases, RabbitMQ et MinIO ont chacun un seul réplica dans le chart.
-- Aucune sauvegarde automatisée ni procédure de restauration éprouvée n'est livrée.
-  Le délai cible de reprise (RTO) et la perte de données admissible (RPO) ne sont pas définis.
-- Une indisponibilité de Gemini affecte le chatbot. Son retour doit être vérifié
-  séparément du parcours boutique.
-- Une requête interrompue peut avoir été traitée avant la coupure. Vérifier l'état
-  de la commande et du paiement avant de réessayer une action métier.
+### Périmètre retenu
 
-## Procédure légère de vérification
+La cible est un bucket privé Cloudflare R2, extérieur aux serveurs qui hébergent les
+sites. Chaque campagne sauvegarde **les dix bases PostgreSQL de chaque site** :
+auth, user, page, log, product, order, cart, payment, stock et ticket. Une campagne
+doit traiter l'inventaire réel des tenants pour inclure les nouveaux sites.
 
-Exécuter les étapes **successivement**, sur le tenant de démonstration Mode Bob,
-sans charge k6 ni reconstruction d'images. Garder un seul onglet de navigateur.
-Les délais de 180 secondes ci-dessous bornent l'attente de la commande ; ils ne
-constituent pas un engagement de reprise.
+Cette politique couvre uniquement les bases des sites. Les objets MinIO (images,
+documents), les messages RabbitMQ, les bases du portail et de l'orchestrateur,
+les secrets et la configuration d'hébergement ne font pas partie de ces archives.
+Une restauration des bases peut donc retrouver des références vers des fichiers
+perdus. **Cette politique ne suffit pas à restaurer intégralement la plateforme.**
 
-### 1. Relever l'état initial
+### Fréquence et rétention
 
-```powershell
-kubectl --context k3d-goosee get pods,pvc -n tenant-mode-bob
-kubectl --context k3d-goosee get deployment product -n tenant-mode-bob
+L'intention exprimée est « 4 sauvegardes jours, 2 semaines, 1 mois ». Le rythme et
+l'articulation des durées restent à préciser avant de configurer l'expiration.
+La proposition à confirmer est quatre campagnes par jour conservées 14 jours,
+puis un point quotidien conservé jusqu'à un mois. Aucun réglage d'expiration
+chiffré ne doit être présenté comme validé tant que cette précision manque.
+
+Le job réalise les exports et les envoie ; R2 conserve les objets. Les règles
+d'expiration peuvent s'appliquer par préfixe et supprimer les archives arrivées
+à échéance. Une règle de cycle de vie ne choisit pas automatiquement un point
+quotidien parmi plusieurs sauvegardes : cette sélection relève du job.
+La suppression n'est pas instantanée à l'échéance.
+Voir les [règles de cycle de vie R2](https://developers.cloudflare.com/r2/buckets/object-lifecycles/).
+
+### Chaîne de sauvegarde à implémenter
+
+```mermaid
+flowchart LR
+    S["Planification sur les serveurs de production"] --> J["Job de sauvegarde à implémenter"]
+    D[("10 bases PostgreSQL par site")] -->|"Exports par base"| J
+    J --> V["Contrôles des archives et manifeste du lot"]
+    V -->|"API S3 via HTTPS"| R[("Cloudflare R2 - bucket privé")]
+    R --> E["Expiration selon la rétention convenue"]
+    R --> T["Restauration de contrôle en environnement isolé"]
+    J --> M["Suivi des succès, échecs et sauvegardes manquantes"]
 ```
 
-Vérifier que les pods sont prêts et les PVC liés. Dans la boutique et son
-administration, noter l'identifiant, le nom et le prix d'un produit existant,
-ainsi qu'une commande existante et son statut. Ne pas lancer de nouvel achat
-pendant l'essai. Accès et comptes : [guide de démonstration](../demo-infra.md).
+Le job peut être un CronJob Kubernetes ou une tâche planifiée sur les hôtes Compose.
+Son emplacement et son déploiement restent à implémenter. Il doit :
 
-### 2. Remplacer un pod applicatif
+1. Inventorier les sites et leurs bases, puis identifier chaque campagne par un
+   horodatage UTC et un identifiant unique. Éviter le chevauchement des campagnes.
+2. Produire un export logique par base avec `pg_dump` au format custom, avec un
+   client compatible avec la version PostgreSQL. Traiter les bases successivement
+   et borner les ressources du job pour limiter l'impact sur les sites.
+3. Contrôler les codes de sortie, la lisibilité des archives et leur empreinte
+   SHA-256. Ces contrôles ne remplacent pas une restauration réelle.
+4. Envoyer les archives sous des clés uniques, par exemple
+   `production/<classe-retention>/<tenant>/<campagne>/<base>.dump`, sans écraser
+   la sauvegarde précédente. Utiliser un bucket privé et des identifiants dédiés,
+   conservés dans le gestionnaire de secrets de l'environnement.
+5. Publier le manifeste de réussite d'un site seulement après vérification de ses
+   dix archives distantes. Y noter versions, heures de début/fin, bases, empreintes
+   et résultats. Un lot incomplet ne doit pas être proposé comme restauration complète.
+6. Alerter sur un échec, un lot incomplet ou l'absence de sauvegarde récente pour
+   un site. Reprendre les envois en échec sans remplacer les derniers lots valides.
 
-```powershell
-$productPods = kubectl --context k3d-goosee get pods -n tenant-mode-bob -l app.kubernetes.io/name=product -o json | ConvertFrom-Json
-$productPod = $productPods.items | Select-Object -First 1
-if (-not $productPod) { throw 'Aucun pod product trouvé' }
-kubectl --context k3d-goosee delete pod $productPod.metadata.name -n tenant-mode-bob
-kubectl --context k3d-goosee rollout status deployment/product -n tenant-mode-bob --timeout=180s
-kubectl --context k3d-goosee get pods -n tenant-mode-bob -l app.kubernetes.io/name=product
+R2 expose une [API compatible S3](https://developers.cloudflare.com/r2/api/) pour
+ces transferts. Aucun bucket ni identifiant Cloudflare n'est créé par cette documentation.
+
+`pg_dump` fournit une vue cohérente d'une base, mais des exports indépendants ne
+constituent pas un instantané atomique des dix bases. Pour obtenir un lot cohérent
+à l'échelle d'un site, prévoir une fenêtre où les écritures et les traitements
+asynchrones sont suspendus après stabilisation des opérations en cours, ou définir
+et tester une procédure de réconciliation métier. Ce choix reste à implémenter.
+Les rôles globaux PostgreSQL doivent être recréés par le provisioning : ils ne
+font pas partie d'un dump de base. Voir la
+[documentation PostgreSQL de pg_dump](https://www.postgresql.org/docs/16/app-pgdump.html).
+
+## Procédure de reprise en production
+
+### Service ou base indisponible, stockage intact
+
+1. Identifier le site, le composant et l'étendue de la panne avec la supervision,
+   les événements et les logs. Vérifier ressources, réseau, stockage et dépendances.
+2. Laisser agir le redémarrage prévu par le runtime, puis contrôler disponibilité
+   et parcours métier. Avec un seul réplica, la coupure reste visible.
+3. Si la reprise automatique échoue, corriger la cause avant un redémarrage ciblé.
+   Conserver les volumes et les secrets ; consigner toute intervention manuelle.
+4. Vérifier les opérations interrompues avant de rejouer un paiement ou une commande.
+
+### Hôte ou nœud perdu
+
+Rétablir l'hôte ou préparer un hôte de remplacement avec les versions applicatives,
+la configuration et les secrets attendus. Sur Kubernetes, le déplacement d'un pod
+ne garantit pas l'accès à ses données : un volume attaché au nœud perdu peut rester
+inaccessible. La topologie et la réplication du stockage doivent être établies.
+Si les volumes sont disponibles, les rattacher selon la procédure du stockage ;
+sinon, suivre la restauration des bases ci-dessous.
+
+### Bases perdues ou corrompues : restauration depuis R2
+
+Cette procédure est la cible d'exploitation, à éprouver avant la mise en service
+du mécanisme de sauvegarde.
+
+1. Mettre le site concerné en maintenance et suspendre producteurs, consommateurs
+   et traitements planifiés qui pourraient écrire pendant la restauration.
+2. Choisir un lot complet antérieur à l'incident. Relever son horodatage et la
+   perte de données potentielle depuis ce point. Préserver l'état endommagé pour analyse.
+3. Télécharger les dix archives et le manifeste depuis R2, puis vérifier leurs
+   empreintes et la compatibilité des versions PostgreSQL et applicatives.
+4. Recréer les rôles nécessaires et restaurer avec `pg_restore` dans des bases
+   neuves isolées. Ne pas écraser les bases actives pour un essai de restauration.
+5. Contrôler les relations métier : comptes auth/user, commandes/paiements,
+   réservations/stock et références aux fichiers. Réconcilier les événements ou
+   webhooks reçus après le point restauré avec l'état réel du prestataire de paiement.
+6. Basculer le site vers les bases restaurées après validation, puis reprendre les
+   traitements sans rejouer aveuglément les messages. Vérifier connexion,
+   catalogue, commandes, stock et tickets avant la réouverture du trafic.
+7. Consigner la durée, le point restauré, les données perdues et les contrôles.
+
+```mermaid
+flowchart TD
+    A["Perte ou corruption des bases d'un site"] --> B["Maintenance et suspension des écritures"]
+    B --> C["Choisir un lot R2 complet antérieur à l'incident"]
+    C --> D["Vérifier les empreintes et restaurer en bases isolées"]
+    D --> E{"Cohérence métier validée ?"}
+    E -->|"Non"| F["Diagnostiquer ou choisir un autre lot"]
+    F --> C
+    E -->|"Oui"| G["Basculer les connexions et reprendre les traitements"]
+    G --> H["Vérifier le site et réouvrir le trafic"]
 ```
 
-Confirmer le remplacement du pod, puis ouvrir le catalogue et le produit témoin.
-Noter la durée d'indisponibilité observée, ou l'absence de coupure visible.
-Ce test démontre la recréation du pod ; il ne teste pas le déclenchement d'une
-sonde de vie sur une application bloquée.
+## Disponibilité et objectifs de reprise
 
-### 3. Redémarrer la base produits en conservant le PVC
+Le chart actuel conserve un seul réplica par base, pour RabbitMQ et pour MinIO.
+La présence de Kubernetes ne prouve ni une topologie multi-nœuds, ni un stockage
+répliqué, ni un basculement automatique opérationnel. Les points de panne communs
+sont les hôtes, le stockage, l'entrée réseau et les dépendances partagées.
 
-```powershell
-kubectl --context k3d-goosee delete pod product-db-0 -n tenant-mode-bob
-kubectl --context k3d-goosee wait --for=condition=Ready pod/product-db-0 -n tenant-mode-bob --timeout=180s
-kubectl --context k3d-goosee get pods,pvc -n tenant-mode-bob
-```
+Le RPO est la perte de données admissible, le RTO le délai de remise en service.
+Ils restent à fixer et mesurer. Si quatre campagnes également espacées par jour
+sont confirmées, l'intervalle nominal serait de six heures ; un échec de sauvegarde
+ou la durée d'export augmente l'ancienneté du dernier point récupérable. Ce n'est
+pas une garantie de RPO. Les dumps décrits ne permettent pas une restauration à
+n'importe quelle seconde entre deux campagnes.
 
-Si le pod n'est pas encore recréé lorsque `wait` démarre, vérifier son apparition
-avec `get pods`, puis relancer l'attente. Ne supprimer ni PVC, ni namespace,
-ni cluster. Relire le produit témoin : identifiant, nom et prix doivent être
-identiques. Vérifier aussi le retour du catalogue et de la commande témoin.
-Ne pas lancer le seed entre les relevés : il pourrait masquer une perte de données.
+## Validation attendue avant exploitation
 
-### 4. Si la reprise échoue
+| Scénario | Critère | État |
+| --- | --- | --- |
+| Reprise d'un service | Disponibilité et parcours métier rétablis, durée relevée | À tester sur l'environnement cible |
+| Redémarrage d'une base | Données témoins identiques, reconnexion applicative | À tester sur l'environnement cible |
+| Campagne R2 | Dix archives vérifiées par site, manifeste complet, échecs signalés | À implémenter |
+| Rétention | Fréquence et durées confirmées, règles vérifiées sur un bucket de test | À préciser puis implémenter |
+| Restauration R2 | Lot restauré en isolation et cohérence métier contrôlée | À implémenter et éprouver |
+| Perte d'un hôte | Accès au stockage ou restauration, délai et pertes mesurés | À tester sur l'environnement cible |
 
-```powershell
-kubectl --context k3d-goosee get events -n tenant-mode-bob --sort-by=.lastTimestamp
-kubectl --context k3d-goosee logs deployment/product -n tenant-mode-bob --tail=80
-kubectl --context k3d-goosee logs pod/product-db-0 -n tenant-mode-bob --tail=80
-kubectl --context k3d-goosee describe pod product-db-0 -n tenant-mode-bob
-```
-
-Chercher un manque de mémoire, une image absente, un PVC non monté ou un échec
-de connexion. Si la base est prête mais le service ne se reconnecte pas, un
-`kubectl --context k3d-goosee rollout restart deployment/product -n tenant-mode-bob`
-est une reprise manuelle possible. La consigner comme telle, puis vérifier de
-nouveau la disponibilité et les données. Éviter les redémarrages globaux répétés.
-
-### 5. Après arrêt de Docker Desktop ou du PC
-
-Redémarrer Docker Desktop et attendre sa disponibilité. Si le cluster existe mais
-est arrêté, utiliser `k3d cluster start goosee`. Vérifier les pods avant de relancer
-les contrôles du [guide de démonstration](../demo-infra.md). Un service Compose
-explicitement arrêté peut nécessiter une relance manuelle.
-
-La commande de présentation avec `--skip-build` peut remettre la démo en route,
-mais elle exécute aussi le seed : elle ne prouve pas la conservation des données.
-Après perte du stockage, le seed permet seulement de recréer des exemples ; les
-données antérieures ne sont pas récupérées par ce mécanisme.
-
-## Consigner le résultat
-
-Ajouter à la [validation POC](../validation-poc-tests.md) la date, le commit,
-le scénario, le délai observé, les données comparées et toute intervention manuelle.
-Ne marquer un scénario réussi qu'après vérification applicative et des données.
-
-| Scénario | État à la rédaction |
-| --- | --- |
-| Remplacement du pod product | À exécuter |
-| Redémarrage de product-db avec conservation des données | À exécuter |
-| Reprise après arrêt du PC | Non validée dans cette passe |
-| Restauration après perte du disque | Non couverte |
+Les [résultats du POC](../validation-poc-tests.md) et les
+[essais locaux de reprise](reprise-tests-locaux.md) restent des références distinctes.
+Une suppression volontaire de pod se teste d'abord en préproduction, dans une
+fenêtre maîtrisée ; les noms et contextes k3d de la démo ne sont pas ceux de production.
 
 ## Références d'implémentation
 

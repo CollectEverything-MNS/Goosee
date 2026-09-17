@@ -137,6 +137,11 @@ serait une commande encaissée sans trace, ou l'inverse.
 | Les 12 services | `Goosee/templates/back/services/` |
 | Traefik, Prometheus | `Goosee/docker/tenant/`, `Goosee/docker/observability/` |
 
+La cible est un hébergement sur serveurs. La « boucle locale » de l'orchestrateur
+désigne l'interface réseau de son hôte, pas un poste utilisateur.
+La cible de [sauvegarde vers Cloudflare R2](resilience-reprise.md) est documentée
+séparément : ce composant n'est pas encore déployé par le code décrit ici.
+
 Les ports vitrine 3100/3102 reflètent la configuration locale de la démonstration et
 restent configurables dans son .env. Les ports du tenant sont des ports internes.
 Le paiement de la démo est simulé ; Gemini est activé avec la clé locale.

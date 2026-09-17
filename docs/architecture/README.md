@@ -2,6 +2,10 @@
 
 Diagrammes de la plateforme Goosee, en **mermaid dans le dépôt**.
 
+Le cadre d'exploitation est la production sur serveurs ou cluster. Les éléments
+implémentés et les cibles encore à réaliser sont distingués dans chaque page.
+Les réglages et commandes propres au POC restent explicitement identifiés comme locaux.
+
 ## Pourquoi mermaid et pas un outil de dessin
 
 Un export d'image se périme sans prévenir : le code bouge, le schéma reste. Ici les diagrammes
@@ -19,7 +23,8 @@ C'est la mise en œuvre de la décision n° 8 de l'[audit du SI](../audit-si.md#
 | [Composants d'un site généré](c4-composants-tenant.md) | Ce qu'il y a dans un site client, et comment ses services communiquent entre eux |
 | [Déploiement](deploiement.md) | Comment un site est réellement déployé, et **en quoi les deux forfaits diffèrent** |
 | [Séquences](sequences.md) | Parcours d'achat, provisionnement d'un client, auto-connexion à l'administration |
-| [Résilience et reprise](resilience-reprise.md) | Redémarrage des services, conservation des données, limites et essais de panne à exécuter |
+| [Résilience et reprise](resilience-reprise.md) | Reprise en production, sauvegarde des bases des sites vers R2 et limites de couverture |
+| [Essais locaux de reprise](reprise-tests-locaux.md) | Annexe de démonstration k3d, distincte de la procédure de production |
 | [Modèle de données](modele-donnees.md) | Les entités de chaque service, et pourquoi il n'y a aucune clé étrangère entre services |
 
 ## Convention de lecture
