@@ -35,8 +35,10 @@ function buildImages(selected = []) {
     console.log(`Building ${name} (builder limited to 2 CPUs)`);
     run(['buildx', 'build', '--builder', builder, '--load', '--progress', 'plain',
       '--build-arg', `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''}`,
+      '--build-arg', `NEXT_PUBLIC_DEMO_PAYMENT=${process.env.NEXT_PUBLIC_DEMO_PAYMENT || 'false'}`,
       '-f', file, '-t', `goosee/${name}:local`, '.']);
   }
+  run(['buildx', 'stop', builder]);
 }
 if (require.main === module) {
   try { buildImages(process.argv.slice(2)); } catch (error) { console.error(error.message); process.exitCode = 1; }

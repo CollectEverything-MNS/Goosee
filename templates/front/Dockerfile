@@ -11,6 +11,8 @@ RUN yarn install --frozen-lockfile
 COPY templates/front ./templates/front
 WORKDIR /usr/src/app/templates/front
 # Clé publique Stripe (test) inlinée au build (NEXT_PUBLIC_*). Vide = checkout en repli.
+ARG NEXT_PUBLIC_DEMO_PAYMENT=false
+ENV NEXT_PUBLIC_DEMO_PAYMENT=$NEXT_PUBLIC_DEMO_PAYMENT
 ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 RUN yarn build

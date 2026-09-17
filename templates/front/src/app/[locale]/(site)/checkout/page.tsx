@@ -12,11 +12,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { stripePromise } from '@/lib/stripe';
+import { api } from '@/lib/api-client';
 import { useCartContext } from '@/features/cart/context/cart-provider';
 import { useCreateOrder } from '@/features/cart/usecases/use-create-order';
 import { useCreatePayment } from '@/features/cart/usecases/use-create-payment';
 import { useGetMe } from '@/features/account/usecases/use-get-me';
 import { useListProducts } from '@/features/products/usecases/use-list-products';
+
+const demoPayment = process.env.NEXT_PUBLIC_DEMO_PAYMENT === 'true';
 
 function formatPrice(cents: number, locale: string) {
   return new Intl.NumberFormat(locale, {
@@ -153,6 +156,7 @@ export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [orderTotal, setOrderTotal] = useState(0);
+  const [demoSubmitting, setDemoSubmitting] = useState(false);
 
   const setBillingField =
     (key: keyof typeof billing) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -174,7 +178,7 @@ export default function CheckoutPage() {
 
   const createOrder = useCreateOrder();
   const createPayment = useCreatePayment();
-  const isPreparing = createOrder.isPending || createPayment.isPending;
+  const isPreparing = demoSubmitting || createOrder.isPending || createPayment.isPending;
 
   useEffect(() => {
     if (profile?.email) setEmail((prev) => prev || profile.email);
@@ -221,6 +225,7 @@ export default function CheckoutPage() {
       toast.error('Veuillez renseigner votre adresse de facturation.');
       return;
     }
+    setDemoSubmitting(true);
     try {
       const order = await createOrder.mutateAsync({
         customerEmail: email,
@@ -243,10 +248,19 @@ export default function CheckoutPage() {
         orderId: order.id,
         amountCents: order.totalCents,
       });
+      if (demoPayment) {
+        const providerRef = payment.payment.providerRef;
+        if (!providerRef?.startsWith('pi_mock_')) throw new Error('Le prestataire de démonstration est indisponible.');
+        await api.post('/payments/webhook', { providerRef, status: 'succeeded' });
+        window.location.assign(`/${locale}/checkout/success?order=${order.id}`);
+        return;
+      }
       setOrderId(order.id);
       setOrderTotal(order.totalCents);
       setClientSecret(payment.clientSecret);
+      setDemoSubmitting(false);
     } catch (err: any) {
+      setDemoSubmitting(false);
       const msg = err?.response?.data?.message;
       toast.error(
         Array.isArray(msg)
@@ -360,7 +374,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </section>
-                {!stripePromise ? (
+                {!stripePromise && !demoPayment ? (
                   <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
                     Stripe n&apos;est pas configuré (clé publique manquante).
                   </p>
@@ -372,7 +386,7 @@ export default function CheckoutPage() {
                     disabled={isPreparing}
                   >
                     {isPreparing && <Loader2 className="h-5 w-5 animate-spin" />}
-                    Continuer vers le paiement
+                    {demoPayment ? 'Simuler le paiement (aucun débit)' : 'Continuer vers le paiement'}
                   </Button>
                 )}
               </>
