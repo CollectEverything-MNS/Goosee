@@ -21,7 +21,8 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
-const { execSync, spawn } = require('child_process');
+const { execSync, execFileSync, spawn } = require('child_process');
+const vitrineConfig = require('./demo-vitrine-config');
 const bcrypt = require('bcryptjs');
 
 const HOST_ENV = { ...process.env };
@@ -104,15 +105,11 @@ const cap = (cmd, opts = {}) => {
     return '';
   }
 };
-const psql = (db, sql) => {
-  const tmp = path.join(os.tmpdir(), `goosee-pres-${rand(4)}.sql`);
-  fs.writeFileSync(tmp, sql, 'utf8');
-  try {
-    run(`docker exec -i ${PG} psql -U postgres -d ${db} -tA < "${tmp}"`, { capture: true });
-  } finally {
-    fs.rmSync(tmp, { force: true });
-  }
-};
+const psql = (db, sql) => execFileSync('docker', [
+  'exec', '-i', PG, 'psql', '-U', vitrineConfig.databaseUser(db),
+  '-d', vitrineConfig.database(db), '-v', 'ON_ERROR_STOP=1', '-tA',
+], { input: sql, encoding: 'utf8', windowsHide: true });
+
 const esc = (s) => String(s).replace(/'/g, "''");
 
 function tenantSecrets(slug) {

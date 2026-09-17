@@ -12,10 +12,8 @@
  * Mots de passe en clair (démo) : superadmin Superadmin#2026, autres Demo#2026.
  * Idempotent : ré-exécutable sans doublon.
  */
-const os = require('os');
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
+const vitrineConfig = require('./demo-vitrine-config');
 const bcrypt = require('bcryptjs');
 
 const PG = 'goosee-postgres-dev';
@@ -28,19 +26,11 @@ const log = (m) => console.log(`\x1b[36m▶ ${m}\x1b[0m`);
 const ok = (m) => console.log(`  \x1b[32m✓\x1b[0m ${m}`);
 
 function psql(db, sql, capture = false) {
-  const tmp = path.join(os.tmpdir(), `goosee-seed-${Date.now()}-${Math.random().toString(36).slice(2)}.sql`);
-  fs.writeFileSync(tmp, sql, 'utf8');
-  try {
-    const out = execSync(`docker exec -i ${PG} psql -U postgres -d ${db} -v ON_ERROR_STOP=1 -tA < "${tmp}"`, {
-      env: { ...process.env, MSYS_NO_PATHCONV: '1' },
-      stdio: capture ? 'pipe' : 'inherit',
-      shell: true,
-      encoding: 'utf8',
-    });
-    return (out || '').toString().trim();
-  } finally {
-    fs.rmSync(tmp, { force: true });
-  }
+  const output = execFileSync('docker', ['exec', '-i', PG, 'psql',
+    '-U', vitrineConfig.databaseUser(db), '-d', vitrineConfig.database(db),
+    '-v', 'ON_ERROR_STOP=1', '-tA'], { input: sql, encoding: 'utf8', windowsHide: true });
+  if (!capture && output.trim()) console.log(output.trim());
+  return output.trim();
 }
 
 // Échappe les apostrophes pour les littéraux SQL.
