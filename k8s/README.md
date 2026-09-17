@@ -3,7 +3,7 @@
 Chart Helm déployant la **pile e-commerce isolée d'un tenant** (site généré) sur un cluster
 Kubernetes local **k3d**. Alternative scalable au déploiement Docker Compose (`docker/tenant/`).
 
-> Statut : Lot 6 en cours. 6.1 (chart + workloads + bases + infra) ✅.
+> POC validé avec stock, tickets et Gemini. Pour le lancement automatique limité en ressources, suivre le [guide de démonstration](../docs/demo-infra.md).
 
 ## Prérequis
 
@@ -35,7 +35,8 @@ k3d image import -c goosee \
   goosee/api-gateway:local goosee/front:local \
   goosee/auth-service:local goosee/user-service:local goosee/page-service:local \
   goosee/log-service:local goosee/product-service:local goosee/order-service:local \
-  goosee/cart-service:local goosee/payment-service:local goosee/notifier-service:local
+  goosee/cart-service:local goosee/payment-service:local goosee/notifier-service:local \
+  goosee/stock-service:local goosee/ticket-service:local goosee/assistant-service:local
 ```
 
 ## 3. Déployer un tenant

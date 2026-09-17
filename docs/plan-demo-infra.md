@@ -36,3 +36,18 @@ Pas de chantier de durcissement production, sauvegarde automatisée ou CI compl�
 - Aucun conteneur Goosee actif au début ; conteneurs d'un autre projet à préserver.
 - Écarts initiaux : stock/ticket/assistant absents des tenants Docker et Helm ;
   Dockerfile assistant non adapté au contexte monorepo ; liste des images incomplète.
+
+## Réalisation au 17 septembre 2026
+
+- [x] 14 images alignées, builds séquentiels plafonnés à 2 CPU et 4 Go.
+- [x] Tenant Docker complet : stock, tickets, assistant, achat simulé au navigateur.
+- [x] Tenant k3s complet, serveur plafonné à 2 CPU et 5 Gio, métriques disponibles.
+- [x] Lancement rejouable, secrets conservés, bases vitrine lues dans son .env.
+- [x] Gemini validé sur les deux tenants avec la clé locale.
+- [x] Arrêt/relance et comparaison des identifiants : données conservées sans doublon.
+- [x] Guide et contrôles dans [demo-infra.md](demo-infra.md) et scripts/check-demo.js.
+
+Les fonctionnalités et correctifs ont des commits séparés. Le dépôt voisin
+Goosee-vitrine contient aussi un commit limitant les builds Next.js à un worker.
+La création en direct d'un nouveau client et les tests de charge restent hors de
+la répétition validée ; la démonstration utilise les deux boutiques préchargées.

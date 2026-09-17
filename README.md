@@ -46,7 +46,7 @@ Monte une démo complète en une commande : plateforme (Traefik + Prometheus), *
 Docker** et **N clients Kubernetes** (forfait scalable), chacun isolé, avec OWNER seedé.
 
 ```bash
-yarn presentation                       # 1 tenant Docker + 2 tenants k8s (défaut)
+yarn presentation                       # 1 tenant Docker + 1 tenant k3s (défaut)
 PRESENTATION_K8S_COUNT=3 yarn presentation
 yarn presentation:down                  # démontage
 ```
@@ -61,6 +61,11 @@ Prérequis : `docker`, `k3d`, `helm`, `kubectl` sur le PATH.
 > La supervision **superadmin** (KPI + allocation cross-tenant) vit dans le portail vitrine
 > (repo `goosee-vitrine`) ; les tenants y apparaissent quand ils sont provisionnés via son
 > orchestrateur.
+
+Le [guide de démonstration](docs/demo-infra.md) détaille les comptes, les contrôles et
+la relance. Builds séquentiels limités à 2 CPU ; serveur k3d limité à 2 CPU et 5 Gio.
+La présentation utilise des paiements simulés et Gemini configuré dans `env/.env.dev`.
+La vitrine locale est accessible sur http://localhost:3100/fr.
 
 ## Paiement Stripe (test)
 
