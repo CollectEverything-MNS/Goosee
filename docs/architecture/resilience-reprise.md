@@ -97,11 +97,25 @@ perdus. **Cette politique ne suffit pas à restaurer intégralement la plateform
 
 ### Fréquence et rétention
 
-L'intention exprimée est « 4 sauvegardes jours, 2 semaines, 1 mois ». Le rythme et
-l'articulation des durées restent à préciser avant de configurer l'expiration.
-La proposition à confirmer est quatre campagnes par jour conservées 14 jours,
-puis un point quotidien conservé jusqu'à un mois. Aucun réglage d'expiration
-chiffré ne doit être présenté comme validé tant que cette précision manque.
+Politique confirmée pour chaque site :
+
+| Ancienneté du point de sauvegarde | Points conservés |
+| --- | --- |
+| Jusqu'à 14 jours | Quatre sauvegardes par jour, espacées de six heures |
+| Au-delà de 14 jours et jusqu'à un mois | Une sauvegarde quotidienne |
+| Au-delà d'un mois | Expiration des archives |
+
+Convention d'implémentation : un mois correspond à 30 jours de rétention.
+Planifier les campagnes à 00:00, 06:00, 12:00 et 18:00 UTC. Conserver celle de
+00:00 dans une classe `daily-30d` dès sa création et les trois autres dans
+`intraday-14d`. Appliquer les expirations respectives à 30 et 14 jours depuis
+la création des objets. Les quatorze premiers jours disposent ainsi de quatre
+points quotidiens, puis d'un seul jusqu'au trentième jour, sans copie tardive
+qui repousserait artificiellement la date d'expiration.
+
+Si la campagne de 00:00 échoue, le job doit sélectionner la première campagne
+complète suivante du jour pour `daily-30d` et signaler le point manquant.
+La fréquence et la rétention sont décidées ; leur automatisation reste à implémenter.
 
 Le job réalise les exports et les envoie ; R2 conserve les objets. Les règles
 d'expiration peuvent s'appliquer par préfixe et supprimer les archives arrivées
@@ -217,8 +231,8 @@ répliqué, ni un basculement automatique opérationnel. Les points de panne com
 sont les hôtes, le stockage, l'entrée réseau et les dépendances partagées.
 
 Le RPO est la perte de données admissible, le RTO le délai de remise en service.
-Ils restent à fixer et mesurer. Si quatre campagnes également espacées par jour
-sont confirmées, l'intervalle nominal serait de six heures ; un échec de sauvegarde
+Ils restent à fixer et mesurer. Les quatre campagnes quotidiennes retenues
+ont un intervalle nominal de six heures ; un échec de sauvegarde
 ou la durée d'export augmente l'ancienneté du dernier point récupérable. Ce n'est
 pas une garantie de RPO. Les dumps décrits ne permettent pas une restauration à
 n'importe quelle seconde entre deux campagnes.
@@ -230,7 +244,7 @@ n'importe quelle seconde entre deux campagnes.
 | Reprise d'un service | Disponibilité et parcours métier rétablis, durée relevée | À tester sur l'environnement cible |
 | Redémarrage d'une base | Données témoins identiques, reconnexion applicative | À tester sur l'environnement cible |
 | Campagne R2 | Dix archives vérifiées par site, manifeste complet, échecs signalés | À implémenter |
-| Rétention | Fréquence et durées confirmées, règles vérifiées sur un bucket de test | À préciser puis implémenter |
+| Rétention | Quatre points par jour sur 14 jours, puis un point quotidien jusqu'à 30 jours, règles vérifiées sur un bucket de test | Politique confirmée, automatisation à implémenter |
 | Restauration R2 | Lot restauré en isolation et cohérence métier contrôlée | À implémenter et éprouver |
 | Perte d'un hôte | Accès au stockage ou restauration, délai et pertes mesurés | À tester sur l'environnement cible |
 
