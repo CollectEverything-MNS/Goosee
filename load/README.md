@@ -41,20 +41,39 @@ Pour les tenants de démonstration et un conteneur k6 plafonné à 0,5 CPU / 256
 voir les [commandes et résultats de validation](../docs/validation-poc-tests.md).
 
 `smoke` (défaut) valide juste que le script et la cible répondent. `load` monte
-jusqu'à 50 VUs sur ~7 min.
+jusqu'à 50 VUs sur ~7 min. `rupture` enchaîne 100 → 250 → 500 → 1 000 VUs (~6 min 20)
+pour trouver le palier où les seuils cassent ; `palier` tient un seul niveau 45 s,
+donné par `VUS`.
 
 ```bash
 # PowerShell
 $env:SCENARIO="load"; yarn load:gateway
+$env:SCENARIO="palier"; $env:VUS="500"; yarn load:gateway
 # bash
 SCENARIO=load yarn load:gateway
+SCENARIO=rupture yarn load:gateway
+SCENARIO=palier VUS=500 yarn load:gateway
 ```
+
+### Garder une preuve du run
+
+`docs/performance/rapports/` est monté dans le conteneur sur `/rapports`. Les options
+ajoutées après `yarn load:…` sont passées à k6 :
+
+```bash
+SCENARIO=palier VUS=500 yarn load:gateway --summary-export /rapports/$(date +%F)-k6-palier-500.json
+```
+
+Le JSON produit (résumé de fin de run : compteurs, percentiles, verdict des seuils) est
+à versionner avec la sortie terminal et une entrée dans le README du dossier. Résultats
+commentés : `docs/analyse-performance.md`.
 
 ### Autres réglages (variables d'environnement, toutes optionnelles)
 
 | Variable | Défaut | Rôle |
 | --- | --- | --- |
-| `SCENARIO` | `smoke` | `smoke` ou `load` |
+| `SCENARIO` | `smoke` | `poc`, `smoke`, `load`, `rupture` ou `palier` |
+| `VUS` | _(vide)_ | nombre de VUs du profil `palier` (obligatoire avec ce profil) |
 | `K6_BASE_URL` | `http://goosee-api-gateway-dev:3001` | cible ; ex. `http://host.docker.internal:3001` hors réseau `goosee_net` |
 | `K6_OWNER_EMAIL` / `K6_OWNER_PASSWORD` | `admin@goosee.dev` / `goosee` | identifiants OWNER (`parcours-navigation.js`) |
 | `K6_PROMETHEUS_RW_SERVER_URL` | _(vide)_ | active la sortie Prometheus (voir plus bas) |
@@ -81,6 +100,10 @@ Un seuil dépassé passe en `✗` et k6 **sort en code 99**. Les valeurs par scr
 | `GET /products`, `GET /products/:id` | p95 < 500 ms (lecture) · < 400 ms (navigation) |
 | `GET /health` | p95 < 200 ms |
 | `POST /cart/items` | p95 < 600 ms |
+
+Ordres de grandeur mesurés (`docs/analyse-performance.md`) : seuils tenus jusqu'à 250 VUs
+sur le parcours de lecture, rupture entre 250 et 500 VUs (plafond ~535 req/s sur la
+machine de test, back en natif).
 
 ### Optionnel : vers Prometheus (puis Grafana)
 

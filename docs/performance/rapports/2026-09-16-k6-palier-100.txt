@@ -1,0 +1,55 @@
+     execution: local
+        script: /scripts/palier.js
+        output: -
+     scenarios: (100.00%) 1 scenario, 100 max VUs, 1m15s max duration (incl. graceful stop):
+              * rupture: Up to 100 looping VUs for 1m5s over 3 stages (gracefulRampDown: 10s, gracefulStop: 30s)
+
+  █ THRESHOLDS
+
+    http_req_duration{name:GET /health}
+    ✓ 'p(95)<200' p(95)=6.15ms
+
+    http_req_duration{name:GET /products}
+    ✓ 'p(95)<500' p(95)=20.74ms
+
+    http_req_duration{name:GET /products/:id}
+    ✓ 'p(95)<500' p(95)=19.9ms
+
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 16194   246.50682/s
+    checks_succeeded...: 100.00% 16194 out of 16194
+    checks_failed......: 0.00%   0 out of 16194
+
+    ✓ health 200
+    ✓ liste 200
+    ✓ detail 200
+
+    HTTP
+    http_req_duration..............: avg=8.63ms  min=1.29ms med=8.66ms  max=122.47ms p(90)=14.49ms p(95)=18.15ms p(99)=28.15ms
+      { expected_response:true }...: avg=8.63ms  min=1.29ms med=8.66ms  max=122.47ms p(90)=14.49ms p(95)=18.15ms p(99)=28.15ms
+      { name:GET /health }.........: avg=3ms     min=1.29ms med=2.47ms  max=75.94ms  p(90)=4.47ms  p(95)=6.15ms  p(99)=11.37ms
+      { name:GET /products }.......: avg=11.64ms min=6.76ms med=10.08ms max=122.47ms p(90)=16.63ms p(95)=20.74ms p(99)=32.47ms
+      { name:GET /products/:id }...: avg=11.25ms min=6.27ms med=9.69ms  max=66.92ms  p(90)=16.28ms p(95)=19.9ms  p(99)=31.73ms
+    http_req_failed................: 0.00%  0 out of 16194
+    http_reqs......................: 16194  246.50682/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.02s   min=1.01s  med=1.02s   max=1.19s    p(90)=1.03s   p(95)=1.04s   p(99)=1.07s
+    iterations.....................: 5398   82.16894/s
+    vus............................: 11     min=6          max=100
+    vus_max........................: 100    min=100        max=100
+
+    NETWORK
+    data_received..................: 69 MB  1.0 MB/s
+    data_sent......................: 1.6 MB 25 kB/s
+
+
+
+
+running (1m05.7s), 000/100 VUs, 5398 complete and 0 interrupted iterations
+rupture ✓ [ 100% ] 000/100 VUs  1m5s

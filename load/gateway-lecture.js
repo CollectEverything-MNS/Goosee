@@ -5,7 +5,7 @@
  *   GET /health  ·  GET /products  ·  GET /products/:id
  *
  * Lancement (stack dev up) : `yarn load:gateway`
- * Profil : -e SCENARIO=smoke (défaut) | load     — voir profils.js
+ * Profil : -e SCENARIO=smoke (défaut) | load | rupture | palier (+ -e VUS=<n>) — voir profils.js
  * Cible  : -e BASE_URL=... (défaut : gateway du réseau goosee_net)
  */
 import http from 'k6/http';
@@ -21,13 +21,14 @@ export const options = {
     lecture: {
       executor: 'ramping-vus',
       startVUs: 0,
-      stages: stagesPour(SCENARIO),
+      stages: stagesPour(SCENARIO, __ENV.VUS),
       gracefulRampDown: '10s',
     },
   },
   thresholds: {
     http_req_failed: ['rate<0.01'],
     'http_req_duration{name:GET /products}': ['p(95)<500'],
+    'http_req_duration{name:GET /products/:id}': ['p(95)<500'],
     'http_req_duration{name:GET /health}': ['p(95)<200'],
   },
 };

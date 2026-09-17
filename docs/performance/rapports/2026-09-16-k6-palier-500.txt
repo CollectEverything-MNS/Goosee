@@ -1,0 +1,56 @@
+     execution: local
+        script: /scripts/palier.js
+        output: -
+     scenarios: (100.00%) 1 scenario, 500 max VUs, 1m15s max duration (incl. graceful stop):
+              * rupture: Up to 500 looping VUs for 1m5s over 3 stages (gracefulRampDown: 10s, gracefulStop: 30s)
+
+  █ THRESHOLDS
+
+    http_req_duration{name:GET /health}
+    ✗ 'p(95)<200' p(95)=407.64ms
+
+    http_req_duration{name:GET /products}
+    ✗ 'p(95)<500' p(95)=830.62ms
+
+    http_req_duration{name:GET /products/:id}
+    ✗ 'p(95)<500' p(95)=818.47ms
+
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 35298   535.409463/s
+    checks_succeeded...: 100.00% 35298 out of 35298
+    checks_failed......: 0.00%   0 out of 35298
+
+    ✓ health 200
+    ✓ liste 200
+    ✓ detail 200
+
+    HTTP
+    http_req_duration..............: avg=459.42ms min=1.29ms med=495.95ms max=1.85s    p(90)=737.86ms p(95)=798.12ms p(99)=877.31ms
+      { expected_response:true }...: avg=459.42ms min=1.29ms med=495.95ms max=1.85s    p(90)=737.86ms p(95)=798.12ms p(99)=877.31ms
+      { name:GET /health }.........: avg=268.04ms min=1.29ms med=286.15ms max=579.64ms p(90)=383.57ms p(95)=407.64ms p(99)=441ms
+      { name:GET /products }.......: avg=559.67ms min=6.98ms med=593.31ms max=1.84s    p(90)=782.34ms p(95)=830.62ms p(99)=968.66ms
+      { name:GET /products/:id }...: avg=550.55ms min=6.85ms med=587.69ms max=1.85s    p(90)=760.6ms  p(95)=818.47ms p(99)=886.57ms
+    http_req_failed................: 0.00%  0 out of 35298
+    http_reqs......................: 35298  535.409463/s
+
+    EXECUTION
+    iteration_duration.............: avg=2.37s    min=1.01s  med=2.49s    max=3.86s    p(90)=2.87s    p(95)=2.94s    p(99)=3.5s
+    iterations.....................: 11766  178.469821/s
+    vus............................: 1      min=1          max=500
+    vus_max........................: 500    min=500        max=500
+
+    NETWORK
+    data_received..................: 149 MB 2.3 MB/s
+    data_sent......................: 3.6 MB 54 kB/s
+
+
+
+
+running (1m05.9s), 000/500 VUs, 11766 complete and 0 interrupted iterations
+rupture ✓ [ 100% ] 000/500 VUs  1m5s
+time="2026-09-16T19:55:27Z" level=error msg="thresholds on metrics 'http_req_duration{name:GET /health}, http_req_duration{name:GET /products/:id}, http_req_duration{name:GET /products}' have been crossed"
