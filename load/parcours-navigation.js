@@ -14,7 +14,7 @@
  * catégorie + des produits (stock large). Chaque VU utilise sa propre clé de panier.
  *
  * Lancement (stack dev up + `yarn init:user`) : `yarn load:navigation`
- * Profil : -e SCENARIO=smoke (défaut) | load     — voir profils.js
+ * Profil : -e SCENARIO=smoke (défaut) | load | rupture | palier (+ -e VUS=<n>) — voir profils.js
  * Identifiants OWNER (setup) : -e OWNER_EMAIL / -e OWNER_PASSWORD
  */
 import http from 'k6/http';
@@ -36,7 +36,7 @@ export const options = {
     navigation: {
       executor: 'ramping-vus',
       startVUs: 0,
-      stages: stagesPour(SCENARIO),
+      stages: stagesPour(SCENARIO, __ENV.VUS),
       gracefulRampDown: '10s',
     },
   },

@@ -1,0 +1,51 @@
+     execution: local
+        script: /scripts/gateway-lecture.js
+        output: -
+     scenarios: (100.00%) 1 scenario, 50 max VUs, 7m40s max duration (incl. graceful stop):
+              * lecture: Up to 50 looping VUs for 7m30s over 5 stages (gracefulRampDown: 10s, gracefulStop: 30s)
+
+  █ THRESHOLDS
+
+    http_req_duration{name:GET /health}
+    ✓ 'p(95)<200' p(95)=5.75ms
+
+    http_req_duration{name:GET /products}
+    ✓ 'p(95)<500' p(95)=18.84ms
+
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 41589   92.244882/s
+    checks_succeeded...: 100.00% 41589 out of 41589
+    checks_failed......: 0.00%   0 out of 41589
+
+    ✓ health 200
+    ✓ liste 200
+    ✓ détail 200
+
+    HTTP
+    http_req_duration..............: avg=8.32ms  min=1.34ms med=8.54ms max=100.13ms p(90)=13.42ms p(95)=16.39ms p(99)=28.12ms
+      { expected_response:true }...: avg=8.32ms  min=1.34ms med=8.54ms max=100.13ms p(90)=13.42ms p(95)=16.39ms p(99)=28.12ms
+      { name:GET /health }.........: avg=3.07ms  min=1.34ms med=2.55ms max=69.11ms  p(90)=4.21ms  p(95)=5.75ms  p(99)=12.48ms
+      { name:GET /products }.......: avg=11.17ms min=6.41ms med=9.79ms max=100.13ms p(90)=15.21ms p(95)=18.84ms p(99)=32.52ms
+    http_req_failed................: 0.00%  0 out of 41590
+    http_reqs......................: 41590  92.2471/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.02s   min=1.01s  med=1.02s  max=1.2s     p(90)=1.03s   p(95)=1.04s   p(99)=1.07s
+    iterations.....................: 13863  30.748294/s
+    vus............................: 1      min=0          max=50
+    vus_max........................: 50     min=50         max=50
+
+    NETWORK
+    data_received..................: 176 MB 391 kB/s
+    data_sent......................: 4.2 MB 9.3 kB/s
+
+
+
+
+running (7m30.9s), 00/50 VUs, 13863 complete and 0 interrupted iterations
+lecture ✓ [ 100% ] 00/50 VUs  7m30s

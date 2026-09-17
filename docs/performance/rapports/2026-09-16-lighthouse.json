@@ -1,0 +1,478 @@
+[
+  {
+    "page": "accueil",
+    "url": "http://localhost:3000/fr",
+    "formFactor": "desktop",
+    "fetchTime": "2026-09-16T19:33:30.505Z",
+    "lighthouseVersion": "12.8.2",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 40,
+      "throughputKbps": 10240,
+      "requestLatencyMs": 0,
+      "downloadThroughputKbps": 0,
+      "uploadThroughputKbps": 0,
+      "cpuSlowdownMultiplier": 1
+    },
+    "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "benchmarkIndex": 1794.5,
+    "scores": {
+      "performance": 0.98
+    },
+    "metrics": {
+      "first-contentful-paint": {
+        "numericValue": 355.8267,
+        "numericUnit": "millisecond",
+        "displayValue": "0.4 s",
+        "score": 1
+      },
+      "largest-contentful-paint": {
+        "numericValue": 1082.9888000000003,
+        "numericUnit": "millisecond",
+        "displayValue": "1.1 s",
+        "score": 0.93
+      },
+      "total-blocking-time": {
+        "numericValue": 14.000000000000114,
+        "numericUnit": "millisecond",
+        "displayValue": "10 ms",
+        "score": 1
+      },
+      "cumulative-layout-shift": {
+        "numericValue": 0.000788217863876227,
+        "numericUnit": "unitless",
+        "displayValue": "0.001",
+        "score": 1
+      },
+      "speed-index": {
+        "numericValue": 614.9592357503058,
+        "numericUnit": "millisecond",
+        "displayValue": "0.6 s",
+        "score": 1
+      },
+      "interactive": {
+        "numericValue": 1082.9888000000003,
+        "numericUnit": "millisecond",
+        "displayValue": "1.1 s",
+        "score": 1
+      }
+    },
+    "diagnostics": {
+      "render-blocking-resources": {
+        "displayValue": "Est savings of 100 ms",
+        "score": 0
+      },
+      "unused-javascript": {
+        "displayValue": "Est savings of 23 KiB",
+        "score": 0.5
+      },
+      "server-response-time": {
+        "displayValue": "Root document took 60 ms",
+        "score": 1
+      },
+      "total-byte-weight": {
+        "displayValue": "Total size was 322 KiB",
+        "score": 1
+      }
+    },
+    "runWarnings": []
+  },
+  {
+    "page": "catalogue",
+    "url": "http://localhost:3000/fr/catalogue",
+    "formFactor": "desktop",
+    "fetchTime": "2026-09-16T19:34:07.311Z",
+    "lighthouseVersion": "12.8.2",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 40,
+      "throughputKbps": 10240,
+      "requestLatencyMs": 0,
+      "downloadThroughputKbps": 0,
+      "uploadThroughputKbps": 0,
+      "cpuSlowdownMultiplier": 1
+    },
+    "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "benchmarkIndex": 1381,
+    "scores": {
+      "performance": 0.99
+    },
+    "metrics": {
+      "first-contentful-paint": {
+        "numericValue": 261.0634,
+        "numericUnit": "millisecond",
+        "displayValue": "0.3 s",
+        "score": 1
+      },
+      "largest-contentful-paint": {
+        "numericValue": 877.9305,
+        "numericUnit": "millisecond",
+        "displayValue": "0.9 s",
+        "score": 0.97
+      },
+      "total-blocking-time": {
+        "numericValue": 0,
+        "numericUnit": "millisecond",
+        "displayValue": "0 ms",
+        "score": 1
+      },
+      "cumulative-layout-shift": {
+        "numericValue": 0.000788217863876227,
+        "numericUnit": "unitless",
+        "displayValue": "0.001",
+        "score": 1
+      },
+      "speed-index": {
+        "numericValue": 395.17933266656456,
+        "numericUnit": "millisecond",
+        "displayValue": "0.4 s",
+        "score": 1
+      },
+      "interactive": {
+        "numericValue": 877.9305000000002,
+        "numericUnit": "millisecond",
+        "displayValue": "0.9 s",
+        "score": 1
+      }
+    },
+    "diagnostics": {
+      "render-blocking-resources": {
+        "displayValue": "Est savings of 50 ms",
+        "score": 0
+      },
+      "unused-javascript": {
+        "displayValue": "Est savings of 23 KiB",
+        "score": 0.5
+      },
+      "server-response-time": {
+        "displayValue": "Root document took 30 ms",
+        "score": 1
+      },
+      "total-byte-weight": {
+        "displayValue": "Total size was 324 KiB",
+        "score": 1
+      }
+    },
+    "runWarnings": []
+  },
+  {
+    "page": "produit",
+    "url": "http://localhost:3000/fr/produits/0a5b07ea-b942-4002-a0c5-086a9858fded",
+    "formFactor": "desktop",
+    "fetchTime": "2026-09-16T19:34:26.902Z",
+    "lighthouseVersion": "12.8.2",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 40,
+      "throughputKbps": 10240,
+      "requestLatencyMs": 0,
+      "downloadThroughputKbps": 0,
+      "uploadThroughputKbps": 0,
+      "cpuSlowdownMultiplier": 1
+    },
+    "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "benchmarkIndex": 1568,
+    "scores": {
+      "performance": 0.98
+    },
+    "metrics": {
+      "first-contentful-paint": {
+        "numericValue": 264.6504,
+        "numericUnit": "millisecond",
+        "displayValue": "0.3 s",
+        "score": 1
+      },
+      "largest-contentful-paint": {
+        "numericValue": 1094.7840999999999,
+        "numericUnit": "millisecond",
+        "displayValue": "1.1 s",
+        "score": 0.92
+      },
+      "total-blocking-time": {
+        "numericValue": 0,
+        "numericUnit": "millisecond",
+        "displayValue": "0 ms",
+        "score": 1
+      },
+      "cumulative-layout-shift": {
+        "numericValue": 0.000788217863876227,
+        "numericUnit": "unitless",
+        "displayValue": "0.001",
+        "score": 1
+      },
+      "speed-index": {
+        "numericValue": 515.2669470002538,
+        "numericUnit": "millisecond",
+        "displayValue": "0.5 s",
+        "score": 1
+      },
+      "interactive": {
+        "numericValue": 1094.7840999999999,
+        "numericUnit": "millisecond",
+        "displayValue": "1.1 s",
+        "score": 1
+      }
+    },
+    "diagnostics": {
+      "render-blocking-resources": {
+        "displayValue": "Est savings of 50 ms",
+        "score": 0
+      },
+      "unused-javascript": {
+        "displayValue": "Est savings of 23 KiB",
+        "score": 0.5
+      },
+      "server-response-time": {
+        "displayValue": "Root document took 30 ms",
+        "score": 1
+      },
+      "total-byte-weight": {
+        "displayValue": "Total size was 459 KiB",
+        "score": 1
+      },
+      "third-party-summary": {
+        "displayValue": "Third-party code blocked the main thread for 0 ms",
+        "score": 1
+      }
+    },
+    "runWarnings": []
+  },
+  {
+    "page": "accueil",
+    "url": "http://localhost:3000/fr",
+    "formFactor": "mobile",
+    "fetchTime": "2026-09-16T19:35:02.151Z",
+    "lighthouseVersion": "12.8.2",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "benchmarkIndex": 1546,
+    "scores": {
+      "performance": 0.81
+    },
+    "metrics": {
+      "first-contentful-paint": {
+        "numericValue": 920.4901,
+        "numericUnit": "millisecond",
+        "displayValue": "0.9 s",
+        "score": 1
+      },
+      "largest-contentful-paint": {
+        "numericValue": 3761.7972999999997,
+        "numericUnit": "millisecond",
+        "displayValue": "3.8 s",
+        "score": 0.56
+      },
+      "total-blocking-time": {
+        "numericValue": 340,
+        "numericUnit": "millisecond",
+        "displayValue": "340 ms",
+        "score": 0.74
+      },
+      "cumulative-layout-shift": {
+        "numericValue": 0,
+        "numericUnit": "unitless",
+        "displayValue": "0",
+        "score": 1
+      },
+      "speed-index": {
+        "numericValue": 1126.8774320005598,
+        "numericUnit": "millisecond",
+        "displayValue": "1.1 s",
+        "score": 1
+      },
+      "interactive": {
+        "numericValue": 3761.7973,
+        "numericUnit": "millisecond",
+        "displayValue": "3.8 s",
+        "score": 0.9
+      }
+    },
+    "diagnostics": {
+      "render-blocking-resources": {
+        "displayValue": "Est savings of 150 ms",
+        "score": 0
+      },
+      "unused-javascript": {
+        "displayValue": "Est savings of 23 KiB",
+        "score": 0.5
+      },
+      "server-response-time": {
+        "displayValue": "Root document took 30 ms",
+        "score": 1
+      },
+      "total-byte-weight": {
+        "displayValue": "Total size was 320 KiB",
+        "score": 1
+      }
+    },
+    "runWarnings": []
+  },
+  {
+    "page": "catalogue",
+    "url": "http://localhost:3000/fr/catalogue",
+    "formFactor": "mobile",
+    "fetchTime": "2026-09-16T19:35:21.447Z",
+    "lighthouseVersion": "12.8.2",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "benchmarkIndex": 1498.5,
+    "scores": {
+      "performance": 0.77
+    },
+    "metrics": {
+      "first-contentful-paint": {
+        "numericValue": 921.7139999999999,
+        "numericUnit": "millisecond",
+        "displayValue": "0.9 s",
+        "score": 1
+      },
+      "largest-contentful-paint": {
+        "numericValue": 4131.8135,
+        "numericUnit": "millisecond",
+        "displayValue": "4.1 s",
+        "score": 0.46
+      },
+      "total-blocking-time": {
+        "numericValue": 388,
+        "numericUnit": "millisecond",
+        "displayValue": "390 ms",
+        "score": 0.69
+      },
+      "cumulative-layout-shift": {
+        "numericValue": 0,
+        "numericUnit": "unitless",
+        "displayValue": "0",
+        "score": 1
+      },
+      "speed-index": {
+        "numericValue": 1068.8806200005956,
+        "numericUnit": "millisecond",
+        "displayValue": "1.1 s",
+        "score": 1
+      },
+      "interactive": {
+        "numericValue": 4131.8135,
+        "numericUnit": "millisecond",
+        "displayValue": "4.1 s",
+        "score": 0.86
+      }
+    },
+    "diagnostics": {
+      "render-blocking-resources": {
+        "displayValue": "Est savings of 80 ms",
+        "score": 0
+      },
+      "unused-javascript": {
+        "displayValue": "Est savings of 23 KiB",
+        "score": 0
+      },
+      "server-response-time": {
+        "displayValue": "Root document took 40 ms",
+        "score": 1
+      },
+      "total-byte-weight": {
+        "displayValue": "Total size was 322 KiB",
+        "score": 1
+      }
+    },
+    "runWarnings": []
+  },
+  {
+    "page": "produit",
+    "url": "http://localhost:3000/fr/produits/0a5b07ea-b942-4002-a0c5-086a9858fded",
+    "formFactor": "mobile",
+    "fetchTime": "2026-09-16T19:35:41.214Z",
+    "lighthouseVersion": "12.8.2",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "benchmarkIndex": 1306.5,
+    "scores": {
+      "performance": 0.76
+    },
+    "metrics": {
+      "first-contentful-paint": {
+        "numericValue": 925.3215,
+        "numericUnit": "millisecond",
+        "displayValue": "0.9 s",
+        "score": 1
+      },
+      "largest-contentful-paint": {
+        "numericValue": 3920.7955,
+        "numericUnit": "millisecond",
+        "displayValue": "3.9 s",
+        "score": 0.52
+      },
+      "total-blocking-time": {
+        "numericValue": 490,
+        "numericUnit": "millisecond",
+        "displayValue": "490 ms",
+        "score": 0.59
+      },
+      "cumulative-layout-shift": {
+        "numericValue": 0,
+        "numericUnit": "unitless",
+        "displayValue": "0",
+        "score": 1
+      },
+      "speed-index": {
+        "numericValue": 1291.050280000158,
+        "numericUnit": "millisecond",
+        "displayValue": "1.3 s",
+        "score": 1
+      },
+      "interactive": {
+        "numericValue": 3920.7955,
+        "numericUnit": "millisecond",
+        "displayValue": "3.9 s",
+        "score": 0.88
+      }
+    },
+    "diagnostics": {
+      "render-blocking-resources": {
+        "displayValue": "Est savings of 60 ms",
+        "score": 0
+      },
+      "unused-javascript": {
+        "displayValue": "Est savings of 23 KiB",
+        "score": 0
+      },
+      "server-response-time": {
+        "displayValue": "Root document took 40 ms",
+        "score": 1
+      },
+      "total-byte-weight": {
+        "displayValue": "Total size was 454 KiB",
+        "score": 1
+      },
+      "third-party-summary": {
+        "displayValue": "Third-party code blocked the main thread for 0 ms",
+        "score": 1
+      }
+    },
+    "runWarnings": []
+  }
+]
