@@ -32,6 +32,11 @@ metadata:
     app.kubernetes.io/name: {{ .name }}
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .name }}
@@ -90,6 +95,11 @@ metadata:
     app.kubernetes.io/name: {{ .Values.notifier.name }}
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .Values.notifier.name }}
@@ -138,6 +148,11 @@ metadata:
     app.kubernetes.io/name: {{ .Values.front.name }}
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .Values.front.name }}
