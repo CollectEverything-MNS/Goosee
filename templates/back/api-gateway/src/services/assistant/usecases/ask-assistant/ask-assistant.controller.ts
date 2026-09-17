@@ -33,6 +33,7 @@ export class AskAssistantController {
   })
   async ask(@Body() dto: AskAssistantDto) {
     const url = routesConfig.assistant.ask.link(this.services.assistant);
-    return this.httpProxy.post(url, dto, 'Ask assistant failed');
+    // Gemini dispose de 30 s côté service ; le proxy doit attendre sa réponse.
+    return this.httpProxy.postWithConfig(url, dto, { timeout: 35_000 }, 'Ask assistant failed');
   }
 }
