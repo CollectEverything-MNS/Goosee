@@ -25,13 +25,11 @@ describe('GeminiClient', () => {
   });
 
   it("appelle l'API Gemini avec le prompt systeme et les roles convertis", async () => {
-    const fetchFn = jest
-      .fn()
-      .mockResolvedValue(
-        jsonResponse(200, {
-          candidates: [{ content: { parts: [{ text: 'Bonjour ' }, { text: '!' }] } }],
-        })
-      );
+    const fetchFn = jest.fn().mockResolvedValue(
+      jsonResponse(200, {
+        candidates: [{ content: { parts: [{ text: 'Bonjour ' }, { text: '!' }] } }],
+      })
+    );
     const client = new TestableGeminiClient(
       configWith({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'gemini-test' }),
       fetchFn
@@ -49,6 +47,70 @@ describe('GeminiClient', () => {
     const body = JSON.parse(init.body);
     expect(body.system_instruction.parts[0].text).toBe('SYS');
     expect(body.contents.map((c: { role: string }) => c.role)).toEqual(['user', 'model']);
+  });
+
+  it('bascule sur le modele de repli quand le principal repond 503', async () => {
+    const fetchFn = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(503, { error: { message: 'high demand' } }))
+      .mockResolvedValueOnce(
+        jsonResponse(200, { candidates: [{ content: { parts: [{ text: 'Repli OK' }] } }] })
+      );
+    const client = new TestableGeminiClient(
+      configWith({
+        GEMINI_API_KEY: 'k',
+        GEMINI_MODEL: 'gemini-principal',
+        GEMINI_FALLBACK_MODELS: 'gemini-repli-1, gemini-repli-2',
+      }),
+      fetchFn
+    );
+
+    const answer = await client.generate('SYS', [{ role: 'user', content: 'Salut' }]);
+
+    expect(answer).toBe('Repli OK');
+    expect(client.models).toEqual(['gemini-principal', 'gemini-repli-1', 'gemini-repli-2']);
+    expect(fetchFn).toHaveBeenCalledTimes(2);
+    expect(fetchFn.mock.calls[0][0]).toContain('/models/gemini-principal:');
+    expect(fetchFn.mock.calls[1][0]).toContain('/models/gemini-repli-1:');
+  });
+
+  it('bascule aussi sur 429 et sur erreur reseau, puis renvoie la derniere erreur', async () => {
+    const fetchFn = jest
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(429, {}))
+      .mockRejectedValueOnce(new Error('ECONNRESET'))
+      .mockResolvedValueOnce(jsonResponse(429, {}));
+    const client = new TestableGeminiClient(
+      configWith({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'a', GEMINI_FALLBACK_MODELS: 'b,c' }),
+      fetchFn
+    );
+
+    await expect(client.generate('SYS', [])).rejects.toMatchObject({
+      status: HttpStatus.TOO_MANY_REQUESTS,
+    });
+    expect(fetchFn).toHaveBeenCalledTimes(3);
+  });
+
+  it('ne bascule pas sur une erreur 4xx metier', async () => {
+    const fetchFn = jest.fn().mockResolvedValue(jsonResponse(400, { error: { message: 'bad' } }));
+    const client = new TestableGeminiClient(
+      configWith({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'a', GEMINI_FALLBACK_MODELS: 'b' }),
+      fetchFn
+    );
+
+    await expect(client.generate('SYS', [])).rejects.toMatchObject({
+      status: HttpStatus.BAD_GATEWAY,
+    });
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+
+  it('utilise les modeles de repli par defaut si GEMINI_FALLBACK_MODELS est absent', () => {
+    const client = new TestableGeminiClient(configWith({ GEMINI_API_KEY: 'k' }), jest.fn());
+    expect(client.models).toEqual([
+      'gemini-3.6-flash',
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+    ]);
   });
 
   it('utilise le modele par defaut si GEMINI_MODEL est absent', () => {

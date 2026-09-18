@@ -14,3 +14,9 @@
 env/.env*
 .claude/
 CLAUDE.md
+
+# Fichiers .env locaux des templates : jamais dans les images (NEXT_PUBLIC_API_URL y figerait
+# une URL de dev, alors que le front doit dériver l'API de son hôte au runtime).
+templates/**/.env
+templates/**/.env.*
+!templates/**/.env.example

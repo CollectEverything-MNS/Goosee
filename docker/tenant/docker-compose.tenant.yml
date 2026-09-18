@@ -561,6 +561,8 @@ services:
       ASSISTANT_SERVICE_PORT: 3012
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      # Modeles essayes dans l'ordre si le principal est sature (503/429) ou en erreur.
+      GEMINI_FALLBACK_MODELS: ${GEMINI_FALLBACK_MODELS:-gemini-2.5-flash,gemini-2.5-flash-lite}
     networks:
       - tenant_net
     cpus: '0.50'
