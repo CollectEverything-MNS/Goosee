@@ -237,6 +237,95 @@ ou la durée d'export augmente l'ancienneté du dernier point récupérable. Ce 
 pas une garantie de RPO. Les dumps décrits ne permettent pas une restauration à
 n'importe quelle seconde entre deux campagnes.
 
+## Continuité et reprise : PCA, PRA, RTO et RPO
+
+Le plan de continuité d'activité (PCA) décrit comment le service tient malgré un
+incident. Le plan de reprise d'activité (PRA) décrit comment on repart après un
+sinistre qui a arrêté le service. Le RPO (objectif de point de reprise) est la perte
+de données admissible, mesurée en temps. Le RTO (objectif de temps de reprise) est
+le délai maximal de remise en service. Les valeurs ci-dessous sont des cibles de
+production, conditionnées par la mise en place du job de sauvegarde décrit plus haut.
+
+Deux situations se distinguent, selon que le stockage est intact ou perdu.
+
+```mermaid
+flowchart TB
+  INC["Incident détecté par la supervision"]
+  Q{"Le stockage des données est-il intact ?"}
+  INC --> Q
+
+  Q -->|"Oui"| PCA["PCA, continuité"]
+  PCA --> P1["Redémarrage automatique du service en échec"]
+  P1 --> P2["L'autoscaler maintient les répliques"]
+  P2 --> P3["Le bus rejoue les messages en attente"]
+  P3 --> POK["Service rétabli en quelques minutes<br/>RTO quelques minutes, RPO nul"]
+
+  Q -->|"Non, noeud ou disque perdu"| PRA["PRA, reprise"]
+  PRA --> R1["Provisionner un nouvel environnement"]
+  R1 --> R2["Restaurer les bases depuis la dernière sauvegarde"]
+  R2 --> R3["Vérifier les données puis remettre en service"]
+  R3 --> ROK["Service rétabli en quelques heures<br/>RTO quelques heures, RPO six heures"]
+
+  BK["Sauvegardes automatiques toutes les six heures"] --> R2S[("Cloudflare R2, bucket privé externe")]
+  R2S -.->|"source de restauration"| R2
+```
+
+| Objectif | Cible | Sur quoi il repose |
+| --- | --- | --- |
+| RTO service ou base, stockage intact | Quelques minutes | Reprise automatique et redémarrage orchestré |
+| RTO perte d'un noeud ou du disque | Quelques heures | Restauration depuis la dernière sauvegarde externe |
+| RPO | Six heures | Quatre sauvegardes par jour espacées de six heures |
+
+Limite assumée. Les images du catalogue ne sont pas encore sauvegardées, une
+restauration peut donc pointer vers des fichiers manquants. Ces objectifs sont des
+cibles, non une garantie tant que le job de sauvegarde et la restauration ne sont
+pas implémentés et éprouvés.
+
+## Architecture cible en haute disponibilité (trois zones)
+
+Le déploiement actuel tient sur un seul site, un cluster local à un noeud. La perte
+de ce site, incendie, coupure réseau ou panne électrique, arrête toutes les boutiques
+en même temps. C'est le point unique de défaillance le plus lourd, et la présence de
+Kubernetes ne suffit pas à le lever.
+
+La cible de production répartit la charge sur trois zones géographiques distinctes,
+séparées d'au moins cent kilomètres. Une zone est un centre de données autonome, avec
+sa propre alimentation et son propre réseau. La distance évite qu'un même sinistre
+régional touche deux zones à la fois. Les bases sont répliquées entre les zones, un
+répartiteur de charge dirige le trafic vers les zones actives, et si une zone tombe,
+les deux autres prennent le relais. Le cluster s'étend sur les trois zones, et ses
+règles de placement évitent de concentrer toutes les répliques d'un service au même
+endroit.
+
+```mermaid
+graph TB
+  U["Clients"] --> LB["Répartiteur de charge<br/>bascule sur les zones actives"]
+  LB --> A1
+  LB --> B1
+  LB --> C1
+  subgraph Z1["Zone A"]
+    A1["Cluster Kubernetes"] --> A2[("Bases")]
+  end
+  subgraph Z2["Zone B, à 100 km"]
+    B1["Cluster Kubernetes"] --> B2[("Bases")]
+  end
+  subgraph Z3["Zone C, à 100 km"]
+    C1["Cluster Kubernetes"] --> C2[("Bases")]
+  end
+  A2 <-->|"réplication"| B2
+  B2 <-->|"réplication"| C2
+  A2 <-->|"réplication"| C2
+
+  classDef appli fill:#4a6fa5,stroke:#2f4870,color:#ffffff
+  classDef infra fill:#f0f0f0,stroke:#999,color:#333
+  class A1,B1,C1,LB appli
+  class A2,B2,C2,U infra
+```
+
+Cette topologie survit à la perte complète d'une zone et rend atteignables les
+objectifs RTO et RPO ci-dessus. Elle reste une cible, le contexte scolaire ne
+disposant que d'un cluster local à un noeud.
+
 ## Validation attendue avant exploitation
 
 | Scénario | Critère | État |
