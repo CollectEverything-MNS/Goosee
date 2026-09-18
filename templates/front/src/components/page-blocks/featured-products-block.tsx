@@ -3,10 +3,11 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
-import { Package, ShoppingCart } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { QuickAddButton } from '@/features/cart/components/quick-add-button';
 import { useSiteTemplate } from '@/hooks/use-site-template';
 import { useListProducts } from '@/features/products/usecases/use-list-products';
 import { useListStocks } from '@/features/stock/usecases/use-list-stocks';
@@ -17,6 +18,7 @@ interface Product {
   id?: string;
   name: string;
   price: string;
+  priceCents?: number;
   image?: string;
   link?: string;
   soldOut?: boolean;
@@ -119,6 +121,7 @@ function useFeaturedItems(productsJson: unknown, filters: FeaturedFilters): Prod
         id: p.id,
         name: p.name,
         price: formatPrice(Number(p.price)),
+        priceCents: Math.round(Number(p.price) * 100),
         image: mainImageUrl(p.images),
         link: `/${locale}/produits/${p.id}`,
         soldOut: !p.isAvailable || (availableByProductId.get(p.id) ?? 0) <= 0,
@@ -229,11 +232,16 @@ function DefaultLayout({
                 <h3 className="font-medium text-sm line-clamp-2">{product.name}</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-base font-bold text-primary">{product.price}</span>
-                  <Button asChild size="sm" variant="outline" className="block-button h-8 gap-1.5 text-xs">
-                    <span>
-                      <ShoppingCart className="h-3.5 w-3.5" /> Voir
-                    </span>
-                  </Button>
+                  <QuickAddButton
+                    productId={product.id}
+                    name={product.name}
+                    unitPriceCents={product.priceCents}
+                    disabled={product.soldOut}
+                    label="Ajouter"
+                    size="sm"
+                    variant="outline"
+                    className="h-8 text-xs"
+                  />
                 </div>
               </div>
             </CardWrap>
@@ -308,11 +316,14 @@ function DriveLayout({
                 <h3 className="line-clamp-2 text-xs font-medium text-foreground">{product.name}</h3>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-lg font-extrabold text-primary">{product.price}</span>
-                  <Button asChild size="sm" className="block-button h-8 w-8 shrink-0 rounded-full p-0">
-                    <span aria-label="Voir">
-                      <ShoppingCart className="h-3.5 w-3.5" />
-                    </span>
-                  </Button>
+                  <QuickAddButton
+                    productId={product.id}
+                    name={product.name}
+                    unitPriceCents={product.priceCents}
+                    disabled={product.soldOut}
+                    size="icon"
+                    className="h-8 w-8 shrink-0 rounded-full p-0"
+                  />
                 </div>
               </div>
             </CardWrap>

@@ -58,13 +58,17 @@ function OrderSummary({
           const image = imageOf(item.productId);
           return (
             <li key={item.productId} className="flex items-center gap-3">
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-gray-50">
-                {image ? (
-                  <img src={image} alt={item.name} className="h-full w-full object-cover" />
-                ) : (
-                  <Package className="absolute inset-0 m-auto h-6 w-6 text-gray-300" />
-                )}
-                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+              <div className="relative h-14 w-14 shrink-0">
+                <div className="h-full w-full overflow-hidden rounded-lg border bg-gray-50">
+                  {image ? (
+                    <img src={image} alt={item.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <Package className="h-6 w-6 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+                <span className="absolute -right-1.5 -top-1.5 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow-sm ring-2 ring-background">
                   {item.quantity}
                 </span>
               </div>

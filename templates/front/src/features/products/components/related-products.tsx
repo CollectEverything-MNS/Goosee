@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { Package } from 'lucide-react';
 
+import { QuickAddButton } from '@/features/cart/components/quick-add-button';
 import { useListProducts } from '../usecases/use-list-products';
 
 interface RelatedProductsProps {
@@ -72,6 +73,14 @@ export function RelatedProducts({ currentId, categoryIds, limit = 4 }: RelatedPr
                     <Package className="h-10 w-10 text-gray-200" />
                   </div>
                 )}
+                <QuickAddButton
+                  productId={product.id}
+                  name={product.name}
+                  unitPriceCents={Math.round(Number(product.price) * 100)}
+                  disabled={!product.isAvailable || Number(product.stock) <= 0}
+                  size="icon"
+                  className="absolute bottom-2 right-2 h-9 w-9 rounded-full p-0 opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100"
+                />
               </div>
               <div className="space-y-1 p-3">
                 <h3 className="line-clamp-1 text-sm font-medium">{product.name}</h3>

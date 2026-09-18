@@ -33,7 +33,7 @@ function CheckoutSuccess() {
       </p>
       {orderId && (
         <p className="rounded-md bg-muted px-4 py-2 font-mono text-sm">
-          N° de commande : {orderId}
+          N° de commande : CMD-{orderId.slice(0, 8).toUpperCase()}
         </p>
       )}
       <Button asChild className="mt-2">

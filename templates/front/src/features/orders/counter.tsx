@@ -7,8 +7,15 @@ import { toast } from 'sonner';
 import { AdminTitle } from '@/components/layout/admin/components/admin-title';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-import { Order } from './data/order.types';
+import { ORDER_STATUSES, Order, OrderStatus } from './data/order.types';
 import { useListOrders } from './usecases/use-list-orders';
 import { useUpdateOrderStatus } from './usecases/use-update-order-status';
 
@@ -33,6 +40,7 @@ function formatTime(value: string, locale: string) {
 
 function CounterCard({ order }: { order: Order }) {
   const t = useTranslations('admin.orders.counter');
+  const tStatus = useTranslations('admin.orders.statusValues');
   const locale = useLocale();
   const updateStatus = useUpdateOrderStatus();
   const isPending = updateStatus.isPending && updateStatus.variables?.id === order.id;
@@ -45,6 +53,17 @@ function CounterCard({ order }: { order: Order }) {
       { id: order.id, status: 'shipped' },
       {
         onSuccess: () => toast.success(t('delivered')),
+        onError: () => toast.error(t('error')),
+      }
+    );
+  };
+
+  const handleStatusChange = (status: OrderStatus) => {
+    if (status === order.status) return;
+    updateStatus.mutate(
+      { id: order.id, status },
+      {
+        onSuccess: () => toast.success(t('statusUpdated')),
         onError: () => toast.error(t('error')),
       }
     );
@@ -90,6 +109,26 @@ function CounterCard({ order }: { order: Order }) {
           <span className="text-lg font-bold">{formatPrice(order.total, locale)}</span>
         </div>
 
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-muted-foreground">{t('statusLabel')}</label>
+          <Select
+            value={order.status}
+            onValueChange={(v) => handleStatusChange(v as OrderStatus)}
+            disabled={isPending}
+          >
+            <SelectTrigger className="h-10 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ORDER_STATUSES.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {tStatus(status)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <Button size="lg" className="w-full gap-2" onClick={handleDeliver} disabled={isPending}>
           {isPending ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -106,8 +145,10 @@ function CounterCard({ order }: { order: Order }) {
 export function Counter() {
   const t = useTranslations('admin.orders.counter');
   const { data: orders = [], isLoading } = useListOrders();
-  // Commandes à remettre au client : payées ou préparées (pas encore livrées/annulées).
-  const toHandOver = orders.filter((o) => o.status === 'paid' || o.status === 'prepared');
+  // Commandes actives à remettre au client : tout sauf déjà livrées ou annulées.
+  // (Changer le statut entre en attente/payée/préparée garde la carte visible ;
+  // seul « livré » ou « annulée » la fait sortir de la caisse.)
+  const toHandOver = orders.filter((o) => o.status !== 'shipped' && o.status !== 'cancelled');
 
   return (
     <div className="space-y-6">
