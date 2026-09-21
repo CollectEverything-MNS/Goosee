@@ -25,6 +25,10 @@ class SsoDto {
 export class SsoController {
   private readonly services: ServiceUrls;
 
+  // Jetons SSO déjà consommés, indexés par signature avec leur date d'expiration.
+  // Garantit l'usage unique : un jeton rejoué dans sa fenêtre de deux minutes est refusé.
+  private readonly consumed = new Map<string, number>();
+
   constructor(
     private readonly http: HttpService,
     private readonly config: ConfigService
@@ -71,6 +75,18 @@ export class SsoController {
     if (!data.email || !data.exp || Date.now() > data.exp) {
       throw new UnauthorizedException('Jeton SSO expiré');
     }
+
+    // Usage unique : on refuse un jeton déjà présenté, puis on le mémorise jusqu'à son
+    // expiration. On purge au passage les signatures dont la fenêtre est écoulée.
+    const now = Date.now();
+    for (const [seen, exp] of this.consumed) {
+      if (exp <= now) this.consumed.delete(seen);
+    }
+    if (this.consumed.has(sig)) {
+      throw new UnauthorizedException('Jeton SSO déjà utilisé');
+    }
+    this.consumed.set(sig, data.exp);
+
     return data.email;
   }
 }
