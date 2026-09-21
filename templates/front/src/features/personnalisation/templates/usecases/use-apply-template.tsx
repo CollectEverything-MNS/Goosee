@@ -2,6 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { TemplateDefinition } from '../data/drive-template';
 
+// Pages conservées quel que soit le template appliqué (obligations légales).
+const PROTECTED_SLUGS = ['mentions-legales', 'politique-de-confidentialite'];
+
 async function applyTemplate(template: TemplateDefinition) {
   try {
     const currentSettings = await api.get<{
@@ -54,6 +57,8 @@ async function applyTemplate(template: TemplateDefinition) {
   }
 
   for (const leftover of Object.values(existingBySlug)) {
+    // On ne supprime jamais les pages légales : elles restent hors du template.
+    if (PROTECTED_SLUGS.includes(leftover.slug)) continue;
     await api.delete(`/pages/${leftover.id}`);
   }
 
