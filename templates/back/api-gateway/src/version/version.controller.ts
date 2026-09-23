@@ -58,6 +58,21 @@ export class VersionController {
     return 'none';
   }
 
+  // Contenu de la mise à jour : liste des changements depuis la version actuelle du site.
+  private async changes(current: string): Promise<string[]> {
+    if (!this.orchestrator) return [];
+    try {
+      const res = await fetch(
+        `${this.orchestrator}/platform/changelog?from=${encodeURIComponent(current)}`,
+      );
+      if (!res.ok) return [];
+      const data = (await res.json()) as { changes?: string[] };
+      return Array.isArray(data?.changes) ? data.changes : [];
+    } catch {
+      return [];
+    }
+  }
+
   // Public : état de version du site, consommé par la bannière et l'affichage des settings.
   @Get()
   async info() {
@@ -69,6 +84,7 @@ export class VersionController {
       latest,
       updateType: type,
       updateAvailable: type !== 'none',
+      changes: type !== 'none' ? await this.changes(current) : [],
     };
   }
 
