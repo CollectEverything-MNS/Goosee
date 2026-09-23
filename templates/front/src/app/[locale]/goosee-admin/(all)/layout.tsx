@@ -9,7 +9,6 @@ import { getPageKeyFromPathname } from '@/config/page-keys.config';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { AssistantWidget } from '@/features/assistant/components/assistant-widget';
-import { UpdateBanner } from '@/features/version/update-banner';
 
 export default function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated, canAccess } = useAuth();
@@ -53,7 +52,6 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
 
   return (
     <AdminThemeProvider>
-      {canAccess('settings') && <UpdateBanner />}
       {children}
       <AssistantWidget />
     </AdminThemeProvider>

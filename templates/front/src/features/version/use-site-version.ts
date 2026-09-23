@@ -8,6 +8,7 @@ export interface SiteVersion {
   latest: string;
   updateType: 'none' | 'patch' | 'minor' | 'major';
   updateAvailable: boolean;
+  changes?: string[];
 }
 
 // Version du site (fournie par la gateway) : version déployée vs dernière disponible.

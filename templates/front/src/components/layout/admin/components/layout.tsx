@@ -4,6 +4,8 @@ import React from 'react';
 
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
+import { UpdateBanner } from '@/features/version/update-banner';
+
 import { AdminProfileDropdown } from './admin-profile-dropdown';
 import { AdminSearchbar } from './admin-searchbar';
 import { AdminSidebar } from './admin-sidebar';
@@ -32,6 +34,7 @@ export default function AdminLayout({ children }: Props) {
             <AdminProfileDropdown />
           </div>
         </header>
+        <UpdateBanner />
         <main id="contenu-principal-admin" tabIndex={-1} className="flex-1 px-6 py-8">
           {children}
         </main>
