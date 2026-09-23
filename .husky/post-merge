@@ -1,1 +1,2 @@
-bash scripts/rebuild-changed.sh
+nohup bash scripts/rebuild-changed.sh > .git/rebuild.log 2>&1 &
+echo "[goosee] rebuild des images changées lancé en arrière-plan (log: .git/rebuild.log)"
