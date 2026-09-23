@@ -2,7 +2,7 @@
 # Gemini facultatif : --profile assistant et GEMINI_API_KEY.
 services:
   front:
-    image: goosee/front:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/front:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -13,7 +13,7 @@ services:
           - ${TENANT_SLUG}-front
     cpus: '0.50'
   gateway:
-    image: goosee/api-gateway:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/api-gateway:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -77,7 +77,7 @@ services:
       retries: 12
       start_period: 30s
   auth:
-    image: goosee/auth-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/auth-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -112,7 +112,7 @@ services:
       retries: 12
       start_period: 30s
   user:
-    image: goosee/user-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/user-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -141,7 +141,7 @@ services:
       retries: 12
       start_period: 30s
   page:
-    image: goosee/page-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/page-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -177,7 +177,7 @@ services:
       retries: 12
       start_period: 30s
   log:
-    image: goosee/log-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/log-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -206,7 +206,7 @@ services:
       retries: 12
       start_period: 30s
   product:
-    image: goosee/product-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/product-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -243,7 +243,7 @@ services:
       retries: 12
       start_period: 30s
   order:
-    image: goosee/order-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/order-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -277,7 +277,7 @@ services:
       retries: 12
       start_period: 30s
   cart:
-    image: goosee/cart-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/cart-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -304,7 +304,7 @@ services:
       retries: 12
       start_period: 30s
   payment:
-    image: goosee/payment-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/payment-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -334,7 +334,7 @@ services:
       retries: 12
       start_period: 30s
   notifier:
-    image: goosee/notifier-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/notifier-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -474,7 +474,7 @@ services:
       - tenant_net
     cpus: '0.50'
   stock:
-    image: goosee/stock-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/stock-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -515,7 +515,7 @@ services:
       - tenant_net
     cpus: '0.50'
   ticket:
-    image: goosee/ticket-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/ticket-service:${IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -556,7 +556,7 @@ services:
       - tenant_net
     cpus: '0.50'
   assistant:
-    image: goosee/assistant-service:${IMAGE_TAG:-local}
+    image: ${IMAGE_PREFIX:-goosee}/assistant-service:${IMAGE_TAG:-local}
     profiles:
       - assistant
     restart: unless-stopped

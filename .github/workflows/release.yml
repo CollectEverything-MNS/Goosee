@@ -105,8 +105,10 @@ jobs:
 
       - id: img
         name: Nom d'image (minuscules)
+        # Chemin aligné sur le compose tenant : ${IMAGE_PREFIX}/<service>. En prod on posera
+        # IMAGE_PREFIX=ghcr.io/<owner>/goosee, donc l'image pull est <prefix>/<service>:<version>.
         run: |
-          REPO="$(echo "${{ env.REGISTRY }}/${{ github.repository_owner }}/goosee-${{ matrix.name }}" | tr '[:upper:]' '[:lower:]')"
+          REPO="$(echo "${{ env.REGISTRY }}/${{ github.repository_owner }}/goosee/${{ matrix.name }}" | tr '[:upper:]' '[:lower:]')"
           echo "repo=$REPO" >> "$GITHUB_OUTPUT"
 
       - name: Build & push
@@ -138,7 +140,8 @@ jobs:
             echo "### Release $VERSION publiée ✅"
             echo ""
             echo "- Tag \`v$VERSION\` créé sur \`main\`."
-            echo "- Images poussées sur \`${{ env.REGISTRY }}/${{ github.repository_owner }}/goosee-*:$VERSION\` (+ \`:latest\`)."
+            echo "- Images poussées sur \`${{ env.REGISTRY }}/${{ github.repository_owner }}/goosee/*:$VERSION\` (+ \`:latest\`)."
+            echo "- En prod : \`IMAGE_PREFIX=${{ env.REGISTRY }}/${{ github.repository_owner }}/goosee\`."
             echo ""
             echo "**Déploiement** : sur l'orchestrateur, régler \`PLATFORM_VERSION=$VERSION\` et \`IMAGE_TAG=$VERSION\`,"
             echo "puis lancer la montée de version des sites (supervision, bannière client ou cron patch-auto)."
