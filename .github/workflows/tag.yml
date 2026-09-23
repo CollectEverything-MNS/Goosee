@@ -1,0 +1,36 @@
+name: Tag auto
+
+# Sur push vers `main`, crée automatiquement le tag semver suivant à partir des messages de
+# commit (Conventional Commits, déjà en place via commitlint) :
+#   fix: ...   -> patch (1.0.0 -> 1.0.1)
+#   feat: ...  -> mineure (1.0.0 -> 1.1.0)
+#   feat!: / BREAKING CHANGE -> majeure
+# Ne build RIEN : le job ne fait que poser le tag (quelques secondes). Les images restent
+# construites en local ; l'orchestrateur lit ce tag comme « dernière version disponible ».
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write # créer et pousser le tag
+
+concurrency:
+  group: tag-main
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # historique complet pour lire les commits depuis le dernier tag
+
+      - name: Créer le tag semver depuis les commits
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Si aucun type conventionnel n'est détecté, on incrémente le patch par défaut.
+          default_bump: patch
+          tag_prefix: v
